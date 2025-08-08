@@ -1,0 +1,594 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+/* Reset and base styles */
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #000;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'VT323', monospace;
+}
+
+/* Canvas styles */
+canvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  object-fit: contain;
+  width: 100%;
+  height: auto;
+  max-width: 100vw;
+  max-height: 100vh;
+}
+
+/* Animations */
+@keyframes mailboxPulse {
+  0%, 100% { 
+    transform: translateX(-50%) scale(1); 
+  }
+  50% { 
+    transform: translateX(-50%) scale(1.1); 
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    transform: scale(1); 
+  }
+  50% { 
+    transform: scale(1.1); 
+  }
+}
+
+/* Game prompt styles */
+#prompt {
+  position: fixed;
+  transform: translateX(-50%);
+  background: #fff2d4;
+  color: #8b6914;
+  font-family: monospace;
+  font-size: 14px;
+  padding: 6px 12px;
+  border: 2px solid #8b6914;
+  border-style: outset;
+  display: none;
+  z-index: 10;
+  animation: mailboxPulse 1.2s infinite ease-in-out;
+  pointer-events: none;
+}
+
+/* Talk prompt styles */
+#talkPrompt {
+  position: fixed;
+  transform: translateX(-50%);
+  background: #2c5530;
+  color: #ffffff;
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  padding: 8px 16px;
+  border: 3px solid #ffffff;
+  border-radius: 8px;
+  display: none;
+  z-index: 15;
+  animation: pulse 1.5s infinite ease-in-out;
+  pointer-events: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Mail container styles */
+.mail-container {
+  display: none;
+  background: #f4e4c1;
+  border: 4px solid #8b7355;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 999;
+}
+
+.mail-header {
+  background: #8b7355;
+  color: #f4e4c1;
+  padding: 15px;
+  margin: -20px -20px 20px -20px;
+  text-align: center;
+  font-size: 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-btn {
+  cursor: pointer;
+  font-size: 32px;
+  padding: 0 10px;
+  transition: transform 0.2s;
+  user-select: none;
+}
+
+.close-btn:hover {
+  transform: scale(1.2);
+}
+
+/* Mail item styles */
+.mail-item {
+  background: #fff9f0;
+  border: 2px solid #8b7355;
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.mail-item:hover {
+  background: #8b7355;
+  color: #f4e4c1;
+  transform: translateX(5px);
+}
+
+.mail-item .icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.mail-item .sender {
+  font-size: 24px;
+  flex-grow: 1;
+}
+
+.mail-item .new-badge {
+  background: #ff6b6b;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 18px;
+  animation: pulse 2s infinite;
+  flex-shrink: 0;
+}
+
+/* Video modal styles */
+.video-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.video-container {
+  background: #f4e4c1;
+  border: 4px solid #8b7355;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: min(90vw, 800px);
+  max-height: 85vh;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.video-header {
+  background: #8b7355;
+  color: #f4e4c1;
+  padding: 10px 15px;
+  margin: -20px -20px 15px -20px;
+  text-align: center;
+  font-size: clamp(18px, 4vw, 28px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  min-height: 44px;
+}
+
+.video-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+video {
+  max-width: 100%;
+  max-height: 70vh;
+  width: auto;
+  height: auto;
+  border-radius: 4px;
+  background: #000;
+  object-fit: contain;
+  display: block;
+  z-index: 1;
+  position: relative;
+}
+
+/* Video Navigation Arrows */
+.video-nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #e8dcc0 0%, #d4c4a0 100%);
+  border: 3px solid #8b6914;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 24px;
+  color: #8b6914;
+  z-index: 10;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  user-select: none;
+  font-family: 'VT323', monospace;
+}
+
+.video-nav-arrow:hover {
+  background: linear-gradient(135deg, #f0e6c8 0%, #dccca8 100%);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.video-nav-arrow:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.video-nav-left {
+  left: 20px;
+}
+
+.video-nav-right {
+  right: 20px;
+}
+
+.video-nav-arrow.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%) scale(0.8);
+}
+
+/* Arrow animations */
+@keyframes arrowPulse {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.05);
+  }
+}
+
+.video-nav-arrow:not(.hidden) {
+  animation: arrowPulse 2s ease-in-out infinite;
+}
+
+/* Audio elements (hidden) */
+audio {
+  display: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .mail-container {
+    margin: 15px;
+    max-width: calc(100vw - 30px);
+    max-height: calc(100vh - 30px);
+  }
+  
+  .mail-header {
+    font-size: clamp(20px, 5vw, 28px);
+    padding: 8px 12px;
+  }
+  
+  .mail-item {
+    padding: 10px;
+    gap: 10px;
+  }
+  
+  .mail-item .icon {
+    font-size: 24px;
+  }
+  
+  .mail-item .sender {
+    font-size: 18px;
+  }
+  
+  .video-modal {
+    padding: 15px;
+  }
+  
+  .video-container {
+    max-width: 95vw;
+    max-height: 90vh;
+    padding: 15px;
+  }
+  
+  .video-header {
+    font-size: clamp(16px, 4vw, 24px);
+    padding: 8px 12px;
+    margin: -15px -15px 12px -15px;
+  }
+  
+  .close-btn {
+    font-size: clamp(24px, 6vw, 32px);
+    padding: 0 8px;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  video {
+    max-height: 65vh;
+  }
+  
+  #prompt {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .video-modal {
+    padding: 10px;
+  }
+  
+  .video-container {
+    max-width: 98vw;
+    max-height: 95vh;
+    padding: 12px;
+  }
+  
+  .video-header {
+    font-size: clamp(14px, 4vw, 20px);
+    padding: 6px 10px;
+    margin: -12px -12px 10px -12px;
+  }
+  
+  .close-btn {
+    font-size: clamp(20px, 5vw, 28px);
+    min-width: 40px;
+    min-height: 40px;
+  }
+  
+  video {
+    max-height: 60vh;
+  }
+  
+  .mail-header {
+    font-size: clamp(18px, 5vw, 24px);
+    padding: 6px 10px;
+  }
+  
+  .mail-item {
+    padding: 8px;
+    gap: 8px;
+  }
+  
+  .mail-item .icon {
+    font-size: 20px;
+  }
+  
+  .mail-item .sender {
+    font-size: 16px;
+  }
+  
+  .mail-item .new-badge {
+    font-size: 14px;
+    padding: 1px 6px;
+  }
+}
+
+/* Accessibility improvements */
+.mail-item:focus {
+  outline: 3px solid #4a90e2;
+  outline-offset: 2px;
+}
+
+.close-btn:focus {
+  outline: 2px solid #4a90e2;
+  outline-offset: 2px;
+}
+
+/* Stardew Valley Dialog Styles */
+.dialog-container {
+  display: none;
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1500;
+  width: 90%;
+  max-width: 1600px;
+}
+
+.dialog-box {
+  background: linear-gradient(135deg, #e8dcc0 0%, #d4c4a0 100%);
+  border: 8px solid #8b6914;
+  border-radius: 24px;
+  box-shadow: 
+    0 16px 40px rgba(0, 0, 0, 0.4),
+    inset 0 4px 8px rgba(255, 255, 255, 0.3),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  padding: 32px 40px;
+  position: relative;
+  font-family: 'VT323', monospace;
+}
+
+.dialog-portrait {
+  width: 128px;
+  height: 128px;
+  border: 6px solid #4a3f35;
+  border-radius: 16px;
+  margin-left: 32px;
+  flex-shrink: 0;
+  background-size: cover;
+  background-position: center;
+  order: 2;
+}
+
+.dialog-portrait.khushi {
+  background-image: url('../assets/images/khushi_portrait.png');
+}
+
+.dialog-portrait.roti {
+  background-image: url('../assets/images/roti_portrait.png');
+}
+
+.dialog-portrait.me {
+  background-image: url('../assets/images/me_portrait.png');
+}
+
+.dialog-content {
+  flex: 1;
+  padding-left: 0;
+  padding-right: 80px;
+  order: 1;
+}
+
+.dialog-name {
+  font-size: 44px;
+  font-weight: bold;
+  color: #2c5530;
+  margin-bottom: 12px;
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+}
+
+.dialog-text {
+  font-size: 36px;
+  color: #2c2c2c;
+  line-height: 1.4;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+.vietnamese-text {
+  font-size: 32px;
+  color: #666;
+  font-style: italic;
+}
+
+.dialog-continue {
+  position: absolute;
+  bottom: 16px;
+  right: 32px;
+  font-size: 40px;
+  color: #8b6914;
+  animation: bounce 1.5s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-4px);
+  }
+  60% {
+    transform: translateY(-2px);
+  }
+}
+
+/* Responsive dialog */
+@media (max-width: 768px) {
+  .dialog-container {
+    width: 95%;
+    bottom: 15px;
+  }
+  
+  .dialog-box {
+    padding: 12px 16px;
+  }
+  
+  .dialog-portrait {
+    width: 48px;
+    height: 48px;
+    margin-left: 12px;
+  }
+  
+  .dialog-name {
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+  
+  .dialog-text {
+    font-size: 16px;
+  }
+  
+  .dialog-continue {
+    font-size: 16px;
+    bottom: 6px;
+    right: 12px;
+  }
+  
+  #talkPrompt {
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dialog-box {
+    padding: 10px 12px;
+  }
+  
+  .dialog-portrait {
+    width: 40px;
+    height: 40px;
+    margin-left: 10px;
+  }
+  
+  .dialog-name {
+    font-size: 16px;
+  }
+  
+  .dialog-text {
+    font-size: 14px;
+  }
+  
+  #talkPrompt {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .mail-container,
+  .video-modal,
+  #prompt,
+  #talkPrompt,
+  .dialog-container {
+    display: none !important;
+  }
+}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stardew Mailbox</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <div id="prompt">Press E to check mail</div>
+  <div id="talkPrompt">Press E to talk</div>
+  <div id="audioStatus" style="position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 5px; font-family: monospace; font-size: 12px; z-index: 1000;">Audio: Loading...</div>
+  
+  <!-- Audio Elements -->
+  <audio id="barkRoti" src="assets/audio/roti.mp3" preload="auto"></audio>
+  <audio id="barkKhushi" src="assets/audio/khushi.mp3" preload="auto"></audio>
+  <audio id="happybday" src="assets/audio/me.m4a" preload="auto"></audio>
+  <audio id="bgMusic" src="assets/audio/bg.mp3" preload="auto" loop></audio>
+
+  <!-- Mailbox Modal -->
+  <div class="mail-container" id="mailContainer">
+    <div class="mail-header">
+      <span>🎂 Birthday Mailbox 🎂</span>
+      <span class="close-btn">✕</span>
+    </div>
+    <div id="mailList"></div>
+  </div>
+
+  <!-- Video Modal -->
+  <div class="video-modal" id="videoModal">
+    <div class="video-container">
+      <div class="video-header">
+        <span id="videoTitle">Message from Friend</span>
+        <span class="close-btn">✕</span>
+      </div>
+      <div class="video-content">
+        <div class="video-nav-arrow video-nav-left" id="videoNavLeft">
+          <span>◀</span>
+        </div>
+        <video id="videoPlayer" controls></video>
+        <div class="video-nav-arrow video-nav-right" id="videoNavRight">
+          <span>▶</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stardew Valley Style Dialog -->
+  <div class="dialog-container" id="dialogContainer">
+    <div class="dialog-box">
+      <div class="dialog-portrait" id="dialogPortrait"></div>
+      <div class="dialog-content">
+        <div class="dialog-name" id="dialogName">Dog</div>
+        <div class="dialog-text" id="dialogText">Woof! Hello there!</div>
+      </div>
+      <div class="dialog-continue">▼</div>
+    </div>
+  </div>
+
+  <!-- Main Entry Point -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
