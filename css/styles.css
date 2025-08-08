@@ -96,9 +96,9 @@ canvas {
   border: 4px solid #8b7355;
   border-radius: 8px;
   padding: 20px;
-  max-width: min(600px, 95vw);
-  width: auto;
-  max-height: min(80vh, calc(100vh - 20px));
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
   overflow-y: auto;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   position: fixed;
@@ -369,11 +369,13 @@ audio {
   }
   
   .mail-container {
-    padding: 15px;
-    max-width: 95vw;
-    width: 95vw;
-    max-height: 90vh;
+    padding: 10px;
+    width: 90vw;
+    max-width: none;
+    height: 80vh;
+    max-height: none;
     margin: 0;
+    border: 2px solid #8b7355;
   }
   
   .mail-header {
@@ -415,12 +417,16 @@ audio {
   }
   
   .mail-container {
-    padding: 10px;
+    padding: 5px;
+    width: 95vw;
+    max-width: none;
+    height: 85vh;
+    max-height: none;
     margin: 0;
-    max-width: 98vw;
-    width: 98vw;
-    max-height: 95vh;
-    border: 2px solid #8b7355;
+    border: 1px solid #8b7355;
+    top: 50vh;
+    left: 50vw;
+    transform: translate(-50%, -50%);
   }
   
   .mail-header {
