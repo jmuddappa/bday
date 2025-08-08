@@ -626,7 +626,7 @@ audio {
 /* Virtual D-Pad */
 .virtual-dpad {
   position: absolute;
-  bottom: 40px;
+  bottom: 120px;
   left: 40px;
   width: 160px;
   height: 160px;
@@ -683,7 +683,7 @@ audio {
 /* Interact Button */
 .interact-button {
   position: absolute;
-  bottom: 60px;
+  bottom: 140px;
   right: 40px;
   pointer-events: all;
 }
@@ -726,7 +726,7 @@ audio {
   .virtual-dpad {
     width: 180px;
     height: 180px;
-    bottom: 60px;
+    bottom: 140px;
     left: 60px;
   }
   
@@ -748,7 +748,7 @@ audio {
     width: 100px;
     height: 100px;
     font-size: 42px;
-    bottom: 80px;
+    bottom: 160px;
     right: 60px;
   }
 }
