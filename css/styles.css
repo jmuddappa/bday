@@ -366,6 +366,23 @@ audio {
     font-size: 12px;
     padding: 4px 8px;
   }
+  
+  .mail-container {
+    padding: 16px;
+    max-width: calc(100vw - 40px);
+    width: calc(100vw - 40px);
+    max-height: calc(100vh - 80px);
+  }
+  
+  .mail-header {
+    font-size: 20px;
+    padding: 10px 12px;
+  }
+  
+  #mailList {
+    padding: 12px 0;
+    gap: 8px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -395,27 +412,41 @@ audio {
     max-height: 60vh;
   }
   
+  .mail-container {
+    padding: 12px;
+    margin: 10px;
+    max-width: calc(100vw - 20px);
+    width: calc(100vw - 20px);
+    max-height: calc(100vh - 40px);
+  }
+  
   .mail-header {
-    font-size: clamp(18px, 5vw, 24px);
-    padding: 6px 10px;
+    font-size: 16px;
+    padding: 8px 10px;
+  }
+  
+  #mailList {
+    padding: 8px 0;
+    gap: 6px;
   }
   
   .mail-item {
-    padding: 8px;
+    padding: 10px 8px;
     gap: 8px;
+    font-size: 14px;
   }
   
   .mail-item .icon {
-    font-size: 20px;
+    font-size: 18px;
   }
   
   .mail-item .sender {
-    font-size: 16px;
+    font-size: 14px;
   }
   
   .mail-item .new-badge {
-    font-size: 14px;
-    padding: 1px 6px;
+    font-size: 11px;
+    padding: 1px 5px;
   }
 }
 
