@@ -4,12 +4,15 @@
  */
 
 import { EventEmitter } from '../utils/EventEmitter.js';
+import { MobileControls } from './MobileControls.js';
 
 export class InputManager extends EventEmitter {
   constructor() {
     super();
     this.keys = new Set();
+    this.mobileControls = new MobileControls();
     this.setupEventListeners();
+    this.setupMobileControls();
   }
 
   setupEventListeners() {
@@ -78,12 +81,35 @@ export class InputManager extends EventEmitter {
   }
 
   /**
+   * Setup mobile control event listeners
+   */
+  setupMobileControls() {
+    if (!this.mobileControls.isMobileDevice()) return;
+
+    this.mobileControls.on('interact', () => {
+      this.emit('interact');
+      this.emit('audioRequested');
+    });
+
+    // Mobile movement is handled in getMovementInput()
+  }
+
+  /**
    * Get current movement input as a normalized vector
    * @returns {Object} Movement input with dx, dy, and direction
    */
   getMovementInput() {
     const movement = { dx: 0, dy: 0, direction: null };
 
+    // Check mobile controls first (takes priority on mobile devices)
+    if (this.mobileControls.isMobileDevice()) {
+      const mobileMovement = this.mobileControls.getCurrentMovement();
+      if (mobileMovement.dx !== 0 || mobileMovement.dy !== 0) {
+        return mobileMovement;
+      }
+    }
+
+    // Keyboard controls (fallback or desktop)
     if (this.isKeyPressed('ArrowLeft') || this.isKeyPressed('a')) {
       movement.dx = -1;
       movement.direction = 'left';
@@ -120,10 +146,21 @@ export class InputManager extends EventEmitter {
   }
 
   /**
+   * Check if device has mobile controls active
+   */
+  isMobileDevice() {
+    return this.mobileControls.isMobileDevice();
+  }
+
+  /**
    * Clean up event listeners
    */
   destroy() {
     document.removeEventListener('keydown', this.handleKeyDown);
     document.removeEventListener('keyup', this.handleKeyUp);
+    
+    if (this.mobileControls) {
+      this.mobileControls.destroy();
+    }
   }
 }
