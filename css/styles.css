@@ -504,7 +504,7 @@ audio {
 }
 
 .vietnamese-text {
-  font-size: 32px;
+  font-size: 28px;
   color: #666;
   font-style: italic;
 }
@@ -556,6 +556,10 @@ audio {
     font-size: 16px;
   }
   
+  .vietnamese-text {
+    font-size: 14px;
+  }
+  
   .dialog-continue {
     font-size: 16px;
     bottom: 6px;
@@ -585,6 +589,10 @@ audio {
   
   .dialog-text {
     font-size: 14px;
+  }
+  
+  .vietnamese-text {
+    font-size: 12px;
   }
   
   #talkPrompt {
@@ -626,7 +634,7 @@ audio {
 /* Virtual D-Pad */
 .virtual-dpad {
   position: absolute;
-  bottom: 120px;
+  bottom: max(20vh, 200px);
   left: 40px;
   width: 160px;
   height: 160px;
@@ -683,7 +691,7 @@ audio {
 /* Interact Button */
 .interact-button {
   position: absolute;
-  bottom: 140px;
+  bottom: max(22vh, 220px);
   right: 40px;
   pointer-events: all;
 }
@@ -726,7 +734,7 @@ audio {
   .virtual-dpad {
     width: 180px;
     height: 180px;
-    bottom: 140px;
+    bottom: max(25vh, 240px);
     left: 60px;
   }
   
@@ -748,7 +756,7 @@ audio {
     width: 100px;
     height: 100px;
     font-size: 42px;
-    bottom: 160px;
+    bottom: max(27vh, 260px);
     right: 60px;
   }
 }
