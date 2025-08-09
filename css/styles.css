@@ -506,7 +506,24 @@ audio {
   flex-shrink: 0;
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
   order: 2;
+}
+
+/* Adaptive sizing for different portrait aspect ratios */
+.dialog-portrait.friend1_portrait,
+.dialog-portrait.friend2_portrait,
+.dialog-portrait.friend3_portrait {
+  width: 160px;
+  height: 120px; /* Wider aspect ratio for rectangular portraits */
+}
+
+/* If some portraits are taller */
+.dialog-portrait.friend1_portrait.tall,
+.dialog-portrait.friend2_portrait.tall,
+.dialog-portrait.friend3_portrait.tall {
+  width: 120px;
+  height: 160px;
 }
 
 .dialog-portrait.khushi {
@@ -519,6 +536,18 @@ audio {
 
 .dialog-portrait.me {
   background-image: url('../assets/images/me_portrait.png');
+}
+
+.dialog-portrait.friend1_portrait {
+  background-image: url('../assets/images/friends/friend1_portrait.png');
+}
+
+.dialog-portrait.friend2_portrait {
+  background-image: url('../assets/images/friends/friend2_portrait.png');
+}
+
+.dialog-portrait.friend3_portrait {
+  background-image: url('../assets/images/friends/friend3_portrait.png');
 }
 
 .dialog-content {

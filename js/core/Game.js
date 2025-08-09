@@ -76,22 +76,25 @@ export class Game {
           "I love you! Happy birthday Lindo. (Anh yêu em! Chúc mừng sinh nhật Lindo.)"
         ]
       },
+      //khoa
       'Friend1': {
-        portrait: 'roti', // Using placeholder portrait
+        portrait: 'friend1_portrait',
         messages: [
-          "Thanks for helping with the party setup! 🎉"
+          "Khoa: Live, laugh, love! Anne: HOLY EFFIN SHIT BALLS GIRL ITS YOUR BDAY! (Khoa: Sống, cười, yêu! Anne: CHÚC MỪNG SINH NHẬT CẬU Ê! 🎉)"
         ]
       },
+      //raza
       'Friend2': {
-        portrait: 'khushi', // Using placeholder portrait
+        portrait: 'friend2_portrait',
         messages: [
-          "The decorations look amazing! 🎈"
+          "This isn't as nice as a river but I still appreciate the view. (Đây không đẹp bằng một dòng sông nhưng tôi vẫn thích cảnh này.)"
         ]
       },
+      //bome
       'Friend3': {
-        portrait: 'me', // Using placeholder portrait
+        portrait: 'friend3_portrait',
         messages: [
-          "Can't wait to celebrate with everyone! 🥳"
+          "Không thể chờ để ăn mừng với mọi người! 🥳"
         ]
       }
     };
