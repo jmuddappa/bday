@@ -42,7 +42,13 @@ export class Dog extends GameObject {
     this.frameSequence = [0, 1, 2]; // sit → transition → jump
     this.animationDirection = 1; // 1 for forward, -1 for reverse
     this.isAnimating = false;
+    
+    // Interaction bob animation (only when player is nearby)
+    this.interactionBobOffset = 0;
+    this.isPlayerNearForBob = false;
+    
   }
+
 
   /**
    * Set the sprite image for this dog
@@ -80,6 +86,9 @@ export class Dog extends GameObject {
       CONFIG.DOGS.ME_INTERACTION_DISTANCE : 
       CONFIG.DOGS.INTERACTION_DISTANCE;
 
+    // Update interaction state for bob animation
+    this.isPlayerNearForBob = distance < threshold;
+
     if (distance < threshold) {
       this.activate(specialAudio, bgAudio);
     } else {
@@ -107,6 +116,16 @@ export class Dog extends GameObject {
             this.isAnimating = false;
           }
         }
+      }
+    }
+    
+    // Update interaction bob animation for friends only
+    if (this.name.startsWith('Friend')) {
+      if (this.isPlayerNearForBob) {
+        // Gentle bob when player is nearby (can press E)
+        this.interactionBobOffset = Math.sin(Date.now() * 0.004) * 1.5; // Very small 1.5px bob
+      } else {
+        this.interactionBobOffset = 0; // No bob when player is away
       }
     }
   }
@@ -266,7 +285,7 @@ export class Dog extends GameObject {
         sourceWidth: frameWidth,
         sourceHeight: config.frameHeight,
         destX: this.x + offsetX,
-        destY: this.y + offsetY,
+        destY: this.y + offsetY + this.interactionBobOffset,
         destWidth: this.originalWidth * this.scale,
         destHeight: this.originalHeight * this.scale
       };
@@ -289,7 +308,7 @@ export class Dog extends GameObject {
       sourceWidth: sourceWidth,
       sourceHeight: sourceHeight,
       destX: this.x + offsetX,
-      destY: this.y + offsetY,
+      destY: this.y + offsetY + this.interactionBobOffset,
       destWidth: this.originalWidth * this.scale,
       destHeight: this.originalHeight * this.scale
     };
