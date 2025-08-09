@@ -19,7 +19,13 @@ export const CONFIG = {
     HEIGHT: 32,
     SPRITE_WIDTH: 80,
     SPRITE_HEIGHT: 120,
-    SPRITE_HEIGHT_UP: 135
+    SPRITE_HEIGHT_UP: 135,
+    // Walking animation config
+    WALK_FRAME_WIDTH: 475,
+    WALK_FRAME_HEIGHT: 637,
+    WALK_ANIMATION_SPEED: 15, // frames between animation changes (slower)
+    UP_ANIMATION_SPEED: 15, // frames between up animation changes (same as horizontal)
+    DOWN_ANIMATION_SPEED: 15 // frames between down animation changes
   },
 
   // Mailbox configuration
@@ -65,6 +71,9 @@ export const CONFIG = {
       PLAYER_FRONT: 'assets/images/player2.png',
       PLAYER_SIDE: 'assets/images/player2side.png',
       PLAYER_BACK: 'assets/images/playerback.png',
+      PLAYER_MOVEMENT: 'assets/images/movement.png',
+      PLAYER_UP: 'assets/images/up.png',
+      PLAYER_DOWN: 'assets/images/down.png',
       ROTI: 'assets/images/roti.png',
       KHUSHI: 'assets/images/khushi.png',
       ME: 'assets/images/me.png'

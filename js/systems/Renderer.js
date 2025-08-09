@@ -61,26 +61,106 @@ export class Renderer {
 
       const dimensions = player.getDrawDimensions();
       
-      if (player.direction === 'right') {
-        // Flip sprite horizontally for right movement
-        this.ctx.save();
-        this.ctx.scale(-1, 1);
+      // Check if using walking animation sprites
+      const isUsingWalkingSprite = player.isWalkingHorizontally && 
+                                  (player.direction === 'left' || player.direction === 'right') &&
+                                  sprite === player.sprites.get('movement');
+      
+      const isUsingUpWalkingSprite = player.isWalkingUp && 
+                                    player.direction === 'up' &&
+                                    sprite === player.sprites.get('up');
+
+      const isUsingDownWalkingSprite = player.isWalkingDown && 
+                                      player.direction === 'down' &&
+                                      sprite === player.sprites.get('down');
+      
+      if (isUsingWalkingSprite) {
+        // Draw walking animation frame
+        const frameCoords = player.getWalkingFrameCoords();
+        
+        if (player.direction === 'right') {
+          // Flip sprite horizontally for right movement
+          this.ctx.save();
+          this.ctx.scale(-1, 1);
+          this.ctx.drawImage(
+            sprite,
+            frameCoords.sx,
+            frameCoords.sy,
+            frameCoords.swidth,
+            frameCoords.sheight,
+            -player.x - dimensions.width,
+            player.y,
+            dimensions.width,
+            dimensions.height
+          );
+          this.ctx.restore();
+        } else {
+          // Normal walking animation (left)
+          this.ctx.drawImage(
+            sprite,
+            frameCoords.sx,
+            frameCoords.sy,
+            frameCoords.swidth,
+            frameCoords.sheight,
+            player.x,
+            player.y,
+            dimensions.width,
+            dimensions.height
+          );
+        }
+      } else if (isUsingUpWalkingSprite) {
+        // Draw up walking animation frame
+        const frameCoords = player.getUpWalkingFrameCoords();
+        
         this.ctx.drawImage(
           sprite,
-          -player.x - dimensions.width,
-          player.y,
-          dimensions.width,
-          dimensions.height
-        );
-        this.ctx.restore();
-      } else {
-        this.ctx.drawImage(
-          sprite,
+          frameCoords.sx,
+          frameCoords.sy,
+          frameCoords.swidth,
+          frameCoords.sheight,
           player.x,
           player.y,
           dimensions.width,
           dimensions.height
         );
+      } else if (isUsingDownWalkingSprite) {
+        // Draw down walking animation frame
+        const frameCoords = player.getDownWalkingFrameCoords();
+        
+        this.ctx.drawImage(
+          sprite,
+          frameCoords.sx,
+          frameCoords.sy,
+          frameCoords.swidth,
+          frameCoords.sheight,
+          player.x,
+          player.y,
+          dimensions.width,
+          dimensions.height
+        );
+      } else {
+        // Normal sprite drawing (non-walking)
+        if (player.direction === 'right') {
+          // Flip sprite horizontally for right movement
+          this.ctx.save();
+          this.ctx.scale(-1, 1);
+          this.ctx.drawImage(
+            sprite,
+            -player.x - dimensions.width,
+            player.y,
+            dimensions.width,
+            dimensions.height
+          );
+          this.ctx.restore();
+        } else {
+          this.ctx.drawImage(
+            sprite,
+            player.x,
+            player.y,
+            dimensions.width,
+            dimensions.height
+          );
+        }
       }
     } catch (error) {
       ErrorHandler.handleError(error, 'Renderer.drawPlayer');

@@ -20,6 +20,27 @@ export class Player extends GameObject {
     this.direction = 'down';
     this.sprites = new Map();
     this.lastPosition = { x: this.x, y: this.y };
+    
+    // Walking animation state
+    this.walkAnimationFrame = 0; // Current frame in animation sequence
+    this.walkFrameCounter = 0;   // Counter for timing animation frames
+    this.isWalkingHorizontally = false;
+    this.walkSequence = [0, 2, 1]; // Frame 1 → Frame 3 → Frame 2 (repeat)
+    this.currentSequenceIndex = 0;
+    
+    // Up walking animation state
+    this.upAnimationFrame = 0;
+    this.upFrameCounter = 0;
+    this.isWalkingUp = false;
+    this.upSequence = [0, 1, 0, 2]; // Frame 1 → Frame 2 → Frame 1 → Frame 3 (repeat)
+    this.currentUpSequenceIndex = 0;
+    
+    // Down walking animation state
+    this.downAnimationFrame = 0;
+    this.downFrameCounter = 0;
+    this.isWalkingDown = false;
+    this.downSequence = [0, 1, 0, 2]; // Frame 1 → Frame 2 → Frame 1 → Frame 3 (repeat)
+    this.currentDownSequenceIndex = 0;
   }
 
   /**
@@ -27,11 +48,17 @@ export class Player extends GameObject {
    * @param {HTMLImageElement} frontSprite - Front-facing sprite
    * @param {HTMLImageElement} sideSprite - Side-facing sprite
    * @param {HTMLImageElement} backSprite - Back-facing sprite
+   * @param {HTMLImageElement} movementSprite - Walking animation sprite sheet
+   * @param {HTMLImageElement} upSprite - Up walking animation sprite sheet
+   * @param {HTMLImageElement} downSprite - Down walking animation sprite sheet
    */
-  setSprites(frontSprite, sideSprite, backSprite) {
+  setSprites(frontSprite, sideSprite, backSprite, movementSprite, upSprite, downSprite) {
     this.sprites.set('front', frontSprite);
     this.sprites.set('side', sideSprite);
     this.sprites.set('back', backSprite);
+    this.sprites.set('movement', movementSprite);
+    this.sprites.set('up', upSprite);
+    this.sprites.set('down', downSprite);
   }
 
   /**
@@ -52,9 +79,19 @@ export class Player extends GameObject {
     if (this.canMoveTo(newX, newY, collisionBoxes)) {
       this.x = ValidationUtils.clamp(newX, 0, CONFIG.CANVAS.WIDTH - this.width);
       this.y = ValidationUtils.clamp(newY, 0, CONFIG.CANVAS.HEIGHT - this.height);
+      
+      // Check if actually moved for walking animations
+      this.isWalkingHorizontally = Math.abs(dx) > 0 && (this.x !== this.lastPosition.x);
+      this.isWalkingUp = dy < 0 && (this.y !== this.lastPosition.y);
+      this.isWalkingDown = dy > 0 && (this.y !== this.lastPosition.y);
+      
       return true;
     }
     
+    // No movement occurred
+    this.isWalkingHorizontally = false;
+    this.isWalkingUp = false;
+    this.isWalkingDown = false;
     return false; // Movement blocked by collision
   }
 
@@ -96,16 +133,33 @@ export class Player extends GameObject {
   }
 
   /**
-   * Get the current sprite based on direction
+   * Get the current sprite based on direction and animation state
    * @returns {HTMLImageElement|null} Current sprite
    */
   getCurrentSprite() {
     switch (this.direction) {
       case 'left':
       case 'right':
-        return this.sprites.get('side');
+        // Use walking animation only when actually moving horizontally
+        if (this.isWalkingHorizontally) {
+          return this.sprites.get('movement');
+        } else {
+          return this.sprites.get('side');
+        }
       case 'up':
-        return this.sprites.get('back');
+        // Use up walking animation when actually moving up
+        if (this.isWalkingUp) {
+          return this.sprites.get('up');
+        } else {
+          return this.sprites.get('back');
+        }
+      case 'down':
+        // Use down walking animation when actually moving down
+        if (this.isWalkingDown) {
+          return this.sprites.get('down');
+        } else {
+          return this.sprites.get('front');
+        }
       default:
         return this.sprites.get('front');
     }
@@ -120,6 +174,48 @@ export class Player extends GameObject {
     return {
       width: CONFIG.PLAYER.SPRITE_WIDTH,
       height: isUp ? CONFIG.PLAYER.SPRITE_HEIGHT_UP : CONFIG.PLAYER.SPRITE_HEIGHT
+    };
+  }
+
+  /**
+   * Get the current walking animation frame coordinates
+   * @returns {Object} Frame source coordinates {sx, sy, swidth, sheight}
+   */
+  getWalkingFrameCoords() {
+    const currentFrame = this.walkSequence[this.currentSequenceIndex];
+    return {
+      sx: currentFrame * CONFIG.PLAYER.WALK_FRAME_WIDTH,
+      sy: 0,
+      swidth: CONFIG.PLAYER.WALK_FRAME_WIDTH,
+      sheight: CONFIG.PLAYER.WALK_FRAME_HEIGHT
+    };
+  }
+
+  /**
+   * Get the current up walking animation frame coordinates
+   * @returns {Object} Frame source coordinates {sx, sy, swidth, sheight}
+   */
+  getUpWalkingFrameCoords() {
+    const currentFrame = this.upSequence[this.currentUpSequenceIndex];
+    return {
+      sx: currentFrame * CONFIG.PLAYER.WALK_FRAME_WIDTH,
+      sy: 0,
+      swidth: CONFIG.PLAYER.WALK_FRAME_WIDTH,
+      sheight: CONFIG.PLAYER.WALK_FRAME_HEIGHT
+    };
+  }
+
+  /**
+   * Get the current down walking animation frame coordinates
+   * @returns {Object} Frame source coordinates {sx, sy, swidth, sheight}
+   */
+  getDownWalkingFrameCoords() {
+    const currentFrame = this.downSequence[this.currentDownSequenceIndex];
+    return {
+      sx: currentFrame * CONFIG.PLAYER.WALK_FRAME_WIDTH + 1, // Add 1px offset to avoid edge bleeding
+      sy: 1, // Add 1px offset from top
+      swidth: CONFIG.PLAYER.WALK_FRAME_WIDTH - 2, // Reduce width by 2px to avoid bleeding
+      sheight: CONFIG.PLAYER.WALK_FRAME_HEIGHT - 2 // Reduce height by 2px
     };
   }
 
@@ -206,7 +302,46 @@ export class Player extends GameObject {
    * @param {number} deltaTime - Time since last update
    */
   update(deltaTime) {
-    // Player update logic can be added here
-    // For example: animation frame updates, status effects, etc.
+    // Update walking animation when moving horizontally
+    if (this.isWalkingHorizontally && (this.direction === 'left' || this.direction === 'right')) {
+      this.walkFrameCounter++;
+      
+      if (this.walkFrameCounter >= CONFIG.PLAYER.WALK_ANIMATION_SPEED) {
+        this.walkFrameCounter = 0;
+        this.currentSequenceIndex = (this.currentSequenceIndex + 1) % this.walkSequence.length;
+      }
+    } else {
+      // Reset animation when not walking horizontally
+      this.walkFrameCounter = 0;
+      this.currentSequenceIndex = 0;
+    }
+
+    // Update up walking animation when moving up
+    if (this.isWalkingUp && this.direction === 'up') {
+      this.upFrameCounter++;
+      
+      if (this.upFrameCounter >= CONFIG.PLAYER.UP_ANIMATION_SPEED) {
+        this.upFrameCounter = 0;
+        this.currentUpSequenceIndex = (this.currentUpSequenceIndex + 1) % this.upSequence.length;
+      }
+    } else {
+      // Reset animation when not walking up
+      this.upFrameCounter = 0;
+      this.currentUpSequenceIndex = 0;
+    }
+
+    // Update down walking animation when moving down
+    if (this.isWalkingDown && this.direction === 'down') {
+      this.downFrameCounter++;
+      
+      if (this.downFrameCounter >= CONFIG.PLAYER.DOWN_ANIMATION_SPEED) {
+        this.downFrameCounter = 0;
+        this.currentDownSequenceIndex = (this.currentDownSequenceIndex + 1) % this.downSequence.length;
+      }
+    } else {
+      // Reset animation when not walking down
+      this.downFrameCounter = 0;
+      this.currentDownSequenceIndex = 0;
+    }
   }
 }

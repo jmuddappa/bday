@@ -111,11 +111,14 @@ export class Game {
     const { IMAGES } = CONFIG.ASSETS;
     
     // Load all images in parallel
-    const [backgroundImage, playerFront, playerSide, playerBack, rotiSprite, khushiSprite, meSprite] = await Promise.all([
+    const [backgroundImage, playerFront, playerSide, playerBack, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meSprite] = await Promise.all([
       this.assetLoader.loadImage(IMAGES.BACKGROUND),
       this.assetLoader.loadImage(IMAGES.PLAYER_FRONT),
       this.assetLoader.loadImage(IMAGES.PLAYER_SIDE),
       this.assetLoader.loadImage(IMAGES.PLAYER_BACK),
+      this.assetLoader.loadImage(IMAGES.PLAYER_MOVEMENT),
+      this.assetLoader.loadImage(IMAGES.PLAYER_UP),
+      this.assetLoader.loadImage(IMAGES.PLAYER_DOWN),
       this.assetLoader.loadImage(IMAGES.ROTI),
       this.assetLoader.loadImage(IMAGES.KHUSHI),
       this.assetLoader.loadImage(IMAGES.ME)
@@ -123,7 +126,7 @@ export class Game {
 
     // Store loaded assets
     this.backgroundImage = backgroundImage;
-    this.player.setSprites(playerFront, playerSide, playerBack);
+    this.player.setSprites(playerFront, playerSide, playerBack, playerMovement, playerUp, playerDown);
     
     return { rotiSprite, khushiSprite, meSprite };
   }
@@ -267,7 +270,15 @@ export class Game {
       if (!moved && this.audioManager.musicStarted) {
         this.playBumpSound();
       }
+    } else {
+      // No movement input - stop walking animations
+      this.player.isWalkingHorizontally = false;
+      this.player.isWalkingUp = false;
+      this.player.isWalkingDown = false;
     }
+    
+    // Update player animations and state
+    this.player.update();
   }
 
   updateDogs() {
