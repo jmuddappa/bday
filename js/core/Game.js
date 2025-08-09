@@ -234,6 +234,23 @@ export class Game {
       this.audioManager.tryStartAudio();
     });
 
+    // Mobile touch events - close dialogs when tapping anywhere
+    this.canvas.addEventListener('touchstart', (e) => {
+      // Only close dialog if one is open
+      if (this.dialogContainer && this.dialogContainer.style.display === 'block') {
+        e.preventDefault();
+        this.closeDialog();
+      }
+    });
+
+    // Also handle clicks for desktop
+    this.canvas.addEventListener('click', (e) => {
+      // Only close dialog if one is open
+      if (this.dialogContainer && this.dialogContainer.style.display === 'block') {
+        this.closeDialog();
+      }
+    });
+
     // Window events
     window.addEventListener('beforeunload', () => this.destroy());
     
