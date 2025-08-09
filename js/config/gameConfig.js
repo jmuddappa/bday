@@ -79,7 +79,7 @@ export const CONFIG = {
     },
     //khoa
     FRIEND1: {
-      x: 200, y: 600, scale: 2,
+      x: 25, y: 300, scale: 2,
       width: 80, height: 120,
       sitFrame: { sx: 0, sy: 0 },
       jumpFrame: { sx: 0, sy: 0 }, // Same as sit - no animation
@@ -95,7 +95,7 @@ export const CONFIG = {
     },
     //bome
     FRIEND3: {
-      x: 150, y: 450, scale: 1.8,
+      x: 40, y: 650, scale: 1.8,
       width: 80, height: 120,
       sitFrame: { sx: 0, sy: 0 },
       jumpFrame: { sx: 0, sy: 0 }, // Same as sit - no animation
