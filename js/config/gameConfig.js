@@ -25,7 +25,11 @@ export const CONFIG = {
     WALK_FRAME_HEIGHT: 637,
     WALK_ANIMATION_SPEED: 15, // frames between animation changes (slower)
     UP_ANIMATION_SPEED: 15, // frames between up animation changes (same as horizontal)
-    DOWN_ANIMATION_SPEED: 15 // frames between down animation changes
+    DOWN_ANIMATION_SPEED: 15, // frames between down animation changes
+    // Shadow config
+    SHADOW_WIDTH: 60,
+    SHADOW_HEIGHT: 20,
+    SHADOW_OFFSET_Y: 8
   },
 
   // Mailbox configuration
@@ -46,21 +50,32 @@ export const CONFIG = {
       width: 450, height: 800,
       sitFrame: { sx: 1064, sy: 321 },
       jumpFrame: { sx: 417, sy: 175 },
-      jumpOffsetY: -20
+      jumpOffsetY: -20,
+      shadowWidth: 40, shadowHeight: 15, shadowOffsetY: 20
     },
     KHUSHI: {
       x: 150, y: 250, scale: 0.1,
       width: 700, height: 740,
       sitFrame: { sx: 789, sy: 186 },
-      jumpFrame: { sx: 55, sy: 177 }
+      jumpFrame: { sx: 55, sy: 177 },
+      shadowWidth: 50, shadowHeight: 18, shadowOffsetY: 8
     },
     ME: {
       x: 860, y: 432, scale: 0.19,
-      width: 550, height: 900,
+      width: 550, height: 990,
+      // Original frames (fallback)
       sitFrame: { sx: 541, sy: 77 },
       jumpFrame: { sx: 2, sy: 62 },
       jumpOffsetX: -15,
-      jumpOffsetY: -3
+      jumpOffsetY: -3,
+      // New 3-frame animation system
+      totalWidth: 1536, // Total sprite width
+      frameHeight: 1024,
+      sitFrameNew: { sx: 1024, sy: 0 },      // Frame 1 (rest/sit)
+      transitionFrame: { sx: 512, sy: 0 },   // Frame 2 (transition)  
+      jumpFrameNew: { sx: 0, sy: 0 },        // Frame 3 (jump/singing)
+      animationSpeed: 8, // frames between transitions
+      shadowWidth: 70, shadowHeight: 25, shadowOffsetY: 10
     }
   },
 
@@ -70,13 +85,13 @@ export const CONFIG = {
       BACKGROUND: 'assets/images/background.png',
       PLAYER_FRONT: 'assets/images/player2.png',
       PLAYER_SIDE: 'assets/images/player2side.png',
-      PLAYER_BACK: 'assets/images/playerback.png',
       PLAYER_MOVEMENT: 'assets/images/movement.png',
       PLAYER_UP: 'assets/images/up.png',
       PLAYER_DOWN: 'assets/images/down.png',
       ROTI: 'assets/images/roti.png',
       KHUSHI: 'assets/images/khushi.png',
-      ME: 'assets/images/me.png'
+      ME: 'assets/images/me.png',
+      ME_FRAMES: 'assets/images/me_frames.png'
     },
     AUDIO: {
       BG_MUSIC: 'assets/audio/bg.mp3',

@@ -49,6 +49,40 @@ export class Renderer {
   }
 
   /**
+   * Draw a Stardew Valley-style shadow
+   * @param {number} x - X position for shadow center
+   * @param {number} y - Y position for shadow center  
+   * @param {number} width - Shadow width
+   * @param {number} height - Shadow height
+   * @param {number} opacity - Shadow opacity (0-1)
+   */
+  drawShadow(x, y, width, height, opacity = 0.3) {
+    try {
+      this.ctx.save();
+      
+      // Create radial gradient for soft shadow
+      const gradient = this.ctx.createRadialGradient(
+        x, y, 0,           // Inner circle (center)
+        x, y, width / 2   // Outer circle
+      );
+      gradient.addColorStop(0, `rgba(0, 0, 0, ${opacity})`);
+      gradient.addColorStop(0.7, `rgba(0, 0, 0, ${opacity * 0.4})`);
+      gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      
+      this.ctx.fillStyle = gradient;
+      
+      // Draw elliptical shadow
+      this.ctx.beginPath();
+      this.ctx.ellipse(x, y, width / 2, height / 2, 0, 0, 2 * Math.PI);
+      this.ctx.fill();
+      
+      this.ctx.restore();
+    } catch (error) {
+      ErrorHandler.handleError(error, 'Renderer.drawShadow');
+    }
+  }
+
+  /**
    * Draw the player character
    * @param {Player} player - Player entity to draw
    */
@@ -61,13 +95,17 @@ export class Renderer {
 
       const dimensions = player.getDrawDimensions();
       
+      // Draw shadow first (behind player)
+      const shadowX = player.x + dimensions.width / 2;
+      const shadowY = player.y + dimensions.height - CONFIG.PLAYER.SHADOW_OFFSET_Y;
+      this.drawShadow(shadowX, shadowY, CONFIG.PLAYER.SHADOW_WIDTH, CONFIG.PLAYER.SHADOW_HEIGHT);
+      
       // Check if using walking animation sprites
       const isUsingWalkingSprite = player.isWalkingHorizontally && 
                                   (player.direction === 'left' || player.direction === 'right') &&
                                   sprite === player.sprites.get('movement');
       
-      const isUsingUpWalkingSprite = player.isWalkingUp && 
-                                    player.direction === 'up' &&
+      const isUsingUpWalkingSprite = player.direction === 'up' &&
                                     sprite === player.sprites.get('up');
 
       const isUsingDownWalkingSprite = player.isWalkingDown && 
@@ -167,6 +205,7 @@ export class Renderer {
     }
   }
 
+
   /**
    * Draw a dog entity
    * @param {Dog} dog - Dog entity to draw
@@ -176,6 +215,19 @@ export class Renderer {
 
     try {
       const drawData = dog.getDrawData();
+      const config = CONFIG.DOGS[dog.name.toUpperCase()];
+      
+      // Draw shadow first (behind dog)
+      if (config && config.shadowWidth) {
+        const shadowX = drawData.destX + drawData.destWidth / 2;
+        // For jump state, use original position (without jump offset) for shadow
+        const baseY = dog.state === 'jump' ? 
+          drawData.destY - (config.jumpOffsetY || 0) + drawData.destHeight - config.shadowOffsetY :
+          drawData.destY + drawData.destHeight - config.shadowOffsetY;
+        const shadowY = baseY;
+        const opacity = dog.state === 'jump' ? 0.2 : 0.3; // Lighter shadow when jumping
+        this.drawShadow(shadowX, shadowY, config.shadowWidth, config.shadowHeight, opacity);
+      }
       
       this.ctx.drawImage(
         drawData.sprite,

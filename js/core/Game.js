@@ -93,10 +93,10 @@ export class Game {
       this.audioManager.updateStatus();
       
       console.log('📦 Loading game assets...');
-      await this.loadAssets();
+      const sprites = await this.loadAssets();
       
       console.log('🎭 Creating game entities...');
-      this.createEntities();
+      await this.createEntities(sprites);
       
       console.log('🚀 Starting game loop...');
       this.start();
@@ -111,28 +111,28 @@ export class Game {
     const { IMAGES } = CONFIG.ASSETS;
     
     // Load all images in parallel
-    const [backgroundImage, playerFront, playerSide, playerBack, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meSprite] = await Promise.all([
+    const [backgroundImage, playerFront, playerSide, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meSprite, meFramesSprite] = await Promise.all([
       this.assetLoader.loadImage(IMAGES.BACKGROUND),
       this.assetLoader.loadImage(IMAGES.PLAYER_FRONT),
       this.assetLoader.loadImage(IMAGES.PLAYER_SIDE),
-      this.assetLoader.loadImage(IMAGES.PLAYER_BACK),
       this.assetLoader.loadImage(IMAGES.PLAYER_MOVEMENT),
       this.assetLoader.loadImage(IMAGES.PLAYER_UP),
       this.assetLoader.loadImage(IMAGES.PLAYER_DOWN),
       this.assetLoader.loadImage(IMAGES.ROTI),
       this.assetLoader.loadImage(IMAGES.KHUSHI),
-      this.assetLoader.loadImage(IMAGES.ME)
+      this.assetLoader.loadImage(IMAGES.ME),
+      this.assetLoader.loadImage(IMAGES.ME_FRAMES)
     ]);
 
     // Store loaded assets
     this.backgroundImage = backgroundImage;
-    this.player.setSprites(playerFront, playerSide, playerBack, playerMovement, playerUp, playerDown);
+    this.player.setSprites(playerFront, playerSide, playerUp, playerMovement, playerUp, playerDown);
     
-    return { rotiSprite, khushiSprite, meSprite };
+    return { rotiSprite, khushiSprite, meSprite, meFramesSprite };
   }
 
-  async createEntities() {
-    const { rotiSprite, khushiSprite, meSprite } = await this.loadAssets();
+  async createEntities(sprites) {
+    const { rotiSprite, khushiSprite, meSprite, meFramesSprite } = sprites;
     
     // Create dogs with their sprites and audio
     const rotiDog = new Dog('Roti', CONFIG.DOGS.ROTI);
@@ -144,7 +144,8 @@ export class Game {
     khushiDog.setAudio(this.audioManager.getAudio('barkKhushi'));
     
     const meDog = new Dog('Me', CONFIG.DOGS.ME);
-    meDog.setSprite(meSprite);
+    meDog.setSprite(meSprite); // Keep original for fallback
+    meDog.setFramesSprite(meFramesSprite); // Set new animation sprite
     
     this.dogs = [rotiDog, khushiDog, meDog];
   }
@@ -297,6 +298,7 @@ export class Game {
   updateUI() {
     // Handle talk prompt for any nearby dog
     const nearbyDog = this.getNearbyDog();
+    
     if (nearbyDog) {
       this.showTalkPrompt(nearbyDog);
       this.hidePrompt();
@@ -382,10 +384,11 @@ export class Game {
     return this.dogs.find(dog => dog.isPlayerInRange(this.player));
   }
 
-  showTalkPrompt(dog) {
-    if (this.talkPrompt && dog) {
+
+  showTalkPrompt(character) {
+    if (this.talkPrompt && character) {
       this.talkPrompt.style.display = 'block';
-      this.updateTalkPromptPosition(dog);
+      this.updateTalkPromptPosition(character);
     }
   }
 
@@ -395,10 +398,10 @@ export class Game {
     }
   }
 
-  updateTalkPromptPosition(dog) {
-    if (!dog) {
+  updateTalkPromptPosition(character) {
+    if (!character) {
       const nearbyDog = this.getNearbyDog();
-      if (nearbyDog) dog = nearbyDog;
+      if (nearbyDog) character = nearbyDog;
       else return;
     }
     
@@ -408,33 +411,36 @@ export class Game {
       rect.height / CONFIG.CANVAS.HEIGHT
     );
     
-    const x = rect.left + (dog.x + dog.width / 2 - 70) * canvasScale;
-    const y = rect.top + (dog.y - 80) * canvasScale;
+    const x = rect.left + (character.x + character.width / 2 - 70) * canvasScale;
+    const y = rect.top + (character.y - 80) * canvasScale;
     
     this.talkPrompt.style.left = `${x}px`;
     this.talkPrompt.style.top = `${y}px`;
   }
 
-  openDialog(dog) {
-    if (this.dialogContainer && dog) {
+  openDialog(character) {
+    if (this.dialogContainer && character) {
       this.dialogContainer.style.display = 'block';
       
-      // Play bark sound for Roti and Khushi (not Me)
-      if (dog.name === 'Roti' || dog.name === 'Khushi') {
-        if (dog.audio) {
-          dog.audio.currentTime = 0; // Reset to start
-          dog.audio.play().catch(e => {
-            console.log('Could not play bark sound:', e);
-          });
+      // Play sound for all characters except Me
+      if (character.name !== 'Me' && character.audio) {
+        character.audio.currentTime = 0; // Reset to start
+        character.audio.play().catch(e => {
+          console.log('Could not play sound:', e);
+        });
+        
+        // For simple sprites, call playSound method
+        if (character.playSound && typeof character.playSound === 'function') {
+          character.playSound();
         }
       }
       
-      const dialogData = this.dogDialogs[dog.name];
+      const dialogData = this.dogDialogs[character.name];
       if (dialogData) {
-        // Set dog name
+        // Set character name
         const dialogNameElement = document.getElementById('dialogName');
         if (dialogNameElement) {
-          dialogNameElement.textContent = dog.name;
+          dialogNameElement.textContent = character.name;
         }
         
         // Set portrait
@@ -442,16 +448,16 @@ export class Game {
         if (dialogPortraitElement) {
           // Remove existing portrait classes
           dialogPortraitElement.className = 'dialog-portrait';
-          // Add the specific dog portrait class
+          // Add the specific portrait class
           dialogPortraitElement.classList.add(dialogData.portrait);
         }
         
         // Get current message and cycle to next
-        const currentIndex = this.dogMessageIndex[dog.name];
+        const currentIndex = this.dogMessageIndex[character.name];
         const currentMessage = dialogData.messages[currentIndex];
         
         // Advance to next message for next interaction
-        this.dogMessageIndex[dog.name] = (currentIndex + 1) % dialogData.messages.length;
+        this.dogMessageIndex[character.name] = (currentIndex + 1) % dialogData.messages.length;
         
         const dialogTextElement = document.getElementById('dialogText');
         if (dialogTextElement) {

@@ -147,12 +147,8 @@ export class Player extends GameObject {
           return this.sprites.get('side');
         }
       case 'up':
-        // Use up walking animation when actually moving up
-        if (this.isWalkingUp) {
-          return this.sprites.get('up');
-        } else {
-          return this.sprites.get('back');
-        }
+        // Always use up sprite (frame 1 when at rest, animation when walking)
+        return this.sprites.get('up');
       case 'down':
         // Use down walking animation when actually moving down
         if (this.isWalkingDown) {
