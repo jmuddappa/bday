@@ -277,12 +277,17 @@ export class Dog extends GameObject {
     const offsetX = this.state === 'jump' ? this.jumpOffsetX : 0;
     const offsetY = this.state === 'jump' ? this.jumpOffsetY : 0;
 
+    // For simple friends, use full image dimensions
+    const isFriend = this.name.startsWith('Friend') && this.sprite;
+    const sourceWidth = isFriend ? this.sprite.naturalWidth : this.originalWidth;
+    const sourceHeight = isFriend ? this.sprite.naturalHeight : this.originalHeight;
+
     return {
       sprite: this.sprite,
       sourceX: frame.sx,
       sourceY: frame.sy,
-      sourceWidth: this.originalWidth,
-      sourceHeight: this.originalHeight,
+      sourceWidth: sourceWidth,
+      sourceHeight: sourceHeight,
       destX: this.x + offsetX,
       destY: this.y + offsetY,
       destWidth: this.originalWidth * this.scale,

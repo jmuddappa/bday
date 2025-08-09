@@ -217,6 +217,12 @@ export class Renderer {
       const drawData = dog.getDrawData();
       const config = CONFIG.DOGS[dog.name.toUpperCase()];
       
+      // Check if sprite loaded properly
+      if (!drawData.sprite || drawData.sprite.naturalWidth === 0) {
+        console.warn(`🚨 ${dog.name} sprite not loaded properly`);
+        return;
+      }
+      
       // Draw shadow first (behind dog)
       if (config && config.shadowWidth) {
         const shadowX = drawData.destX + drawData.destWidth / 2;

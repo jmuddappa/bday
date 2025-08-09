@@ -75,6 +75,12 @@ export class Game {
           "Wanna see something cool? Press ; to see the collision boxes that prevent you from bumping into things! (Muốn thấy điều gì đó thú vị không? Nhấn ; để xem các hộp va chạm ngăn bạn đâm vào đồ vật!)",
           "I love you! Happy birthday Lindo. (Anh yêu em! Chúc mừng sinh nhật Lindo.)"
         ]
+      },
+      'Friend1': {
+        portrait: 'roti', // Using placeholder portrait
+        messages: [
+          "Thanks for helping with the party setup! 🎉"
+        ]
       }
     };
     
@@ -82,7 +88,8 @@ export class Game {
     this.dogMessageIndex = {
       'Roti': 0,
       'Khushi': 0,
-      'Me': 0
+      'Me': 0,
+      'Friend1': 0
     };
     
     this.setupEventListeners();
@@ -111,7 +118,7 @@ export class Game {
     const { IMAGES } = CONFIG.ASSETS;
     
     // Load all images in parallel
-    const [backgroundImage, playerFront, playerSide, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meSprite, meFramesSprite] = await Promise.all([
+    const [backgroundImage, playerFront, playerSide, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite] = await Promise.all([
       this.assetLoader.loadImage(IMAGES.BACKGROUND),
       this.assetLoader.loadImage(IMAGES.PLAYER_FRONT),
       this.assetLoader.loadImage(IMAGES.PLAYER_SIDE),
@@ -121,18 +128,20 @@ export class Game {
       this.assetLoader.loadImage(IMAGES.ROTI),
       this.assetLoader.loadImage(IMAGES.KHUSHI),
       this.assetLoader.loadImage(IMAGES.ME),
-      this.assetLoader.loadImage(IMAGES.ME_FRAMES)
+      this.assetLoader.loadImage(IMAGES.ME_FRAMES),
+      this.assetLoader.loadImage(IMAGES.FRIEND1)
     ]);
 
     // Store loaded assets
     this.backgroundImage = backgroundImage;
     this.player.setSprites(playerFront, playerSide, playerUp, playerMovement, playerUp, playerDown);
     
-    return { rotiSprite, khushiSprite, meSprite, meFramesSprite };
+    
+    return { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite };
   }
 
   async createEntities(sprites) {
-    const { rotiSprite, khushiSprite, meSprite, meFramesSprite } = sprites;
+    const { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite } = sprites;
     
     // Create dogs with their sprites and audio
     const rotiDog = new Dog('Roti', CONFIG.DOGS.ROTI);
@@ -147,7 +156,14 @@ export class Game {
     meDog.setSprite(meSprite); // Keep original for fallback
     meDog.setFramesSprite(meFramesSprite); // Set new animation sprite
     
-    this.dogs = [rotiDog, khushiDog, meDog];
+    // Create friend1 as simple dog entity
+    const friend1 = new Dog('Friend1', CONFIG.DOGS.FRIEND1);
+    friend1.setSprite(friend1Sprite);
+    friend1.setAudio(this.audioManager.getAudio('friend1Sound'));
+    
+    console.log('🖼️ Friend1 sprite source:', friend1Sprite?.src);
+    
+    this.dogs = [rotiDog, khushiDog, meDog, friend1];
   }
 
   setupEventListeners() {
@@ -411,8 +427,11 @@ export class Game {
       rect.height / CONFIG.CANVAS.HEIGHT
     );
     
+    // Use smaller offset for Friend1 since it's much larger
+    const yOffset = character.name === 'Friend1' ? -20 : -80;
+    
     const x = rect.left + (character.x + character.width / 2 - 70) * canvasScale;
-    const y = rect.top + (character.y - 80) * canvasScale;
+    const y = rect.top + (character.y + yOffset) * canvasScale;
     
     this.talkPrompt.style.left = `${x}px`;
     this.talkPrompt.style.top = `${y}px`;

@@ -76,6 +76,13 @@ export const CONFIG = {
       jumpFrameNew: { sx: 0, sy: 0 },        // Frame 3 (jump/singing)
       animationSpeed: 8, // frames between transitions
       shadowWidth: 70, shadowHeight: 25, shadowOffsetY: 10
+    },
+    FRIEND1: {
+      x: 200, y: 600, scale: 2,
+      width: 80, height: 120,
+      sitFrame: { sx: 0, sy: 0 },
+      jumpFrame: { sx: 0, sy: 0 }, // Same as sit - no animation
+      shadowWidth: 40, shadowHeight: 15, shadowOffsetY: 8
     }
   },
 
@@ -91,7 +98,8 @@ export const CONFIG = {
       ROTI: 'assets/images/roti.png',
       KHUSHI: 'assets/images/khushi.png',
       ME: 'assets/images/me.png',
-      ME_FRAMES: 'assets/images/me_frames.png'
+      ME_FRAMES: 'assets/images/me_frames.png',
+      FRIEND1: 'assets/images/friends/friend1.png'
     },
     AUDIO: {
       BG_MUSIC: 'assets/audio/bg.mp3',
