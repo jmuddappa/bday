@@ -24,6 +24,8 @@ export class AudioManager {
       this.audioElements.set('barkKhushi', document.getElementById('barkKhushi'));
       this.audioElements.set('happybday', document.getElementById('happybday'));
       this.audioElements.set('friend1Sound', document.getElementById('friend1Sound'));
+      this.audioElements.set('friend2Sound', document.getElementById('friend2Sound'));
+      this.audioElements.set('friend3Sound', document.getElementById('friend3Sound'));
       
       // Set up background music properties
       const bgMusic = this.audioElements.get('bgMusic');

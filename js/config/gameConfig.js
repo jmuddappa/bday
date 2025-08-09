@@ -77,8 +77,25 @@ export const CONFIG = {
       animationSpeed: 8, // frames between transitions
       shadowWidth: 70, shadowHeight: 25, shadowOffsetY: 10
     },
+    //khoa
     FRIEND1: {
       x: 200, y: 600, scale: 2,
+      width: 80, height: 120,
+      sitFrame: { sx: 0, sy: 0 },
+      jumpFrame: { sx: 0, sy: 0 }, // Same as sit - no animation
+      shadowWidth: 40, shadowHeight: 15, shadowOffsetY: 8
+    },
+    //raza
+    FRIEND2: {
+      x: 900, y: 150, scale: 1.5,
+      width: 80, height: 120,
+      sitFrame: { sx: 0, sy: 0 },
+      jumpFrame: { sx: 0, sy: 0 }, // Same as sit - no animation
+      shadowWidth: 40, shadowHeight: 15, shadowOffsetY: 8
+    },
+    //bome
+    FRIEND3: {
+      x: 150, y: 450, scale: 1.8,
       width: 80, height: 120,
       sitFrame: { sx: 0, sy: 0 },
       jumpFrame: { sx: 0, sy: 0 }, // Same as sit - no animation
@@ -99,7 +116,9 @@ export const CONFIG = {
       KHUSHI: 'assets/images/khushi.png',
       ME: 'assets/images/me.png',
       ME_FRAMES: 'assets/images/me_frames.png',
-      FRIEND1: 'assets/images/friends/friend1.png'
+      FRIEND1: 'assets/images/friends/friend1.png',
+      FRIEND2: 'assets/images/friends/friend2.png',
+      FRIEND3: 'assets/images/friends/friend3.png'
     },
     AUDIO: {
       BG_MUSIC: 'assets/audio/bg.mp3',

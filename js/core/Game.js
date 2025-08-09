@@ -81,6 +81,18 @@ export class Game {
         messages: [
           "Thanks for helping with the party setup! 🎉"
         ]
+      },
+      'Friend2': {
+        portrait: 'khushi', // Using placeholder portrait
+        messages: [
+          "The decorations look amazing! 🎈"
+        ]
+      },
+      'Friend3': {
+        portrait: 'me', // Using placeholder portrait
+        messages: [
+          "Can't wait to celebrate with everyone! 🥳"
+        ]
       }
     };
     
@@ -89,7 +101,9 @@ export class Game {
       'Roti': 0,
       'Khushi': 0,
       'Me': 0,
-      'Friend1': 0
+      'Friend1': 0,
+      'Friend2': 0,
+      'Friend3': 0
     };
     
     this.setupEventListeners();
@@ -118,7 +132,7 @@ export class Game {
     const { IMAGES } = CONFIG.ASSETS;
     
     // Load all images in parallel
-    const [backgroundImage, playerFront, playerSide, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite] = await Promise.all([
+    const [backgroundImage, playerFront, playerSide, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite, friend2Sprite, friend3Sprite] = await Promise.all([
       this.assetLoader.loadImage(IMAGES.BACKGROUND),
       this.assetLoader.loadImage(IMAGES.PLAYER_FRONT),
       this.assetLoader.loadImage(IMAGES.PLAYER_SIDE),
@@ -129,7 +143,9 @@ export class Game {
       this.assetLoader.loadImage(IMAGES.KHUSHI),
       this.assetLoader.loadImage(IMAGES.ME),
       this.assetLoader.loadImage(IMAGES.ME_FRAMES),
-      this.assetLoader.loadImage(IMAGES.FRIEND1)
+      this.assetLoader.loadImage(IMAGES.FRIEND1),
+      this.assetLoader.loadImage(IMAGES.FRIEND2),
+      this.assetLoader.loadImage(IMAGES.FRIEND3)
     ]);
 
     // Store loaded assets
@@ -137,11 +153,11 @@ export class Game {
     this.player.setSprites(playerFront, playerSide, playerUp, playerMovement, playerUp, playerDown);
     
     
-    return { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite };
+    return { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite, friend2Sprite, friend3Sprite };
   }
 
   async createEntities(sprites) {
-    const { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite } = sprites;
+    const { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite, friend2Sprite, friend3Sprite } = sprites;
     
     // Create dogs with their sprites and audio
     const rotiDog = new Dog('Roti', CONFIG.DOGS.ROTI);
@@ -161,9 +177,21 @@ export class Game {
     friend1.setSprite(friend1Sprite);
     friend1.setAudio(this.audioManager.getAudio('friend1Sound'));
     
-    console.log('🖼️ Friend1 sprite source:', friend1Sprite?.src);
+    // Create friend2 as simple dog entity
+    const friend2 = new Dog('Friend2', CONFIG.DOGS.FRIEND2);
+    friend2.setSprite(friend2Sprite);
+    friend2.setAudio(this.audioManager.getAudio('friend2Sound'));
     
-    this.dogs = [rotiDog, khushiDog, meDog, friend1];
+    // Create friend3 as simple dog entity
+    const friend3 = new Dog('Friend3', CONFIG.DOGS.FRIEND3);
+    friend3.setSprite(friend3Sprite);
+    friend3.setAudio(this.audioManager.getAudio('friend3Sound'));
+    
+    console.log('🖼️ Friend1 sprite source:', friend1Sprite?.src);
+    console.log('🖼️ Friend2 sprite source:', friend2Sprite?.src);
+    console.log('🖼️ Friend3 sprite source:', friend3Sprite?.src);
+    
+    this.dogs = [rotiDog, khushiDog, meDog, friend1, friend2, friend3];
   }
 
   setupEventListeners() {
@@ -427,8 +455,13 @@ export class Game {
       rect.height / CONFIG.CANVAS.HEIGHT
     );
     
-    // Use smaller offset for Friend1 since it's much larger
-    const yOffset = character.name === 'Friend1' ? -20 : -80;
+    // Use smaller offset for friends since they're larger
+    const friendOffsets = {
+      'Friend1': -20,
+      'Friend2': -30,
+      'Friend3': -25
+    };
+    const yOffset = friendOffsets[character.name] || -80;
     
     const x = rect.left + (character.x + character.width / 2 - 70) * canvasScale;
     const y = rect.top + (character.y + yOffset) * canvasScale;
