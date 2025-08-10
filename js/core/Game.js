@@ -79,21 +79,21 @@ export class Game {
         ]
       },
       //khoa
-      'Friend1': {
+      'Khoa & Anne': {
         portrait: 'friend1_portrait',
         messages: [
           "Khoa: Live, laugh, love! Anne: HOLY EFFIN SHIT BALLS GIRL ITS YOUR BDAY! (Khoa: Sống, cười, yêu! Anne: CHÚC MỪNG SINH NHẬT CẬU Ê! 🎉)"
         ]
       },
       //raza
-      'Friend2': {
+      'Raza': {
         portrait: 'friend2_portrait',
         messages: [
           "This isn't as nice as a river but I still appreciate the view. (Đây không đẹp bằng một dòng sông nhưng tôi vẫn thích cảnh này.)"
         ]
       },
       //bome
-      'Friend3': {
+      'bố và mẹ': {
         portrait: 'friend3_portrait',
         messages: [
           "Không thể chờ để ăn mừng với mọi người! 🥳"
@@ -106,9 +106,9 @@ export class Game {
       'Roti': 0,
       'Khushi': 0,
       'Me': 0,
-      'Friend1': 0,
-      'Friend2': 0,
-      'Friend3': 0
+      'Khoa & Anne': 0,
+      'Raza': 0,
+      'bố và mẹ': 0
     };
     
     this.setupEventListeners();
@@ -182,17 +182,17 @@ export class Game {
     meDog.setFramesSprite(meFramesSprite); // Set new animation sprite
     
     // Create friend1 as simple dog entity
-    const friend1 = new Dog('Friend1', CONFIG.DOGS.FRIEND1);
+    const friend1 = new Dog('Khoa & Anne', CONFIG.DOGS.FRIEND1);
     friend1.setSprite(friend1Sprite);
     friend1.setAudio(this.audioManager.getAudio('friend1Sound'));
     
     // Create friend2 as simple dog entity
-    const friend2 = new Dog('Friend2', CONFIG.DOGS.FRIEND2);
+    const friend2 = new Dog('Raza', CONFIG.DOGS.FRIEND2);
     friend2.setSprite(friend2Sprite);
     friend2.setAudio(this.audioManager.getAudio('friend2Sound'));
     
     // Create friend3 as simple dog entity
-    const friend3 = new Dog('Friend3', CONFIG.DOGS.FRIEND3);
+    const friend3 = new Dog('bố và mẹ', CONFIG.DOGS.FRIEND3);
     friend3.setSprite(friend3Sprite);
     friend3.setAudio(this.audioManager.getAudio('friend3Sound'));
     

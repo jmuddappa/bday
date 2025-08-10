@@ -120,7 +120,11 @@ export class Dog extends GameObject {
     }
     
     // Update interaction bob animation for friends only
-    if (this.name.startsWith('Friend')) {
+    const isFriend = this.name.startsWith('Friend') || 
+                    this.name === 'Khoa & Anne' || 
+                    this.name === 'Raza' || 
+                    this.name === 'bố và mẹ';
+    if (isFriend) {
       if (this.isPlayerNearForBob) {
         // Gentle bob when player is nearby (can press E)
         this.interactionBobOffset = Math.sin(Date.now() * 0.004) * 1.5; // Very small 1.5px bob
@@ -297,7 +301,10 @@ export class Dog extends GameObject {
     const offsetY = this.state === 'jump' ? this.jumpOffsetY : 0;
 
     // For simple friends, use full image dimensions
-    const isFriend = this.name.startsWith('Friend') && this.sprite;
+    const isFriend = (this.name.startsWith('Friend') || 
+                     this.name === 'Khoa & Anne' || 
+                     this.name === 'Raza' || 
+                     this.name === 'bố và mẹ') && this.sprite;
     const sourceWidth = isFriend ? this.sprite.naturalWidth : this.originalWidth;
     const sourceHeight = isFriend ? this.sprite.naturalHeight : this.originalHeight;
 
