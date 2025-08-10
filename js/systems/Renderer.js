@@ -435,6 +435,33 @@ export class Renderer {
   }
 
   /**
+   * Draw Danundie streak animation
+   * @param {DanundieStreak} danundieStreak - Danundie streak entity
+   */
+  drawDanundieStreak(danundieStreak) {
+    if (!danundieStreak || !danundieStreak.isStreaking()) return;
+
+    try {
+      const frameData = danundieStreak.getFrameData();
+      if (!frameData) return;
+
+      this.ctx.drawImage(
+        frameData.sprite,
+        frameData.sourceX,
+        frameData.sourceY,
+        frameData.sourceWidth,
+        frameData.sourceHeight,
+        frameData.destX,
+        frameData.destY,
+        frameData.destWidth,
+        frameData.destHeight
+      );
+    } catch (error) {
+      ErrorHandler.handleError(error, 'Renderer.drawDanundieStreak');
+    }
+  }
+
+  /**
    * Get rendering context
    * @returns {CanvasRenderingContext2D}
    */

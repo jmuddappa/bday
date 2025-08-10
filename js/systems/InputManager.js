@@ -60,13 +60,17 @@ export class InputManager extends EventEmitter {
       case 'Escape':
         this.emit('closeModals');
         break;
+      case 'd':
+      case 'D':
+        this.emit('danundieStreak');
+        break;
     }
   }
 
   isGameKey(key) {
     const gameKeys = [
       'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
-      'w', 'a', 's', 'd', 'e', 'E', 'F3', ';', 'Escape'
+      'w', 'a', 's', 'd', 'e', 'E', 'F3', ';', 'Escape', 'D'
     ];
     return gameKeys.includes(key);
   }

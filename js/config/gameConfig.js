@@ -95,7 +95,7 @@ export const CONFIG = {
     },
     //bome
     FRIEND3: {
-      x: 40, y: 650, scale: 1.8,
+      x: 60, y: 580, scale: 1.8,
       width: 80, height: 120,
       sitFrame: { sx: 0, sy: 0 },
       jumpFrame: { sx: 0, sy: 0 }, // Same as sit - no animation
@@ -118,7 +118,8 @@ export const CONFIG = {
       ME_FRAMES: 'assets/images/me_frames.png',
       FRIEND1: 'assets/images/friends/friend1.png',
       FRIEND2: 'assets/images/friends/friend2.png',
-      FRIEND3: 'assets/images/friends/friend3.png'
+      FRIEND3: 'assets/images/friends/friend3.png',
+      DANUNDIE: 'assets/images/danundie.png'
     },
     AUDIO: {
       BG_MUSIC: 'assets/audio/bg.mp3',

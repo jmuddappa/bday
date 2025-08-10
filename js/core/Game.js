@@ -13,6 +13,7 @@ import { MailSystem } from '../features/MailSystem.js';
 import { Player } from '../entities/Player.js';
 import { Dog } from '../entities/Dog.js';
 import { Mailbox } from '../entities/Mailbox.js';
+import { DanundieStreak } from '../entities/DanundieStreak.js';
 import { ErrorHandler } from '../utils/ErrorHandler.js';
 
 export class Game {
@@ -30,6 +31,7 @@ export class Game {
     this.player = new Player();
     this.dogs = [];
     this.mailbox = new Mailbox();
+    this.danundieStreak = new DanundieStreak();
     
     // UI elements
     this.prompt = document.getElementById('prompt');
@@ -135,7 +137,7 @@ export class Game {
     const { IMAGES } = CONFIG.ASSETS;
     
     // Load all images in parallel
-    const [backgroundImage, playerFront, playerSide, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite, friend2Sprite, friend3Sprite] = await Promise.all([
+    const [backgroundImage, playerFront, playerSide, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite, friend2Sprite, friend3Sprite, danundieSprite] = await Promise.all([
       this.assetLoader.loadImage(IMAGES.BACKGROUND),
       this.assetLoader.loadImage(IMAGES.PLAYER_FRONT),
       this.assetLoader.loadImage(IMAGES.PLAYER_SIDE),
@@ -148,13 +150,17 @@ export class Game {
       this.assetLoader.loadImage(IMAGES.ME_FRAMES),
       this.assetLoader.loadImage(IMAGES.FRIEND1),
       this.assetLoader.loadImage(IMAGES.FRIEND2),
-      this.assetLoader.loadImage(IMAGES.FRIEND3)
+      this.assetLoader.loadImage(IMAGES.FRIEND3),
+      this.assetLoader.loadImage(IMAGES.DANUNDIE)
     ]);
 
     // Store loaded assets
     this.backgroundImage = backgroundImage;
     this.player.setSprites(playerFront, playerSide, playerUp, playerMovement, playerUp, playerDown);
     
+    
+    // Set danundie sprite
+    this.danundieStreak.setSprite(danundieSprite);
     
     return { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite, friend2Sprite, friend3Sprite };
   }
@@ -227,6 +233,11 @@ export class Game {
       // Let MailSystem handle its own two-step escape behavior
       // Only close dialog here
       this.closeDialog();
+    });
+
+    // Secret danundie streak trigger
+    this.inputManager.on('danundieStreak', () => {
+      this.triggerDanundieStreak();
     });
 
     // Audio system events
@@ -311,6 +322,7 @@ export class Game {
     try {
       this.updatePlayer();
       this.updateDogs();
+      this.updateDanundie();
       this.updateUI();
     } catch (error) {
       ErrorHandler.handleError(error, 'Game.update');
@@ -357,6 +369,10 @@ export class Game {
         dog.update(this.player);
       }
     });
+  }
+
+  updateDanundie() {
+    this.danundieStreak.update();
   }
 
   updateUI() {
@@ -410,6 +426,9 @@ export class Game {
       
       this.renderer.drawPlayer(this.player);
       
+      // Draw Danundie streak on top of everything
+      this.renderer.drawDanundieStreak(this.danundieStreak);
+      
       this.renderer.drawDebugInfo(this.player, this.dogs);
       this.renderer.drawDebugCollisions(CONFIG.COLLISION_BOXES, this.player);
       
@@ -427,6 +446,36 @@ export class Game {
     
     this.lastBumpTime = currentTime;
     this.audioManager.playBumpSound();
+  }
+
+  /**
+   * Trigger Danundie streak across screen
+   */
+  triggerDanundieStreak() {
+    if (this.danundieStreak.isStreaking()) {
+      console.log('🏃‍♂️ Danundie is already streaking!');
+      return;
+    }
+    
+    if (this.danundieStreak.isOnCooldown()) {
+      console.log(`🏃‍♂️ Danundie is resting! ${this.danundieStreak.getCooldownRemaining()}s remaining`);
+      return;
+    }
+    
+    // Random Y position in playable area
+    const randomY = Math.random() * (CONFIG.CANVAS.HEIGHT - 200) + 100;
+    this.danundieStreak.startStreak(randomY);
+    
+    // Play silly sound effect
+    const danundieAudio = this.audioManager.getAudio('danundieSound');
+    if (danundieAudio) {
+      danundieAudio.currentTime = 0; // Reset to start
+      danundieAudio.play().catch(e => {
+        console.log('Could not play danundie sound:', e);
+      });
+    }
+    
+    console.log('🏃‍♂️ DANUNDIE STREAK TRIGGERED WITH SOUND!');
   }
 
   // Public API
