@@ -10,7 +10,7 @@ import { ErrorHandler } from '../utils/ErrorHandler.js';
 export class DaninjaReveal extends GameObject {
   constructor() {
     // Start at tree interaction zone
-    super(500, 800, 60, 60); // Interaction zone size
+    super(200, 800, 60, 60); // Interaction zone size moved 60px left
     
     this.name = 'Daninja';
     this.sprite = null;
@@ -30,7 +30,7 @@ export class DaninjaReveal extends GameObject {
     // Spinning animation
     this.ballRotation = 0;
     this.spinSpeed = 0.3; // Rotation speed
-    this.ballX = 312; // Start position
+    this.ballX = 252; // Start position (moved 60px left)
     this.ballY = 983;
     this.targetX = 317; // Landing position much closer to trees
     this.targetY = 830;
@@ -101,7 +101,7 @@ export class DaninjaReveal extends GameObject {
     }
     
     // Calculate arc position
-    const startX = 312;
+    const startX = 252; // Moved 60px left
     const startY = 983 - 100; // Start slightly above trees
     const endX = this.targetX;
     const endY = this.targetY;

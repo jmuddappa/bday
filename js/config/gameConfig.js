@@ -43,14 +43,14 @@ export const CONFIG = {
 
   // Jukebox configuration
   JUKEBOX: {
-    X: 980, 
-    Y: 805, // 50px down  
+    X: 595, 
+    Y: 220, // 50px down  
     INTERACTION_DISTANCE: 120,
     PROMPT_OFFSET_X: -5,
     PROMPT_OFFSET_Y: -100, 
     WIGGLE_SPEED: 0.01,
     WIGGLE_AMPLITUDE: 3,
-    SCALE: 0.12
+    SCALE: 0.13
   },
 
   // Dog behavior settings
@@ -107,7 +107,7 @@ export const CONFIG = {
     },
     //bome
     FRIEND3: {
-      x: 60, y: 580, scale: 1.8,
+      x: 60, y: 580, scale: 1.5,
       width: 80, height: 120,
       sitFrame: { sx: 0, sy: 0 },
       jumpFrame: { sx: 0, sy: 0 }, // Same as sit - no animation

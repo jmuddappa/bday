@@ -351,6 +351,7 @@ export class Game {
     if (!this.isRunning) {
       this.isRunning = true;
       this.audioManager.setVolume('bgMusic', 1.0);
+      this.lastFrameTime = performance.now(); // Reset frame time to prevent speed-up
       requestAnimationFrame((time) => this.gameLoop(time));
     }
   }
@@ -358,7 +359,10 @@ export class Game {
   gameLoop(currentTime) {
     if (!this.isRunning) return;
 
-    const deltaTime = currentTime - this.lastFrameTime;
+    let deltaTime = currentTime - this.lastFrameTime;
+    
+    // Cap deltaTime to prevent speed-up after tab switching (max 33ms = ~30fps)
+    deltaTime = Math.min(deltaTime, 33);
     
     // Run at full frame rate (no throttling)
     this.update(deltaTime);
@@ -528,7 +532,7 @@ export class Game {
       rect.height / CONFIG.CANVAS.HEIGHT
     );
     
-    const x = rect.left + (312 - 70) * canvasScale; // Center on interaction zone
+    const x = rect.left + (252 - 70) * canvasScale; // Center on interaction zone (moved 60px left)
     const y = rect.top + (983 - 50) * canvasScale; // Above interaction zone
     
     this.prompt.style.left = `${x}px`;
