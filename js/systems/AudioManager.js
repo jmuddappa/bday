@@ -27,6 +27,7 @@ export class AudioManager {
       this.audioElements.set('friend2Sound', document.getElementById('friend2Sound'));
       this.audioElements.set('friend3Sound', document.getElementById('friend3Sound'));
       this.audioElements.set('danundieSound', document.getElementById('danundieSound'));
+      this.audioElements.set('daninjaSound', document.getElementById('daninjaSound'));
       this.audioElements.set('fadeSound', document.getElementById('fadeSound'));
       
       // Set up background music properties

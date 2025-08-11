@@ -132,7 +132,8 @@ export const CONFIG = {
       FRIEND2: 'assets/images/friends/friend2.png',
       FRIEND3: 'assets/images/friends/friend3.png',
       DANUNDIE: 'assets/images/danundie.png',
-      JUKEBOX: 'assets/images/jukebox.png'
+      JUKEBOX: 'assets/images/jukebox.png',
+      DANINJA: 'assets/images/daninja.png'
     },
     AUDIO: {
       BG_MUSIC: 'assets/audio/bg.mp3',

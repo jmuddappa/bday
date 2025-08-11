@@ -15,6 +15,7 @@ import { Dog } from '../entities/Dog.js';
 import { Mailbox } from '../entities/Mailbox.js';
 import { Jukebox } from '../entities/Jukebox.js';
 import { DanundieStreak } from '../entities/DanundieStreak.js';
+import { DaninjaReveal } from '../entities/DaninjaReveal.js';
 import { JukeboxSystem } from '../features/JukeboxSystem.js';
 import { PoopSystem } from '../systems/PoopSystem.js';
 import { ErrorHandler } from '../utils/ErrorHandler.js';
@@ -38,6 +39,7 @@ export class Game {
     this.mailbox = new Mailbox();
     this.jukebox = new Jukebox();
     this.danundieStreak = new DanundieStreak();
+    this.daninjaReveal = new DaninjaReveal();
     
     // UI elements
     this.prompt = document.getElementById('prompt');
@@ -104,6 +106,15 @@ export class Game {
         messages: [
           "Không thể chờ để ăn mừng với mọi người! 🥳"
         ]
+      },
+      //daninja
+      'Daninja': {
+        portrait: 'daninja_portrait',
+        messages: [
+          "I have been waiting in the trees, watching... Happy birthday from the shadows! 🥷",
+          "The art of stealth is to remain unseen until the perfect moment arrives! 🌳",
+          "I trained in these very trees for years. Now I emerge for your special day! ⚡"
+        ]
       }
     };
     
@@ -114,7 +125,8 @@ export class Game {
       'Me': 0,
       'Khoa & Anne': 0,
       'Raza': 0,
-      'bố và mẹ': 0
+      'bố và mẹ': 0,
+      'Daninja': 0
     };
     
     // Track interaction counts for special behaviors
@@ -148,7 +160,7 @@ export class Game {
     const { IMAGES } = CONFIG.ASSETS;
     
     // Load all images in parallel
-    const [backgroundImage, playerFront, playerSide, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite, friend2Sprite, friend3Sprite, danundieSprite, jukeboxSprite] = await Promise.all([
+    const [backgroundImage, playerFront, playerSide, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite, friend2Sprite, friend3Sprite, danundieSprite, jukeboxSprite, daninjaSprite] = await Promise.all([
       this.assetLoader.loadImage(IMAGES.BACKGROUND),
       this.assetLoader.loadImage(IMAGES.PLAYER_FRONT),
       this.assetLoader.loadImage(IMAGES.PLAYER_SIDE),
@@ -163,7 +175,8 @@ export class Game {
       this.assetLoader.loadImage(IMAGES.FRIEND2),
       this.assetLoader.loadImage(IMAGES.FRIEND3),
       this.assetLoader.loadImage(IMAGES.DANUNDIE),
-      this.assetLoader.loadImage(IMAGES.JUKEBOX)
+      this.assetLoader.loadImage(IMAGES.JUKEBOX),
+      this.assetLoader.loadImage(IMAGES.DANINJA)
     ]);
 
     // Store loaded assets
@@ -176,6 +189,9 @@ export class Game {
     
     // Set jukebox sprite
     this.jukebox.setSprite(jukeboxSprite);
+    
+    // Set daninja sprite
+    this.daninjaReveal.setSprite(daninjaSprite);
     
     return { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite, friend2Sprite, friend3Sprite };
   }
@@ -225,6 +241,19 @@ export class Game {
       const nearbyDog = this.getNearbyDog();
       if (nearbyDog) {
         this.openDialog(nearbyDog);
+        return;
+      }
+      
+      // Check for Daninja interaction (revealed)
+      if (this.daninjaReveal.canTalkToDaninja(this.player)) {
+        const daninjaCharacter = { name: 'Daninja' };
+        this.openDialog(daninjaCharacter);
+        return;
+      }
+      
+      // Check for tree search (hidden Daninja)
+      if (this.daninjaReveal.canInteractWithTrees(this.player)) {
+        this.daninjaReveal.startReveal(this.audioManager);
         return;
       }
       
@@ -344,6 +373,7 @@ export class Game {
       this.updatePlayer();
       this.updateDogs();
       this.updateDanundie();
+      this.updateDaninja();
       this.updateJukebox();
       this.updatePoops();
       this.updateUI();
@@ -398,6 +428,10 @@ export class Game {
     this.danundieStreak.update();
   }
 
+  updateDaninja() {
+    this.daninjaReveal.update(this.player);
+  }
+
   updateJukebox() {
     this.jukebox.update(this.player);
   }
@@ -422,13 +456,19 @@ export class Game {
     if (nearbyDog) {
       this.showTalkPrompt(nearbyDog);
       this.hidePrompt();
+    } else if (this.daninjaReveal.canTalkToDaninja(this.player)) {
+      // Show talk prompt for revealed Daninja
+      this.showDaninjaTalkPrompt();
+      this.hidePrompt();
     } else {
       // If no dog is nearby, close any open dialog
       this.closeDialog();
       this.hideTalkPrompt();
       
-      // Check mailbox
-      if (this.mailbox.isPlayerNearby(this.player)) {
+      // Check for tree interaction (hidden Daninja)
+      if (this.daninjaReveal.canInteractWithTrees(this.player)) {
+        this.showTreeSearchPrompt();
+      } else if (this.mailbox.isPlayerNearby(this.player)) {
         this.showPrompt();
       } else if (this.jukebox.isPlayerInRange(this.player)) {
         // Show prompt for jukebox
@@ -473,6 +513,49 @@ export class Game {
     this.prompt.style.top = `${pos.y}px`;
   }
 
+  showTreeSearchPrompt() {
+    if (this.prompt) {
+      this.prompt.textContent = 'Press E to search trees';
+      this.prompt.style.display = 'block';
+      this.updateTreeSearchPromptPosition();
+    }
+  }
+
+  updateTreeSearchPromptPosition() {
+    const rect = this.canvas.getBoundingClientRect();
+    const canvasScale = Math.min(
+      rect.width / CONFIG.CANVAS.WIDTH,
+      rect.height / CONFIG.CANVAS.HEIGHT
+    );
+    
+    const x = rect.left + (312 - 70) * canvasScale; // Center on interaction zone
+    const y = rect.top + (983 - 50) * canvasScale; // Above interaction zone
+    
+    this.prompt.style.left = `${x}px`;
+    this.prompt.style.top = `${y}px`;
+  }
+
+  showDaninjaTalkPrompt() {
+    if (this.talkPrompt) {
+      this.talkPrompt.style.display = 'block';
+      this.updateDaninjaTalkPromptPosition();
+    }
+  }
+
+  updateDaninjaTalkPromptPosition() {
+    const rect = this.canvas.getBoundingClientRect();
+    const canvasScale = Math.min(
+      rect.width / CONFIG.CANVAS.WIDTH,
+      rect.height / CONFIG.CANVAS.HEIGHT
+    );
+    
+    const x = rect.left + (317 - 70) * canvasScale; // Above Daninja
+    const y = rect.top + (830 - 162 - 20) * canvasScale; // Above sprite top
+    
+    this.talkPrompt.style.left = `${x}px`;
+    this.talkPrompt.style.top = `${y}px`;
+  }
+
   render() {
     try {
       this.renderer.clear();
@@ -492,6 +575,9 @@ export class Game {
       
       // Draw Danundie streak on top of everything
       this.renderer.drawDanundieStreak(this.danundieStreak);
+      
+      // Draw Daninja reveal animation
+      this.renderer.drawDaninjaReveal(this.daninjaReveal);
       
       this.renderer.drawDebugInfo(this.player, this.dogs);
       this.renderer.drawDebugCollisions(CONFIG.COLLISION_BOXES, this.player);

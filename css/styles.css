@@ -550,6 +550,10 @@ audio {
   background-image: url('../assets/images/friends/friend3_portrait.png');
 }
 
+.dialog-portrait.daninja_portrait {
+  background-image: url('../assets/images/daninja_portrait.png');
+}
+
 .dialog-content {
   flex: 1;
   padding-left: 0;

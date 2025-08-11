@@ -568,6 +568,48 @@ export class Renderer {
   }
 
   /**
+   * Draw Daninja reveal animation
+   * @param {DaninjaReveal} daninjaReveal - Daninja reveal entity
+   */
+  drawDaninjaReveal(daninjaReveal) {
+    if (!daninjaReveal) return;
+
+    try {
+      const drawData = daninjaReveal.getDrawData();
+      if (!drawData) return; // Hidden state
+
+      this.ctx.save();
+      
+      // Handle rotation for spinning ball
+      if (drawData.rotation && drawData.rotation !== 0) {
+        const centerX = drawData.destX + drawData.destWidth / 2;
+        const centerY = drawData.destY + drawData.destHeight / 2;
+        
+        this.ctx.translate(centerX, centerY);
+        this.ctx.rotate(drawData.rotation);
+        this.ctx.translate(-centerX, -centerY);
+      }
+
+      // Draw Daninja sprite
+      this.ctx.drawImage(
+        drawData.sprite,
+        drawData.sourceX,
+        drawData.sourceY,
+        drawData.sourceWidth,
+        drawData.sourceHeight,
+        drawData.destX,
+        drawData.destY,
+        drawData.destWidth,
+        drawData.destHeight
+      );
+
+      this.ctx.restore();
+    } catch (error) {
+      ErrorHandler.handleError(error, 'Renderer.drawDaninjaReveal');
+    }
+  }
+
+  /**
    * Get rendering context
    * @returns {CanvasRenderingContext2D}
    */
