@@ -16,6 +16,7 @@ import { Mailbox } from '../entities/Mailbox.js';
 import { Jukebox } from '../entities/Jukebox.js';
 import { DanundieStreak } from '../entities/DanundieStreak.js';
 import { JukeboxSystem } from '../features/JukeboxSystem.js';
+import { PoopSystem } from '../systems/PoopSystem.js';
 import { ErrorHandler } from '../utils/ErrorHandler.js';
 
 export class Game {
@@ -29,6 +30,7 @@ export class Game {
     this.collisionSystem = new CollisionSystem();
     this.mailSystem = new MailSystem(this.audioManager);
     this.jukeboxSystem = new JukeboxSystem(this.audioManager);
+    this.poopSystem = new PoopSystem();
     
     // Game entities
     this.player = new Player();
@@ -113,6 +115,11 @@ export class Game {
       'Khoa & Anne': 0,
       'Raza': 0,
       'bố và mẹ': 0
+    };
+    
+    // Track interaction counts for special behaviors
+    this.dogInteractionCounts = {
+      'Khushi': 0
     };
     
     this.setupEventListeners();
@@ -338,6 +345,7 @@ export class Game {
       this.updateDogs();
       this.updateDanundie();
       this.updateJukebox();
+      this.updatePoops();
       this.updateUI();
     } catch (error) {
       ErrorHandler.handleError(error, 'Game.update');
@@ -392,6 +400,19 @@ export class Game {
 
   updateJukebox() {
     this.jukebox.update(this.player);
+  }
+
+  updatePoops() {
+    // Find Roti dog and update poop system
+    const rotiDog = this.dogs.find(dog => dog.name === 'Roti');
+    if (rotiDog) {
+      this.poopSystem.update(rotiDog, this.player);
+    }
+    
+    // Periodic cleanup of old poops
+    if (Math.random() < 0.01) { // 1% chance each frame
+      this.poopSystem.cleanup();
+    }
   }
 
   updateUI() {
@@ -463,6 +484,9 @@ export class Game {
       
       // Draw jukebox
       this.renderer.drawJukebox(this.jukebox);
+      
+      // Draw poops (before player so player walks over them)
+      this.renderer.drawPoops(this.poopSystem);
       
       this.renderer.drawPlayer(this.player);
       
@@ -619,6 +643,17 @@ export class Game {
         
         // Advance to next message for next interaction
         this.dogMessageIndex[character.name] = (currentIndex + 1) % dialogData.messages.length;
+        
+        // Track interactions for special behaviors
+        if (character.name === 'Khushi') {
+          this.dogInteractionCounts.Khushi++;
+          console.log(`🐱 Khushi interaction count: ${this.dogInteractionCounts.Khushi}`);
+          
+          // Check if Khushi should start fading after 5+ interactions
+          if (this.dogInteractionCounts.Khushi >= 5) {
+            character.startFadeOut(this.audioManager);
+          }
+        }
         
         const dialogTextElement = document.getElementById('dialogText');
         if (dialogTextElement) {

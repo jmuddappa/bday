@@ -47,6 +47,12 @@ export class Dog extends GameObject {
     this.interactionBobOffset = 0;
     this.isPlayerNearForBob = false;
     
+    // Fade out system
+    this.isFading = false;
+    this.fadeOpacity = 1.0;
+    this.fadeSpeed = 0.005; // Much slower fade (per frame) - takes ~3.3 seconds at 60fps
+    this.isVanished = false;
+    
   }
 
 
@@ -132,6 +138,9 @@ export class Dog extends GameObject {
         this.interactionBobOffset = 0; // No bob when player is away
       }
     }
+    
+    // Update fade-out animation
+    this.updateFadeOut();
   }
 
   /**
@@ -345,6 +354,11 @@ export class Dog extends GameObject {
    * @returns {boolean} True if player is in range
    */
   isPlayerInRange(player) {
+    // No interaction if fading or vanished
+    if (this.isFading || this.isVanished) {
+      return false;
+    }
+    
     const distance = this.distanceTo(player);
     const threshold = this.name === 'Me' ? 
       CONFIG.DOGS.ME_INTERACTION_DISTANCE : 
@@ -403,5 +417,78 @@ export class Dog extends GameObject {
     }
     this.sprite = null;
     super.destroy();
+  }
+
+  /**
+   * Get distance to another entity
+   * @param {GameObject} other - Other entity
+   * @returns {number} Distance in pixels
+   */
+  distanceTo(other) {
+    const dx = (this.x + this.width/2) - (other.x + other.width/2);
+    const dy = (this.y + this.height/2) - (other.y + other.height/2);
+    return Math.sqrt(dx*dx + dy*dy);
+  }
+
+  /**
+   * Start fading out the dog
+   * @param {AudioManager} audioManager - Audio manager for playing fade sound
+   */
+  startFadeOut(audioManager) {
+    if (!this.isFading && !this.isVanished) {
+      console.log(`👻 ${this.name} is starting to fade away...`);
+      this.isFading = true;
+      // Enter jump state while fading
+      this.setState('jump');
+      
+      // Play fade sound effect
+      if (audioManager) {
+        const fadeAudio = audioManager.getAudio('fadeSound');
+        if (fadeAudio) {
+          fadeAudio.currentTime = 0;
+          fadeAudio.volume = 0.3; // Gentle volume
+          fadeAudio.play().catch(e => {
+            console.log('Could not play fade sound:', e);
+          });
+        }
+      }
+    }
+  }
+
+  /**
+   * Update fade-out animation
+   */
+  updateFadeOut() {
+    if (this.isFading && !this.isVanished) {
+      this.fadeOpacity -= this.fadeSpeed;
+      
+      if (this.fadeOpacity <= 0) {
+        this.fadeOpacity = 0;
+        this.isVanished = true;
+        this.isFading = false;
+        console.log(`👻 ${this.name} has completely vanished!`);
+      }
+    }
+  }
+
+  /**
+   * Check if dog is visible (not vanished)
+   * @returns {boolean}
+   */
+  isVisible() {
+    return !this.isVanished;
+  }
+
+  /**
+   * Get current opacity for rendering
+   * @returns {number} Opacity value 0-1
+   */
+  getOpacity() {
+    if (this.isFading) {
+      // Add subtle flicker effect while fading to make it more obvious
+      const flicker = Math.sin(Date.now() * 0.01) * 0.1 + 0.9; // Gentle flicker between 0.8-1.0
+      return Math.min(this.fadeOpacity * flicker, this.fadeOpacity);
+    }
+    return this.fadeOpacity;
   }
 }

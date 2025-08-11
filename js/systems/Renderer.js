@@ -211,7 +211,7 @@ export class Renderer {
    * @param {Dog} dog - Dog entity to draw
    */
   drawDog(dog) {
-    if (!dog || !dog.sprite) return;
+    if (!dog || !dog.sprite || !dog.isVisible()) return;
 
     try {
       const drawData = dog.getDrawData();
@@ -223,6 +223,13 @@ export class Renderer {
       if (dog.name === 'bố và mẹ') configKey = 'FRIEND3';
       
       const config = CONFIG.DOGS[configKey];
+      
+      // Handle opacity for fading dogs
+      const opacity = dog.getOpacity();
+      if (opacity < 1.0) {
+        this.ctx.save();
+        this.ctx.globalAlpha = opacity;
+      }
       
       // Check if sprite loaded properly
       if (!drawData.sprite || drawData.sprite.naturalWidth === 0) {
@@ -253,6 +260,11 @@ export class Renderer {
         drawData.destWidth,
         drawData.destHeight
       );
+      
+      // Restore context if we modified opacity
+      if (opacity < 1.0) {
+        this.ctx.restore();
+      }
     } catch (error) {
       ErrorHandler.handleError(error, 'Renderer.drawDog');
     }
@@ -520,6 +532,38 @@ export class Renderer {
       );
     } catch (error) {
       ErrorHandler.handleError(error, 'Renderer.drawDanundieStreak');
+    }
+  }
+
+  /**
+   * Draw poop emojis
+   * @param {PoopSystem} poopSystem - Poop system with poop locations
+   */
+  drawPoops(poopSystem) {
+    if (!poopSystem) return;
+
+    try {
+      const visiblePoops = poopSystem.getVisiblePoops();
+      
+      if (visiblePoops.length > 0) {
+        this.ctx.save();
+        this.ctx.font = '24px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        
+        visiblePoops.forEach(poop => {
+          // Draw poop emoji with slight shadow
+          this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+          this.ctx.fillText('💩', poop.x + 1, poop.y + 1); // Shadow
+          
+          this.ctx.fillStyle = '#8B4513'; // Brown color
+          this.ctx.fillText('💩', poop.x, poop.y);
+        });
+        
+        this.ctx.restore();
+      }
+    } catch (error) {
+      ErrorHandler.handleError(error, 'Renderer.drawPoops');
     }
   }
 
