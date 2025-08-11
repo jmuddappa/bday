@@ -64,20 +64,20 @@ export class Game {
         messages: [
           "Thank you for adopting me, despite what papa said about my ugly nose! (Cảm ơn vì đã nhận nuôi con, mặc dù bố nói mũi con xấu!)",
           "I love you more than life itself (Con yêu bạn hơn cả mạng sống của mình)",
-          "I would kill Khushi to save you! (Con sẽ giết Khushi để cứu bạn!)",
+          "Can I crawl inside you?! (Con có thể chui vào trong người bạn không?!)",
           "I just pissed and pooped on the rug inside! (Con vừa đi tiểu và đại tiện lên thảm trong nhà!)"
         ]
       },
       'Khushi': {
         portrait: 'khushi',
         messages: [
-          "happy bday i guess lol (chúc mừng sinh nhật... chắc vậy lol)",
+          "hmm? is something special about today? (hmm? hôm nay có gì đặc biệt không?)",
           "sup? (sao?)",
-          "um can you give me some space (ừm... cho tôi chút không gian được không)",
+          "um, can you give me some space? (ừm... cho tôi chút không gian được không)",
           "... (...)"
         ]
       },
-      'Me': {
+      'Danoonie': {
         portrait: 'me',
         messages: [
           "Don't move or else I'll stop singing and we have to start this all over again & torture our guests. (Đừng di chuyển không thì tôi sẽ ngừng hát và chúng ta phải bắt đầu lại từ đầu & tra tấn khách của chúng ta.)",
@@ -111,9 +111,9 @@ export class Game {
       'Daninja': {
         portrait: 'daninja_portrait',
         messages: [
-          "I have been waiting in the trees, watching... Happy birthday from the shadows! 🥷",
-          "The art of stealth is to remain unseen until the perfect moment arrives! 🌳",
-          "I trained in these very trees for years. Now I emerge for your special day! ⚡"
+          "I trained in these very trees for years. Now I emerge for your special day! (Tôi đã luyện tập trong những cây này nhiều năm. Giờ tôi xuất hiện cho ngày đặc biệt của bạn!)",
+          "The art of stealth is to remain unseen until the perfect moment arrives! (Nghệ thuật ẩn mình là giữ im lặng cho đến khi thời khắc hoàn hảo đến!)",
+          "Happy birthday from the shadows! (Chúc mừng sinh nhật từ bóng tối! 🥷)"
         ]
       }
     };
@@ -122,7 +122,7 @@ export class Game {
     this.dogMessageIndex = {
       'Roti': 0,
       'Khushi': 0,
-      'Me': 0,
+      'Danoonie': 0,
       'Khoa & Anne': 0,
       'Raza': 0,
       'bố và mẹ': 0,
@@ -208,7 +208,7 @@ export class Game {
     khushiDog.setSprite(khushiSprite);
     khushiDog.setAudio(this.audioManager.getAudio('barkKhushi'));
     
-    const meDog = new Dog('Me', CONFIG.DOGS.ME);
+    const meDog = new Dog('Danoonie', CONFIG.DOGS.ME);
     meDog.setSprite(meSprite); // Keep original for fallback
     meDog.setFramesSprite(meFramesSprite); // Set new animation sprite
     
@@ -420,7 +420,7 @@ export class Game {
     const happybdayAudio = this.audioManager.getAudio('happybday');
     
     this.dogs.forEach(dog => {
-      if (dog.name === 'Me') {
+      if (dog.name === 'Danoonie') {
         dog.update(this.player, happybdayAudio, bgAudio);
       } else {
         dog.update(this.player);
@@ -698,7 +698,7 @@ export class Game {
       this.dialogContainer.style.display = 'block';
       
       // Play sound for all characters except Me
-      if (character.name !== 'Me' && character.audio) {
+      if (character.name !== 'Danoonie' && character.audio) {
         character.audio.currentTime = 0; // Reset to start
         character.audio.play().catch(e => {
           console.log('Could not play sound:', e);

@@ -15,7 +15,7 @@ export class DanundieStreak {
     // Position and movement
     this.x = -100; // Start off-screen left
     this.y = 400; // Middle of screen
-    this.speed = 12; // Fast horizontal movement
+    this.speed = 9.6; // Fast horizontal movement (20% slower)
     
     // Animation properties
     this.currentFrame = 0;

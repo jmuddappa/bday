@@ -107,7 +107,7 @@ export const CONFIG = {
     },
     //bome
     FRIEND3: {
-      x: 60, y: 580, scale: 1.5,
+      x: 60, y: 615, scale: 1.35, // Squished down 15% (1.5 × 0.85)
       width: 80, height: 120,
       sitFrame: { sx: 0, sy: 0 },
       jumpFrame: { sx: 0, sy: 0 }, // Same as sit - no animation
@@ -154,7 +154,7 @@ export const CONFIG = {
     { x: 0, y: 170, width: 1200, height: 10 },
     { x: 550, y: 0, width: 10, height: 300 },
     { x: 700, y: 0, width: 10, height: 300 },
-    { x: 560, y: 300, width: 270, height: 10 },
+    { x: 560, y: 300, width: 225, height: 10 },
     { x: 200, y: 0, width: 10, height: 300 },
     { x: 380, y: 260, width: 5, height: 50 },
     { x: 930, y: 450, width: 130, height: 350 },

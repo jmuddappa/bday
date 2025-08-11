@@ -35,7 +35,7 @@ export class Dog extends GameObject {
     this.animationDuration = 500; // ms
     
     // 3-frame animation system for Me dog
-    this.useFrameAnimation = this.name === 'Me';
+    this.useFrameAnimation = this.name === 'Danoonie';
     this.animationFrame = 0;
     this.frameCounter = 0;
     this.animationSpeed = config.animationSpeed || 30;
@@ -88,7 +88,7 @@ export class Dog extends GameObject {
    */
   update(player, specialAudio = null, bgAudio = null) {
     const distance = this.distanceTo(player);
-    const threshold = this.name === 'Me' ? 
+    const threshold = this.name === 'Danoonie' ? 
       CONFIG.DOGS.ME_INTERACTION_DISTANCE : 
       CONFIG.DOGS.INTERACTION_DISTANCE;
 
@@ -149,7 +149,7 @@ export class Dog extends GameObject {
    * @param {HTMLAudioElement} bgAudio - Background music audio
    */
   activate(specialAudio = null, bgAudio = null) {
-    if (this.name === 'Me' && this.state !== 'jump') {
+    if (this.name === 'Danoonie' && this.state !== 'jump') {
       this.setState('jump');
       this.barked = true;
       
@@ -198,7 +198,7 @@ export class Dog extends GameObject {
    * @param {HTMLAudioElement} bgAudio - Background music audio
    */
   deactivate(specialAudio = null, bgAudio = null) {
-    if (this.name === 'Me' && this.state !== 'sit') {
+    if (this.name === 'Danoonie' && this.state !== 'sit') {
       this.setState('sit');
       this.barked = false;
       
@@ -249,7 +249,7 @@ export class Dog extends GameObject {
    */
   getDrawData() {
     // Use 3-frame animation system for Me dog if frames sprite is available
-    if (this.useFrameAnimation && this.framesSprite && this.name === 'Me') {
+    if (this.useFrameAnimation && this.framesSprite && this.name === 'Danoonie') {
       const config = CONFIG.DOGS.ME;
       const currentFrameIndex = this.frameSequence[this.animationFrame];
       
@@ -335,7 +335,7 @@ export class Dog extends GameObject {
    * @returns {Object} Interaction bounds
    */
   getInteractionBounds() {
-    const threshold = this.name === 'Me' ? 
+    const threshold = this.name === 'Danoonie' ? 
       CONFIG.DOGS.ME_INTERACTION_DISTANCE : 
       CONFIG.DOGS.INTERACTION_DISTANCE;
     
@@ -360,7 +360,7 @@ export class Dog extends GameObject {
     }
     
     const distance = this.distanceTo(player);
-    const threshold = this.name === 'Me' ? 
+    const threshold = this.name === 'Danoonie' ? 
       CONFIG.DOGS.ME_INTERACTION_DISTANCE : 
       CONFIG.DOGS.INTERACTION_DISTANCE;
     
