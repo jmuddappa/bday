@@ -41,6 +41,18 @@ export const CONFIG = {
     PROMPT_OFFSET_Y: -180
   },
 
+  // Jukebox configuration
+  JUKEBOX: {
+    X: 900, 
+    Y: 825, // 50px down  
+    INTERACTION_DISTANCE: 120,
+    PROMPT_OFFSET_X: -5,
+    PROMPT_OFFSET_Y: -30, // Just 30px above jukebox
+    WIGGLE_SPEED: 0.01,
+    WIGGLE_AMPLITUDE: 3,
+    SCALE: 0.6
+  },
+
   // Dog behavior settings
   DOGS: {
     INTERACTION_DISTANCE: 100,
@@ -119,7 +131,8 @@ export const CONFIG = {
       FRIEND1: 'assets/images/friends/friend1.png',
       FRIEND2: 'assets/images/friends/friend2.png',
       FRIEND3: 'assets/images/friends/friend3.png',
-      DANUNDIE: 'assets/images/danundie.png'
+      DANUNDIE: 'assets/images/danundie.png',
+      JUKEBOX: 'assets/images/jukebox.png'
     },
     AUDIO: {
       BG_MUSIC: 'assets/audio/bg.mp3',

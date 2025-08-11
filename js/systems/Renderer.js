@@ -215,7 +215,14 @@ export class Renderer {
 
     try {
       const drawData = dog.getDrawData();
-      const config = CONFIG.DOGS[dog.name.toUpperCase()];
+      
+      // Map friend names to config keys
+      let configKey = dog.name.toUpperCase();
+      if (dog.name === 'Khoa & Anne') configKey = 'FRIEND1';
+      if (dog.name === 'Raza') configKey = 'FRIEND2';
+      if (dog.name === 'bố và mẹ') configKey = 'FRIEND3';
+      
+      const config = CONFIG.DOGS[configKey];
       
       // Check if sprite loaded properly
       if (!drawData.sprite || drawData.sprite.naturalWidth === 0) {
@@ -432,6 +439,61 @@ export class Renderer {
    */
   getCanvas() {
     return this.canvas;
+  }
+
+  /**
+   * Draw jukebox with wiggle animation and music notes
+   * @param {Jukebox} jukebox - Jukebox entity
+   */
+  drawJukebox(jukebox) {
+    if (!jukebox) return;
+
+    try {
+      const drawData = jukebox.getDrawData();
+      if (!drawData) return;
+
+      // Draw shadow first (behind jukebox)
+      const shadowX = drawData.destX + drawData.destWidth / 2;
+      const shadowY = drawData.destY + drawData.destHeight - 5;
+      this.drawShadow(shadowX, shadowY, 60, 20, 0.3);
+
+      // Draw jukebox sprite
+      this.ctx.drawImage(
+        drawData.sprite,
+        drawData.sourceX,
+        drawData.sourceY,
+        drawData.sourceWidth,
+        drawData.sourceHeight,
+        drawData.destX,
+        drawData.destY,
+        drawData.destWidth,
+        drawData.destHeight
+      );
+
+      // Draw floating music notes
+      const musicNotes = jukebox.getMusicNotes();
+      if (musicNotes.length > 0) {
+        this.ctx.save();
+        this.ctx.font = '32px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+
+        musicNotes.forEach(note => {
+          const alpha = Math.max(0, Math.min(1, note.life));
+          this.ctx.fillStyle = `rgba(255, 215, 0, ${alpha})`;
+          this.ctx.strokeStyle = `rgba(139, 69, 19, ${alpha})`;
+          this.ctx.lineWidth = 2;
+          
+          // Draw note with outline
+          this.ctx.strokeText(note.symbol, note.x, note.y);
+          this.ctx.fillText(note.symbol, note.x, note.y);
+        });
+
+        this.ctx.restore();
+      }
+    } catch (error) {
+      ErrorHandler.handleError(error, 'Renderer.drawJukebox');
+    }
   }
 
   /**

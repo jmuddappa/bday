@@ -13,7 +13,9 @@ import { MailSystem } from '../features/MailSystem.js';
 import { Player } from '../entities/Player.js';
 import { Dog } from '../entities/Dog.js';
 import { Mailbox } from '../entities/Mailbox.js';
+import { Jukebox } from '../entities/Jukebox.js';
 import { DanundieStreak } from '../entities/DanundieStreak.js';
+import { JukeboxSystem } from '../features/JukeboxSystem.js';
 import { ErrorHandler } from '../utils/ErrorHandler.js';
 
 export class Game {
@@ -26,11 +28,13 @@ export class Game {
     this.renderer = new Renderer(this.canvas);
     this.collisionSystem = new CollisionSystem();
     this.mailSystem = new MailSystem(this.audioManager);
+    this.jukeboxSystem = new JukeboxSystem(this.audioManager);
     
     // Game entities
     this.player = new Player();
     this.dogs = [];
     this.mailbox = new Mailbox();
+    this.jukebox = new Jukebox();
     this.danundieStreak = new DanundieStreak();
     
     // UI elements
@@ -137,7 +141,7 @@ export class Game {
     const { IMAGES } = CONFIG.ASSETS;
     
     // Load all images in parallel
-    const [backgroundImage, playerFront, playerSide, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite, friend2Sprite, friend3Sprite, danundieSprite] = await Promise.all([
+    const [backgroundImage, playerFront, playerSide, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite, friend2Sprite, friend3Sprite, danundieSprite, jukeboxSprite] = await Promise.all([
       this.assetLoader.loadImage(IMAGES.BACKGROUND),
       this.assetLoader.loadImage(IMAGES.PLAYER_FRONT),
       this.assetLoader.loadImage(IMAGES.PLAYER_SIDE),
@@ -151,7 +155,8 @@ export class Game {
       this.assetLoader.loadImage(IMAGES.FRIEND1),
       this.assetLoader.loadImage(IMAGES.FRIEND2),
       this.assetLoader.loadImage(IMAGES.FRIEND3),
-      this.assetLoader.loadImage(IMAGES.DANUNDIE)
+      this.assetLoader.loadImage(IMAGES.DANUNDIE),
+      this.assetLoader.loadImage(IMAGES.JUKEBOX)
     ]);
 
     // Store loaded assets
@@ -161,6 +166,9 @@ export class Game {
     
     // Set danundie sprite
     this.danundieStreak.setSprite(danundieSprite);
+    
+    // Set jukebox sprite
+    this.jukebox.setSprite(jukeboxSprite);
     
     return { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite, friend2Sprite, friend3Sprite };
   }
@@ -216,6 +224,12 @@ export class Game {
       // Then check mailbox
       if (this.mailbox.isPlayerNearby(this.player)) {
         this.mailSystem.openMailbox();
+        return;
+      }
+      
+      // Then check jukebox
+      if (this.jukebox.isPlayerInRange(this.player)) {
+        this.jukeboxSystem.openJukebox();
       }
     });
 
@@ -323,6 +337,7 @@ export class Game {
       this.updatePlayer();
       this.updateDogs();
       this.updateDanundie();
+      this.updateJukebox();
       this.updateUI();
     } catch (error) {
       ErrorHandler.handleError(error, 'Game.update');
@@ -375,6 +390,10 @@ export class Game {
     this.danundieStreak.update();
   }
 
+  updateJukebox() {
+    this.jukebox.update(this.player);
+  }
+
   updateUI() {
     // Handle talk prompt for any nearby dog
     const nearbyDog = this.getNearbyDog();
@@ -390,6 +409,9 @@ export class Game {
       // Check mailbox
       if (this.mailbox.isPlayerNearby(this.player)) {
         this.showPrompt();
+      } else if (this.jukebox.isPlayerInRange(this.player)) {
+        // Show prompt for jukebox
+        this.showJukeboxPrompt();
       } else {
         this.hidePrompt();
       }
@@ -398,6 +420,7 @@ export class Game {
 
   showPrompt() {
     if (this.prompt) {
+      this.prompt.textContent = 'Press E to check mail';
       this.prompt.style.display = 'block';
       this.updatePromptPosition();
     }
@@ -415,6 +438,20 @@ export class Game {
     this.prompt.style.top = `${pos.y}px`;
   }
 
+  showJukeboxPrompt() {
+    if (this.prompt) {
+      this.prompt.textContent = 'Press E for jukebox';
+      this.prompt.style.display = 'block';
+      this.updateJukeboxPromptPosition();
+    }
+  }
+
+  updateJukeboxPromptPosition() {
+    const pos = this.jukebox.getPromptPosition(this.canvas);
+    this.prompt.style.left = `${pos.x}px`;
+    this.prompt.style.top = `${pos.y}px`;
+  }
+
   render() {
     try {
       this.renderer.clear();
@@ -423,6 +460,9 @@ export class Game {
       this.dogs.forEach(dog => {
         this.renderer.drawDog(dog);
       });
+      
+      // Draw jukebox
+      this.renderer.drawJukebox(this.jukebox);
       
       this.renderer.drawPlayer(this.player);
       
