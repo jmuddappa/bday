@@ -43,14 +43,14 @@ export const CONFIG = {
 
   // Jukebox configuration
   JUKEBOX: {
-    X: 900, 
-    Y: 825, // 50px down  
+    X: 980, 
+    Y: 805, // 50px down  
     INTERACTION_DISTANCE: 120,
     PROMPT_OFFSET_X: -5,
-    PROMPT_OFFSET_Y: -30, // Just 30px above jukebox
+    PROMPT_OFFSET_Y: -100, 
     WIGGLE_SPEED: 0.01,
     WIGGLE_AMPLITUDE: 3,
-    SCALE: 0.6
+    SCALE: 0.12
   },
 
   // Dog behavior settings
