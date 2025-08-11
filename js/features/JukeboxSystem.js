@@ -133,7 +133,6 @@ export class JukeboxSystem {
       songItem.innerHTML = `
         <div class="mail-icon">${song.icon}</div>
         <div class="mail-sender">${song.title}</div>
-        <div class="mail-preview">🎵 Jukebox Song</div>
       `;
       
       // Add click handler
