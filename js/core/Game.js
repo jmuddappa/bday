@@ -128,6 +128,13 @@ export class Game {
           "I am going to eat this *gobble* *gobble*"
         ]
       },
+      //Anne (friend7)
+      'Anne': {
+        portrait: 'friend7_portrait',
+        messages: [
+          "HOLY SHITBALLS GIRL ITS YOUR BDAY!"
+        ]
+      },
       //Khoa (friend8)
       'Khoa': {
         portrait: 'friend8_portrait',
@@ -147,6 +154,7 @@ export class Game {
       'Daninja': 0,
       'Madeline': 0,
       'Nolan': 0,
+      'Anne': 0,
       'Khoa': 0
     };
     
@@ -182,7 +190,7 @@ export class Game {
     const { IMAGES } = CONFIG.ASSETS;
     
     // Load all images in parallel
-    const [backgroundImage, playerFront, playerSide, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meSprite, meFramesSprite, friend2Sprite, friend3Sprite, friend5Sprite, friend6Sprite, friend8Sprite, danundieSprite, jukeboxSprite, daninjaSprite] = await Promise.all([
+    const [backgroundImage, playerFront, playerSide, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meSprite, meFramesSprite, friend2Sprite, friend3Sprite, friend5Sprite, friend6Sprite, friend7Sprite, friend8Sprite, danundieSprite, jukeboxSprite, daninjaSprite] = await Promise.all([
       this.assetLoader.loadImage(IMAGES.BACKGROUND),
       this.assetLoader.loadImage(IMAGES.PLAYER_FRONT),
       this.assetLoader.loadImage(IMAGES.PLAYER_SIDE),
@@ -197,6 +205,7 @@ export class Game {
       this.assetLoader.loadImage(IMAGES.FRIEND3),
       this.assetLoader.loadImage(IMAGES.FRIEND5),
       this.assetLoader.loadImage(IMAGES.FRIEND6),
+      this.assetLoader.loadImage(IMAGES.FRIEND7),
       this.assetLoader.loadImage(IMAGES.FRIEND8),
       this.assetLoader.loadImage(IMAGES.DANUNDIE),
       this.assetLoader.loadImage(IMAGES.JUKEBOX),
@@ -217,11 +226,11 @@ export class Game {
     // Set daninja sprite
     this.daninjaReveal.setSprite(daninjaSprite);
     
-    return { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend2Sprite, friend3Sprite, friend5Sprite, friend6Sprite, friend8Sprite };
+    return { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend2Sprite, friend3Sprite, friend5Sprite, friend6Sprite, friend7Sprite, friend8Sprite };
   }
 
   async createEntities(sprites) {
-    const { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend2Sprite, friend3Sprite, friend5Sprite, friend6Sprite, friend8Sprite } = sprites;
+    const { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend2Sprite, friend3Sprite, friend5Sprite, friend6Sprite, friend7Sprite, friend8Sprite } = sprites;
     
     // Create dogs with their sprites and audio
     const rotiDog = new Dog('Roti', CONFIG.DOGS.ROTI);
@@ -258,6 +267,11 @@ export class Game {
     friend6.setFramesSprite(friend6Sprite); // Use same sprite for frames
     // Note: Madeline's audio plays only during reveal, not during regular interactions
     
+    // Create friend7 (Anne) with 2-frame animation
+    const friend7 = new Dog('Anne', CONFIG.DOGS.FRIEND7);
+    friend7.setSprite(friend7Sprite);
+    friend7.setAudio(this.audioManager.getAudio('friend7Sound'));
+    
     // Create friend8 (Khoa) with 3-frame animation
     const friend8 = new Dog('Khoa', CONFIG.DOGS.FRIEND8);
     friend8.setSprite(friend8Sprite); // Set main sprite
@@ -268,10 +282,11 @@ export class Game {
     console.log('🖼️ Friend3 sprite source:', friend3Sprite?.src);
     console.log('🖼️ Friend5 sprite source:', friend5Sprite?.src);
     console.log('🖼️ Friend6 sprite source:', friend6Sprite?.src);
+    console.log('🖼️ Friend7 sprite source:', friend7Sprite?.src);
     console.log('🖼️ Friend8 sprite source:', friend8Sprite?.src);
     
     
-    this.dogs = [rotiDog, khushiDog, meDog, friend2, friend3, friend5, friend6, friend8];
+    this.dogs = [rotiDog, khushiDog, meDog, friend2, friend3, friend5, friend6, friend7, friend8];
     console.log('🎮 Total dogs in array:', this.dogs.length);
     console.log('🎮 Dog names:', this.dogs.map(dog => dog.name));
   }

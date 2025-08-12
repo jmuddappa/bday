@@ -160,6 +160,14 @@ export const CONFIG = {
       transitionFrameOffset: { x: -5, y: 0 }, // Frame 2 - 5px left
       jumpFrameOffset: { x: -5, y: 0 },       // Frame 3 - 5px left
       shadowWidth: 0, shadowHeight: 0, shadowOffsetY: 0
+    },
+    //Anne
+    FRIEND7: {
+      x: 30, y: 320, scale: 0.6,
+      width: 256, height: 256,
+      sitFrame: { sx: 0, sy: 0 },      // Frame 1: 0-256px
+      jumpFrame: { sx: 256, sy: 0 },   // Frame 2: 256-512px
+      shadowWidth: 40, shadowHeight: 15, shadowOffsetY: 8
     }
   },
 
@@ -180,6 +188,7 @@ export const CONFIG = {
       FRIEND3: 'assets/images/friends/friend3.png',
       FRIEND5: 'assets/images/friends/friend5.png',
       FRIEND6: 'assets/images/friends/friend6.png',
+      FRIEND7: 'assets/images/friends/friend7.png',
       FRIEND8: 'assets/images/friends/friend8.png',
       DANUNDIE: 'assets/images/danundie.png',
       JUKEBOX: 'assets/images/jukebox.png',
