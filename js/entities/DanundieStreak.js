@@ -10,7 +10,7 @@ export class DanundieStreak {
     this.sprite = null;
     this.isActive = false;
     this.lastStreakTime = 0;
-    this.cooldownDuration = 10000; // 10 seconds in milliseconds
+    this.cooldownDuration = 90000; // 1m30 seconds in milliseconds
     
     // Position and movement
     this.x = -100; // Start off-screen left

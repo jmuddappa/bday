@@ -256,6 +256,7 @@ export class Game {
     const friend6 = new Dog('Madeline', CONFIG.DOGS.FRIEND6);
     friend6.setSprite(friend6Sprite); // Set main sprite
     friend6.setFramesSprite(friend6Sprite); // Use same sprite for frames
+    // Note: Madeline's audio plays only during reveal, not during regular interactions
     
     // Create friend8 (Khoa) with 3-frame animation
     const friend8 = new Dog('Khoa', CONFIG.DOGS.FRIEND8);

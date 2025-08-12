@@ -77,6 +77,9 @@ export class Dog extends GameObject {
     this.eatingComplete = false;
     this.shouldDieAfterEating = false;
     
+    // Audio tracking (prevent repeat sounds)
+    this.hasPlayedRevealSound = false;
+    
     
   }
 
@@ -635,8 +638,8 @@ export class Dog extends GameObject {
         this.animationFrame = 0; // Reset to first frame
       }
       
-      // Play plant growth sound for Madeline
-      if (this.name === 'Madeline' && audioManager) {
+      // Play plant growth sound and Madeline's voice for Madeline (only on first reveal)
+      if (this.name === 'Madeline' && audioManager && !this.hasPlayedRevealSound) {
         const plantSound = audioManager.getAudio('plantGrowSound');
         if (plantSound) {
           plantSound.currentTime = 0;
@@ -645,6 +648,19 @@ export class Dog extends GameObject {
             console.log('Could not play plant growth sound:', e);
           });
         }
+        
+        // Play Madeline's voice audio (only once)
+        const madelineSound = audioManager.getAudio('friend6Sound');
+        if (madelineSound) {
+          madelineSound.currentTime = 0;
+          madelineSound.volume = 0.7; // Normal volume
+          madelineSound.play().catch(e => {
+            console.log('Could not play Madeline sound:', e);
+          });
+        }
+        
+        // Mark that reveal sound has been played
+        this.hasPlayedRevealSound = true;
       }
     }
   }
