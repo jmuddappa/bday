@@ -168,6 +168,14 @@ export const CONFIG = {
       sitFrame: { sx: 0, sy: 0 },      // Frame 1: 0-350px
       jumpFrame: { sx: 350, sy: 0 },   // Frame 2: 350-700px
       shadowWidth: 40, shadowHeight: 15, shadowOffsetY: 8
+    },
+    //Mom
+    MOM: {
+      x: 100, y: 495, scale: 0.3,
+      width: 350, height: 512,
+      sitFrame: { sx: 0, sy: 0 },      // Frame 1: 0-350px
+      jumpFrame: { sx: 350, sy: 0 },   // Frame 2: 350-700px
+      shadowWidth: 40, shadowHeight: 15, shadowOffsetY: 8
     }
   },
 
@@ -190,6 +198,7 @@ export const CONFIG = {
       FRIEND7: 'assets/images/friends/friend7.png',
       FRIEND8: 'assets/images/friends/friend8.png',
       FRIEND9: 'assets/images/friends/friend9.png',
+      MOM: 'assets/images/friends/mom.png',
       DANUNDIE: 'assets/images/danundie.png',
       JUKEBOX: 'assets/images/jukebox.png',
       DANINJA: 'assets/images/daninja.png'

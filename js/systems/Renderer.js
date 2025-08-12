@@ -220,7 +220,9 @@ export class Renderer {
       let configKey = dog.name.toUpperCase();
       if (dog.name === 'Khoa & Anne') configKey = 'FRIEND1';
       if (dog.name === 'Raza') configKey = 'FRIEND2';
-      if (dog.name === 'bố và mẹ') configKey = 'FRIEND3';
+      if (dog.name === 'Anne') configKey = 'FRIEND7';
+      if (dog.name === 'bố') configKey = 'FRIEND9';
+      if (dog.name === 'mẹ') configKey = 'MOM';
       
       const config = CONFIG.DOGS[configKey];
       

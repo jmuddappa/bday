@@ -28,6 +28,7 @@ export class AudioManager {
       this.audioElements.set('friend6Sound', document.getElementById('friend6Sound'));
       this.audioElements.set('friend7Sound', document.getElementById('friend7Sound'));
       this.audioElements.set('friend9Sound', document.getElementById('friend9Sound'));
+      this.audioElements.set('momSound', document.getElementById('momSound'));
       this.audioElements.set('danundieSound', document.getElementById('danundieSound'));
       this.audioElements.set('daninjaSound', document.getElementById('daninjaSound'));
       this.audioElements.set('fadeSound', document.getElementById('fadeSound'));
