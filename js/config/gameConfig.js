@@ -112,6 +112,25 @@ export const CONFIG = {
       sitFrame: { sx: 0, sy: 0 },
       jumpFrame: { sx: 0, sy: 0 }, // Same as sit - no animation
       shadowWidth: 40, shadowHeight: 15, shadowOffsetY: 8
+    },
+    //madeline
+    FRIEND6: {
+      x: 470, y: 720, scale: 0.22, // Moved left 5px and up 10px
+      width: 400, height: 650, // Source dimensions for each frame (correct 400px width)
+      // 3-frame animation system
+      totalWidth: 1200, // Total sprite width (300px per frame * 4 frames)
+      frameHeight: 650, // Source frame height
+      sitFrame: { sx: 300, sy: 0 },      // Frame 1 at 300px
+      transitionFrame: { sx: 600, sy: 0 }, // Frame 2 at 600px  
+      jumpFrame: { sx: 900, sy: 0 },      // Frame 3 at 900px
+      animationSpeed: 12, // 15% slower (10 * 1.15 ≈ 12)
+      // Frame position offsets - all frames render at exact same position (centered in sprite)
+      sitFrameOffset: { x: 0, y: 0 },        // Frame 1 - no offset
+      transitionFrameOffset: { x: 0, y: 0 }, // Frame 2 - no offset  
+      jumpFrameOffset: { x: 0, y: 0 },       // Frame 3 - no offset
+      shadowWidth: 20, shadowHeight: 8, shadowOffsetY: 4, // Smaller shadow
+      // Special behavior - starts hidden
+      startsHidden: true
     }
   },
 
@@ -131,6 +150,7 @@ export const CONFIG = {
       FRIEND1: 'assets/images/friends/friend1.png',
       FRIEND2: 'assets/images/friends/friend2.png',
       FRIEND3: 'assets/images/friends/friend3.png',
+      FRIEND6: 'assets/images/friends/friend6.png',
       DANUNDIE: 'assets/images/danundie.png',
       JUKEBOX: 'assets/images/jukebox.png',
       DANINJA: 'assets/images/daninja.png'

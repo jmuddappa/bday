@@ -34,8 +34,8 @@ export class Dog extends GameObject {
     this.stateChangeTime = 0;
     this.animationDuration = 500; // ms
     
-    // 3-frame animation system for Me dog
-    this.useFrameAnimation = this.name === 'Danoonie';
+    // 3-frame animation system for Me dog and Madeline
+    this.useFrameAnimation = this.name === 'Danoonie' || this.name === 'Madeline';
     this.animationFrame = 0;
     this.frameCounter = 0;
     this.animationSpeed = config.animationSpeed || 30;
@@ -52,6 +52,12 @@ export class Dog extends GameObject {
     this.fadeOpacity = 1.0;
     this.fadeSpeed = 0.005; // Much slower fade (per frame) - takes ~3.3 seconds at 60fps
     this.isVanished = false;
+    
+    // Hidden state system (for characters that start hidden)
+    this.isHidden = config.startsHidden || false;
+    this.hasBeenRevealed = false;
+    this.isGrowing = false; // New state: currently playing growth animation
+    
     
   }
 
@@ -115,6 +121,13 @@ export class Dog extends GameObject {
           if (this.animationFrame >= this.frameSequence.length - 1) {
             this.animationFrame = this.frameSequence.length - 1; // Stay at jump frame
             this.isAnimating = false;
+            
+            // If this was a growth animation, mark as fully revealed
+            if (this.isGrowing) {
+              this.isGrowing = false;
+              this.hasBeenRevealed = true;
+              console.log(`🌸 ${this.name} growth complete - ready to talk!`);
+            }
           }
         } else { // Reverse
           if (this.animationFrame <= 0) {
@@ -248,50 +261,88 @@ export class Dog extends GameObject {
    * @returns {Object} Drawing data for renderer
    */
   getDrawData() {
-    // Use 3-frame animation system for Me dog if frames sprite is available
-    if (this.useFrameAnimation && this.framesSprite && this.name === 'Danoonie') {
-      const config = CONFIG.DOGS.ME;
+    // Use 3-frame animation system for Me dog and Madeline if frames sprite is available
+    if (this.useFrameAnimation && this.framesSprite && (this.name === 'Danoonie' || this.name === 'Madeline')) {
+      const config = this.name === 'Danoonie' ? CONFIG.DOGS.ME : CONFIG.DOGS.FRIEND6;
       const currentFrameIndex = this.frameSequence[this.animationFrame];
       
       let sourceX;
       let frameWidth;
-      switch (currentFrameIndex) {
-        case 0: // sit frame (1058-end)
-          sourceX = 1058;
-          frameWidth = config.totalWidth - 1058; // Remaining width after 1058
-          break;
-        case 1: // transition frame (512-1058px)
-          sourceX = 512;
-          frameWidth = 546; // 1058 - 512
-          break;
-        case 2: // jump frame (0-512px)
-          sourceX = 0;
-          frameWidth = 512;
-          break;
-        default:
-          sourceX = 1058;
-          frameWidth = config.totalWidth - 1058;
+      
+      if (this.name === 'Danoonie') {
+        // Danoonie's frame layout (original system)
+        switch (currentFrameIndex) {
+          case 0: // sit frame (1058-end)
+            sourceX = 1058;
+            frameWidth = config.totalWidth - 1058;
+            break;
+          case 1: // transition frame (512-1058px)
+            sourceX = 512;
+            frameWidth = 546;
+            break;
+          case 2: // jump frame (0-512px)
+            sourceX = 0;
+            frameWidth = 512;
+            break;
+          default:
+            sourceX = 1058;
+            frameWidth = config.totalWidth - 1058;
+        }
+      } else if (this.name === 'Madeline') {
+        // Madeline's frame layout - exact 400px frames at correct positions
+        switch (currentFrameIndex) {
+          case 0: // Frame 1: 0-400px
+            sourceX = 0;
+            frameWidth = 400;
+            break;
+          case 1: // Frame 2: 400-800px
+            sourceX = 400;
+            frameWidth = 400;
+            break;
+          case 2: // Frame 3: 800-1200px
+            sourceX = 800;
+            frameWidth = 400;
+            break;
+          default:
+            sourceX = 0;
+            frameWidth = 400;
+        }
+        // DEBUG: Log current frame for debugging
+        console.log(`🌱 DEBUG: Madeline showing frame ${currentFrameIndex + 1}/3 (sourceX: ${sourceX}-${sourceX + frameWidth})`);
       }
       
       let offsetX = 0;
       let offsetY = 0;
       
-      switch (currentFrameIndex) {
-        case 0: // sit frame - no offset needed
-          offsetX = 0;
-          offsetY = 0;
-          break;
-        case 1: // transition frame - adjust position to align with sit frame
-          offsetX = -1;
-          offsetY = 3;
-          break;
-        case 2: // jump frame - use original jump offsets
-          offsetX = this.jumpOffsetX - 1; // Account for transition offset too
-          offsetY = this.jumpOffsetY + 3;
-          break;
+      if (this.name === 'Danoonie') {
+        // Danoonie's offsets (original system)
+        switch (currentFrameIndex) {
+          case 0: // sit frame - no offset needed
+            offsetX = 0;
+            offsetY = 0;
+            break;
+          case 1: // transition frame - adjust position to align with sit frame
+            offsetX = -1;
+            offsetY = 3;
+            break;
+          case 2: // jump frame - use original jump offsets
+            offsetX = this.jumpOffsetX - 1;
+            offsetY = this.jumpOffsetY + 3;
+            break;
+        }
+      } else if (this.name === 'Madeline') {
+        // Madeline's offsets - use config offsets to keep frames in same position
+        const frameOffsets = {
+          0: config.sitFrameOffset || { x: 0, y: 0 },
+          1: config.transitionFrameOffset || { x: 0, y: 0 },
+          2: config.jumpFrameOffset || { x: 0, y: 0 }
+        };
+        const currentOffset = frameOffsets[currentFrameIndex] || { x: 0, y: 0 };
+        offsetX = currentOffset.x;
+        offsetY = currentOffset.y;
       }
 
-      return {
+      const renderData = {
         sprite: this.framesSprite,
         sourceX: sourceX,
         sourceY: 0,
@@ -302,6 +353,9 @@ export class Dog extends GameObject {
         destWidth: this.originalWidth * this.scale,
         destHeight: this.originalHeight * this.scale
       };
+      
+      
+      return renderData;
     }
     
     // Fallback to original 2-frame system for other dogs or if frames sprite not available
@@ -365,6 +419,56 @@ export class Dog extends GameObject {
       CONFIG.DOGS.INTERACTION_DISTANCE;
     
     return distance < threshold;
+  }
+
+  /**
+   * Check if player can interact with hidden character (for prompt display)
+   * @param {Player} player - Player entity
+   * @returns {boolean} True if player is in range of hidden character
+   */
+  isPlayerInRangeForHidden(player) {
+    // Only for hidden characters that haven't been revealed
+    if (!this.isHidden || this.hasBeenRevealed) {
+      return false;
+    }
+    
+    const distance = this.distanceTo(player);
+    const threshold = CONFIG.DOGS.INTERACTION_DISTANCE;
+    
+    
+    return distance < threshold;
+  }
+
+  /**
+   * Reveal a hidden character
+   * @param {AudioManager} audioManager - Audio manager for playing reveal sound
+   */
+  reveal(audioManager) {
+    if (this.isHidden && !this.hasBeenRevealed && !this.isGrowing) {
+      console.log(`✨ ${this.name} is starting to grow!`);
+      this.isHidden = false;
+      this.isGrowing = true; // Enter growing state
+      
+      // Start animation for characters with 3-frame animation
+      if (this.useFrameAnimation) {
+        this.animationDirection = 1;
+        this.isAnimating = true;
+        this.frameCounter = 0;
+        this.animationFrame = 0; // Reset to first frame
+      }
+      
+      // Play plant growth sound for Madeline
+      if (this.name === 'Madeline' && audioManager) {
+        const plantSound = audioManager.getAudio('plantGrowSound');
+        if (plantSound) {
+          plantSound.currentTime = 0;
+          plantSound.volume = 0.3; // Gentle volume
+          plantSound.play().catch(e => {
+            console.log('Could not play plant growth sound:', e);
+          });
+        }
+      }
+    }
   }
 
   /**
@@ -472,11 +576,19 @@ export class Dog extends GameObject {
   }
 
   /**
-   * Check if dog is visible (not vanished)
+   * Check if dog is visible (not vanished and not hidden)
    * @returns {boolean}
    */
   isVisible() {
-    return !this.isVanished;
+    return !this.isVanished && !this.isHidden;
+  }
+
+  /**
+   * Check if dog can be talked to (fully grown)
+   * @returns {boolean}
+   */
+  canTalk() {
+    return this.hasBeenRevealed && !this.isGrowing && !this.isHidden;
   }
 
   /**

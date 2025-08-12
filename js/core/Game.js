@@ -111,9 +111,14 @@ export class Game {
       'Daninja': {
         portrait: 'daninja_portrait',
         messages: [
-          "I trained in these very trees for years. Now I emerge for your special day! (Tôi đã luyện tập trong những cây này nhiều năm. Giờ tôi xuất hiện cho ngày đặc biệt của bạn!)",
-          "The art of stealth is to remain unseen until the perfect moment arrives! (Nghệ thuật ẩn mình là giữ im lặng cho đến khi thời khắc hoàn hảo đến!)",
-          "Happy birthday from the shadows! (Chúc mừng sinh nhật từ bóng tối! 🥷)"
+          "I trained in these very trees for years. Now I emerge for your special day to deliver this letter from Danoonie! (Tôi đã luyện tập trong những cây này nhiều năm. Giờ tôi xuất hiện cho ngày đặc biệt của bạn!)"
+        ]
+      },
+      //madeline
+      'Madeline': {
+        portrait: 'friend6_portrait',
+        messages: [
+          "Despite you never watering me, I still somehow grew to be healthy, thank you & happy birthday!!"
         ]
       }
     };
@@ -126,7 +131,8 @@ export class Game {
       'Khoa & Anne': 0,
       'Raza': 0,
       'bố và mẹ': 0,
-      'Daninja': 0
+      'Daninja': 0,
+      'Madeline': 0
     };
     
     // Track interaction counts for special behaviors
@@ -160,7 +166,7 @@ export class Game {
     const { IMAGES } = CONFIG.ASSETS;
     
     // Load all images in parallel
-    const [backgroundImage, playerFront, playerSide, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite, friend2Sprite, friend3Sprite, danundieSprite, jukeboxSprite, daninjaSprite] = await Promise.all([
+    const [backgroundImage, playerFront, playerSide, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite, friend2Sprite, friend3Sprite, friend6Sprite, danundieSprite, jukeboxSprite, daninjaSprite] = await Promise.all([
       this.assetLoader.loadImage(IMAGES.BACKGROUND),
       this.assetLoader.loadImage(IMAGES.PLAYER_FRONT),
       this.assetLoader.loadImage(IMAGES.PLAYER_SIDE),
@@ -174,6 +180,7 @@ export class Game {
       this.assetLoader.loadImage(IMAGES.FRIEND1),
       this.assetLoader.loadImage(IMAGES.FRIEND2),
       this.assetLoader.loadImage(IMAGES.FRIEND3),
+      this.assetLoader.loadImage(IMAGES.FRIEND6),
       this.assetLoader.loadImage(IMAGES.DANUNDIE),
       this.assetLoader.loadImage(IMAGES.JUKEBOX),
       this.assetLoader.loadImage(IMAGES.DANINJA)
@@ -193,11 +200,11 @@ export class Game {
     // Set daninja sprite
     this.daninjaReveal.setSprite(daninjaSprite);
     
-    return { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite, friend2Sprite, friend3Sprite };
+    return { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite, friend2Sprite, friend3Sprite, friend6Sprite };
   }
 
   async createEntities(sprites) {
-    const { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite, friend2Sprite, friend3Sprite } = sprites;
+    const { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite, friend2Sprite, friend3Sprite, friend6Sprite } = sprites;
     
     // Create dogs with their sprites and audio
     const rotiDog = new Dog('Roti', CONFIG.DOGS.ROTI);
@@ -227,17 +234,31 @@ export class Game {
     friend3.setSprite(friend3Sprite);
     friend3.setAudio(this.audioManager.getAudio('friend3Sound'));
     
+    // Create friend6 (Madeline) with 3-frame animation
+    const friend6 = new Dog('Madeline', CONFIG.DOGS.FRIEND6);
+    friend6.setSprite(friend6Sprite); // Set main sprite
+    friend6.setFramesSprite(friend6Sprite); // Use same sprite for frames
+    
     console.log('🖼️ Friend1 sprite source:', friend1Sprite?.src);
     console.log('🖼️ Friend2 sprite source:', friend2Sprite?.src);
     console.log('🖼️ Friend3 sprite source:', friend3Sprite?.src);
+    console.log('🖼️ Friend6 sprite source:', friend6Sprite?.src);
     
-    this.dogs = [rotiDog, khushiDog, meDog, friend1, friend2, friend3];
+    this.dogs = [rotiDog, khushiDog, meDog, friend1, friend2, friend3, friend6];
   }
 
   setupEventListeners() {
     // Input system events
     this.inputManager.on('interact', () => {
-      // Check for dialog with any dog first
+      // Check for hidden character interaction first
+      const hiddenDog = this.getNearbyHiddenDog();
+      if (hiddenDog) {
+        hiddenDog.reveal(this.audioManager);
+        // Don't open dialog immediately - wait for growth animation to complete
+        return;
+      }
+
+      // Check for dialog with any visible dog
       const nearbyDog = this.getNearbyDog();
       if (nearbyDog) {
         this.openDialog(nearbyDog);
@@ -465,12 +486,17 @@ export class Game {
       this.showDaninjaTalkPrompt();
       this.hidePrompt();
     } else {
-      // If no dog is nearby, close any open dialog
+      // If no visible dog is nearby, close any open dialog
       this.closeDialog();
       this.hideTalkPrompt();
       
+      // Check for hidden character interaction
+      const hiddenDog = this.getNearbyHiddenDog();
+      if (hiddenDog) {
+        this.showHiddenCharacterPrompt(hiddenDog);
+      }
       // Check for tree interaction (hidden Daninja)
-      if (this.daninjaReveal.canInteractWithTrees(this.player)) {
+      else if (this.daninjaReveal.canInteractWithTrees(this.player)) {
         this.showTreeSearchPrompt();
       } else if (this.mailbox.isPlayerNearby(this.player)) {
         this.showPrompt();
@@ -515,6 +541,28 @@ export class Game {
     const pos = this.jukebox.getPromptPosition(this.canvas);
     this.prompt.style.left = `${pos.x}px`;
     this.prompt.style.top = `${pos.y}px`;
+  }
+
+  showHiddenCharacterPrompt(hiddenDog) {
+    if (this.prompt && hiddenDog) {
+      this.prompt.textContent = 'Press E to Dig';
+      this.prompt.style.display = 'block';
+      this.updateHiddenCharacterPromptPosition(hiddenDog);
+    }
+  }
+
+  updateHiddenCharacterPromptPosition(hiddenDog) {
+    const rect = this.canvas.getBoundingClientRect();
+    const canvasScale = Math.min(
+      rect.width / CONFIG.CANVAS.WIDTH,
+      rect.height / CONFIG.CANVAS.HEIGHT
+    );
+    
+    const x = rect.left + (hiddenDog.x + hiddenDog.width / 2 - 70) * canvasScale;
+    const y = rect.top + (hiddenDog.y - 50) * canvasScale;
+    
+    this.prompt.style.left = `${x}px`;
+    this.prompt.style.top = `${y}px`;
   }
 
   showTreeSearchPrompt() {
@@ -586,6 +634,8 @@ export class Game {
       this.renderer.drawDebugInfo(this.player, this.dogs);
       this.renderer.drawDebugCollisions(CONFIG.COLLISION_BOXES, this.player);
       
+      // Hidden character hitboxes removed for production
+      
     } catch (error) {
       ErrorHandler.handleError(error, 'Game.render');
     }
@@ -648,7 +698,11 @@ export class Game {
 
   // Dialog and interaction methods
   getNearbyDog() {
-    return this.dogs.find(dog => dog.isPlayerInRange(this.player));
+    return this.dogs.find(dog => dog.isPlayerInRange(this.player) && dog.canTalk());
+  }
+
+  getNearbyHiddenDog() {
+    return this.dogs.find(dog => dog.isPlayerInRangeForHidden(this.player));
   }
 
 
@@ -759,6 +813,42 @@ export class Game {
     if (this.dialogContainer) {
       this.dialogContainer.style.display = 'none';
     }
+  }
+
+  drawHiddenCharacterHitboxes() {
+    // Draw interaction hitboxes for hidden characters only
+    this.dogs.forEach(dog => {
+      if (dog.isHidden && !dog.hasBeenRevealed && !dog.isGrowing) {
+        const ctx = this.renderer.ctx;
+        const threshold = CONFIG.DOGS.INTERACTION_DISTANCE;
+        
+        // Calculate hitbox bounds
+        const centerX = dog.x + dog.width / 2;
+        const centerY = dog.y + dog.height / 2;
+        const hitboxX = centerX - threshold;
+        const hitboxY = centerY - threshold;
+        const hitboxWidth = threshold * 2;
+        const hitboxHeight = threshold * 2;
+        
+        // Draw hitbox
+        ctx.save();
+        ctx.strokeStyle = '#FF00FF'; // Bright magenta
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]); // Dashed line
+        ctx.strokeRect(hitboxX, hitboxY, hitboxWidth, hitboxHeight);
+        
+        // Draw center point
+        ctx.fillStyle = '#FF00FF';
+        ctx.fillRect(centerX - 2, centerY - 2, 4, 4);
+        
+        // Draw character name
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '12px monospace';
+        ctx.fillText(dog.name, hitboxX, hitboxY - 5);
+        
+        ctx.restore();
+      }
+    });
   }
 
   destroy() {

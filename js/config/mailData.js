@@ -25,5 +25,7 @@ export const MAIL_DATA = [
   { sender: "Abby & Kenny", src: "videos/friend19.mov", icon: "🌻" },
   { sender: "AJ & Ruby", src: "videos/friend20.mov", icon: "🏆" },
   { sender: "Khoa & Anne", src: "videos/friend21.mov", icon: "🎊" },
-  { sender: "Mateo", src: "videos/friend22.mov", icon: "🎊" }
+  { sender: "nolan", src: "videos/friend22.mov", icon: "🎂" },
+  { sender: "Jeremy", src: "videos/friend23.mov", icon: "🌟" },
+  { sender: "Matty O", src: "videos/friend24.mov", icon: "🐶" },
 ];
