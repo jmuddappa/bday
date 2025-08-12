@@ -51,6 +51,12 @@ export class JukeboxSystem {
       // Handle video modal close - reopen jukebox if it was open
       if (e.target.classList.contains('close-btn') && 
           e.target.closest('.video-modal') && this.wasJukeboxOpen) {
+        // Restore background music
+        const bgMusic = this.audioManager.getAudio('bgMusic');
+        if (bgMusic) {
+          bgMusic.volume = 0.6;
+        }
+        
         // Close video modal
         this.videoModal.style.display = 'none';
         // Reopen jukebox
@@ -67,6 +73,12 @@ export class JukeboxSystem {
       // Handle video modal escape - reopen jukebox if it was open
       if (e.key === 'Escape' && this.videoModal && 
           this.videoModal.style.display === 'flex' && this.wasJukeboxOpen) {
+        // Restore background music
+        const bgMusic = this.audioManager.getAudio('bgMusic');
+        if (bgMusic) {
+          bgMusic.volume = 0.6;
+        }
+        
         // Close video modal
         this.videoModal.style.display = 'none';
         // Reopen jukebox
@@ -171,6 +183,12 @@ export class JukeboxSystem {
       this.videoPlayer.pause();
       this.videoPlayer.currentTime = 0;
       
+      // Pause background music during video playback
+      const bgMusic = this.audioManager.getAudio('bgMusic');
+      if (bgMusic) {
+        bgMusic.volume = 0;
+      }
+      
       this.videoTitle.textContent = video.title;
       this.videoPlayer.src = video.src;
       this.videoPlayer.load();
@@ -183,6 +201,13 @@ export class JukeboxSystem {
       
       // Show video modal with flex display for centering
       this.videoModal.style.display = 'flex';
+      
+      // Setup video end handler to restore background music
+      this.videoPlayer.onended = () => {
+        if (bgMusic) {
+          bgMusic.volume = 0.6;
+        }
+      };
       
       // Auto-play when ready with a small delay to avoid conflicts
       this.videoPlayer.addEventListener('loadeddata', () => {

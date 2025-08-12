@@ -126,7 +126,7 @@ export const CONFIG = {
     },
     //Nolan
     FRIEND5: {
-      x: 750, y: 692, scale: 0.25,
+      x: 720, y: 720, scale: 0.25,
       width: 400, height: 460, // Source dimensions for each frame (400x460 each)
       // 3-frame animation system for eating sequence
       totalWidth: 1200, // Total sprite width (400px per frame * 3 frames)
@@ -134,7 +134,7 @@ export const CONFIG = {
       sitFrame: { sx: 0, sy: 0 },        // Frame 1: 0-400px (normal)
       transitionFrame: { sx: 400, sy: 0 }, // Frame 2: 400-800px (eating)
       jumpFrame: { sx: 800, sy: 0 },    // Frame 3: 800-1200px (finished eating)
-      animationSpeed: 18, // 20% slower than 15 (15 * 1.2 = 18)
+      animationSpeed: 30, // Much slower animation to see each frame clearly
       // Frame position offsets - all frames render at exact same position
       sitFrameOffset: { x: 0, y: 0 },        // Frame 1 - no offset
       transitionFrameOffset: { x: 0, y: 0 }, // Frame 2 - no offset  
@@ -220,7 +220,7 @@ export const CONFIG = {
 
   // Audio settings
   AUDIO: {
-    DEFAULT_VOLUME: 1.0,
+    DEFAULT_VOLUME: 0.6,
     BUMP_VOLUME: 0.4,
     MAIL_VOLUME: 0.5
   }

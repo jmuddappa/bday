@@ -39,6 +39,7 @@ export class Dog extends GameObject {
     this.animationFrame = 0;
     this.frameCounter = 0;
     this.animationSpeed = config.animationSpeed || 30;
+    
     // Set frame sequence based on character
     if (this.name === 'Khoa') {
       this.frameSequence = [0, 1, 2]; // sit → transition → jump (3 frames)
@@ -64,6 +65,17 @@ export class Dog extends GameObject {
     this.isHidden = config.startsHidden || false;
     this.hasBeenRevealed = false;
     this.isGrowing = false; // New state: currently playing growth animation
+    
+    // Investigation system (for Nolan)
+    this.needsInvestigation = config.needsInvestigation || false;
+    this.isPhasing = false;
+    this.phaseOpacity = 0;
+    this.phaseSpeed = 0.02; // Speed of phase-in animation
+    
+    // Eating system (for Nolan)
+    this.isEating = false;
+    this.eatingComplete = false;
+    this.shouldDieAfterEating = false;
     
     
   }
@@ -136,14 +148,12 @@ export class Dog extends GameObject {
         } else if (this.name === 'Nolan' && this.isEating) {
           // Special eating animation - play frames 1->2->3 once and stop
           this.animationFrame++;
-          console.log(`🍄 Nolan eating animation: frame ${this.animationFrame + 1}/3`);
           if (this.animationFrame >= this.frameSequence.length - 1) {
             this.animationFrame = this.frameSequence.length - 1; // Stay at final frame
             this.isAnimating = false;
-            console.log(`🍄 Nolan eating animation complete - staying on frame 3`);
           }
-        } else {
-          // Normal animation logic for other characters
+        } else if (this.name !== 'Nolan') {
+          // Normal animation logic for other characters (excluding Nolan)
           // Move animation frame forward or backward
           this.animationFrame += this.animationDirection;
           
@@ -166,6 +176,10 @@ export class Dog extends GameObject {
               this.isAnimating = false;
             }
           }
+        } else if (this.name === 'Nolan' && this.isAnimating && !this.isEating) {
+          // Nolan shouldn't be animating unless eating
+          this.isAnimating = false;
+          this.animationFrame = 0; // Keep him on frame 1
         }
       }
     }
@@ -244,7 +258,7 @@ export class Dog extends GameObject {
         
         specialAudio.onended = () => {
           if (this.state === 'jump' && bgAudio) {
-            bgAudio.volume = 1;
+            bgAudio.volume = 0.6;
           }
         };
       }
@@ -276,6 +290,16 @@ export class Dog extends GameObject {
       this.setState('sit');
       this.barked = false;
       
+      // Stop special audio and restore background music
+      if (specialAudio) {
+        specialAudio.pause();
+        specialAudio.currentTime = 0;
+      }
+      
+      if (bgAudio) {
+        bgAudio.volume = 0.6;
+      }
+      
       // Start reverse animation
       if (this.useFrameAnimation) {
         this.animationDirection = -1;
@@ -299,7 +323,7 @@ export class Dog extends GameObject {
       }
       
       if (bgAudio) {
-        bgAudio.volume = 1;
+        bgAudio.volume = 0.6;
       }
     } else if (this.name === 'Nolan') {
       // Nolan stays on frame 1 when player moves away - no animation changes
@@ -339,10 +363,11 @@ export class Dog extends GameObject {
    */
   getDrawData() {
     
-    // Use frame animation system for Me dog, Madeline, and Khoa if frames sprite is available
-    if (this.useFrameAnimation && this.framesSprite && (this.name === 'Danoonie' || this.name === 'Madeline' || this.name === 'Khoa')) {
+    // Use frame animation system for Me dog, Madeline, Nolan, and Khoa if frames sprite is available
+    if (this.useFrameAnimation && this.framesSprite && (this.name === 'Danoonie' || this.name === 'Madeline' || this.name === 'Nolan' || this.name === 'Khoa')) {
       const config = this.name === 'Danoonie' ? CONFIG.DOGS.ME : 
                      this.name === 'Madeline' ? CONFIG.DOGS.FRIEND6 : 
+                     this.name === 'Nolan' ? CONFIG.DOGS.FRIEND5 :
                      CONFIG.DOGS.FRIEND8;
       const currentFrameIndex = this.frameSequence[this.animationFrame];
       
@@ -387,8 +412,6 @@ export class Dog extends GameObject {
             sourceX = 0;
             frameWidth = 400;
         }
-        // DEBUG: Log current frame for debugging
-        console.log(`🌱 DEBUG: Madeline showing frame ${currentFrameIndex + 1}/3 (sourceX: ${sourceX}-${sourceX + frameWidth})`);
       } else if (this.name === 'Nolan') {
         // Nolan's frame layout - exact 400px frames at correct positions
         switch (currentFrameIndex) {
@@ -408,8 +431,6 @@ export class Dog extends GameObject {
             sourceX = 0;
             frameWidth = 400;
         }
-        // DEBUG: Log current frame for debugging
-        console.log(`🍄 DEBUG: Nolan showing frame ${currentFrameIndex + 1}/3 (sourceX: ${sourceX}-${sourceX + frameWidth})`);
       } else if (this.name === 'Khoa') {
         // Friend8's frame layout - exact 500px frames at correct positions
         switch (currentFrameIndex) {
@@ -429,8 +450,6 @@ export class Dog extends GameObject {
             sourceX = 0;
             frameWidth = 500;
         }
-        // DEBUG: Log current frame for debugging
-        console.log(`👤 DEBUG: Khoa showing frame ${currentFrameIndex + 1}/3 (sourceX: ${sourceX}-${sourceX + frameWidth})`);
       }
       
       let offsetX = 0;
@@ -799,6 +818,8 @@ export class Dog extends GameObject {
       this.isHidden = false;
       this.isPhasing = true;
       this.phaseOpacity = 0;
+      // Mark as revealed immediately so he can be talked to during phase-in
+      this.hasBeenRevealed = true;
     }
   }
   

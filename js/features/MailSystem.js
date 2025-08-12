@@ -230,7 +230,7 @@ export class MailSystem {
       // Setup video end handler
       this.videoPlayer.onended = () => {
         if (this.audioManager.musicStarted) {
-          this.audioManager.setVolume('bgMusic', 1);
+          this.audioManager.setVolume('bgMusic', 0.6);
         }
       };
 
@@ -274,7 +274,7 @@ export class MailSystem {
         this.videoPlayer.src = '';
         
         if (this.audioManager.musicStarted) {
-          this.audioManager.setVolume('bgMusic', 1);
+          this.audioManager.setVolume('bgMusic', 0.6);
         }
         
         // Clean up event handler

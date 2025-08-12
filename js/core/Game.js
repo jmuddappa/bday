@@ -66,7 +66,7 @@ export class Game {
         portrait: 'roti',
         messages: [
           "Thank you for adopting me, despite what papa said about my ugly nose! (Cảm ơn vì đã nhận nuôi con, mặc dù bố nói mũi con xấu!)",
-          "I love you more than life itself (Con yêu bạn hơn cả mạng sống của mình)",
+          "I'm sorry I dug up your vegetables. You should go check those empty spots out! (Con yêu bạn hơn cả mạng sống của mình)",
           "Can I crawl inside you?! (Con có thể chui vào trong người bạn không?!)",
           "I just pissed and pooped on the rug inside! (Con vừa đi tiểu và đại tiện lên thảm trong nhà!)"
         ]
@@ -128,7 +128,7 @@ export class Game {
       'Khoa': {
         portrait: 'friend8_portrait',
         messages: [
-          "Happy birthday! Wishing you all the best on your special day!"
+          "Hey sister! I've been working real hard on the right words to say to you and this is what I have so far: 'live, laugh, love!'"
         ]
       }
     };
@@ -148,7 +148,8 @@ export class Game {
     
     // Track interaction counts for special behaviors
     this.dogInteractionCounts = {
-      'Khushi': 0
+      'Khushi': 0,
+      'Danoonie': 0
     };
     
     this.setupEventListeners();
@@ -832,8 +833,34 @@ export class Game {
         }, 5000);
       }
       
-      // Play sound for all characters except Me
-      if (character.name !== 'Danoonie' && character.audio) {
+      // Special audio handling for Danoonie (Me) - only on first interaction
+      if (character.name === 'Danoonie' && this.dogInteractionCounts.Danoonie === 0) {
+        const happybdayAudio = this.audioManager.getAudio('happybday');
+        const bgAudio = this.audioManager.getAudio('bgMusic');
+        
+        if (bgAudio) {
+          bgAudio.volume = 0; // Mute background music
+        }
+        
+        if (happybdayAudio) {
+          happybdayAudio.currentTime = 0;
+          
+          // Restore background music when Danoonie's audio ends
+          happybdayAudio.onended = () => {
+            if (bgAudio) {
+              bgAudio.volume = 0.6; // Restore background music volume
+            }
+          };
+          
+          happybdayAudio.play().then(() => {
+            console.log(`🎵 Playing special audio for ${character.name} (first interaction)`);
+          }).catch(e => {
+            console.log('Could not play Danoonie audio:', e);
+          });
+        }
+      } 
+      // Play sound for all other characters
+      else if (character.audio) {
         character.audio.currentTime = 0; // Reset to start
         character.audio.play().catch(e => {
           console.log('Could not play sound:', e);
@@ -878,6 +905,11 @@ export class Game {
           if (this.dogInteractionCounts.Khushi >= 5) {
             character.startFadeOut(this.audioManager);
           }
+        }
+        
+        if (character.name === 'Danoonie') {
+          this.dogInteractionCounts.Danoonie++;
+          console.log(`🎵 Danoonie interaction count: ${this.dogInteractionCounts.Danoonie}`);
         }
         
         // Special behavior for Nolan - start eating animation after dialog
