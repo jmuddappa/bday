@@ -89,14 +89,6 @@ export const CONFIG = {
       animationSpeed: 8, // frames between transitions
       shadowWidth: 70, shadowHeight: 25, shadowOffsetY: 10
     },
-    //khoa
-    FRIEND1: {
-      x: 25, y: 300, scale: 2,
-      width: 80, height: 120,
-      sitFrame: { sx: 0, sy: 0 },
-      jumpFrame: { sx: 0, sy: 0 }, // Same as sit - no animation
-      shadowWidth: 40, shadowHeight: 15, shadowOffsetY: 8
-    },
     //raza
     FRIEND2: {
       x: 900, y: 150, scale: 1.5,
@@ -123,7 +115,7 @@ export const CONFIG = {
       sitFrame: { sx: 300, sy: 0 },      // Frame 1 at 300px
       transitionFrame: { sx: 600, sy: 0 }, // Frame 2 at 600px  
       jumpFrame: { sx: 900, sy: 0 },      // Frame 3 at 900px
-      animationSpeed: 12, // 15% slower (10 * 1.15 ≈ 12)
+      animationSpeed: 14, // 15% slower than 12 (12 * 1.15 ≈ 14)
       // Frame position offsets - all frames render at exact same position (centered in sprite)
       sitFrameOffset: { x: 0, y: 0 },        // Frame 1 - no offset
       transitionFrameOffset: { x: 0, y: 0 }, // Frame 2 - no offset  
@@ -131,6 +123,43 @@ export const CONFIG = {
       shadowWidth: 20, shadowHeight: 8, shadowOffsetY: 4, // Smaller shadow
       // Special behavior - starts hidden
       startsHidden: true
+    },
+    //Nolan
+    FRIEND5: {
+      x: 750, y: 692, scale: 0.25,
+      width: 400, height: 460, // Source dimensions for each frame (400x460 each)
+      // 3-frame animation system for eating sequence
+      totalWidth: 1200, // Total sprite width (400px per frame * 3 frames)
+      frameHeight: 460, // Source frame height
+      sitFrame: { sx: 0, sy: 0 },        // Frame 1: 0-400px (normal)
+      transitionFrame: { sx: 400, sy: 0 }, // Frame 2: 400-800px (eating)
+      jumpFrame: { sx: 800, sy: 0 },    // Frame 3: 800-1200px (finished eating)
+      animationSpeed: 18, // 20% slower than 15 (15 * 1.2 = 18)
+      // Frame position offsets - all frames render at exact same position
+      sitFrameOffset: { x: 0, y: 0 },        // Frame 1 - no offset
+      transitionFrameOffset: { x: 0, y: 0 }, // Frame 2 - no offset  
+      jumpFrameOffset: { x: 0, y: 0 },       // Frame 3 - no offset
+      shadowWidth: 25, shadowHeight: 10, shadowOffsetY: 5,
+      // Special behavior - starts hidden and needs investigation
+      startsHidden: true,
+      needsInvestigation: true
+    },
+    //Khoa
+    FRIEND8: {
+      x: 900, y: 750, scale: 0.35, // Reduced by another 30% (0.56 * 0.7 ≈ 0.39)
+      width: 500, height: 527, // Source dimensions for each frame (500x527 each)
+      // 3-frame animation system
+      totalWidth: 1500, // Total sprite width (500px per frame * 3 frames)
+      frameHeight: 527, // Source frame height
+      sitFrame: { sx: 0, sy: 0 },        // Frame 1: 0-500px
+      transitionFrame: { sx: 500, sy: 0 }, // Frame 2: 500-1000px  
+      jumpFrame: { sx: 1000, sy: 0 },    // Frame 3: 1000-1500px
+      animationSpeed: 12, // Animation timing
+      // Frame position offsets - frame 2 and 3 offset left by 5px
+      sitFrameOffset: { x: 0, y: 0 },        // Frame 1 - no offset
+      transitionFrameOffset: { x: -5, y: 0 }, // Frame 2 - 5px left
+      jumpFrameOffset: { x: -5, y: 0 },       // Frame 3 - 5px left
+      shadowWidth: 0, shadowHeight: 0, shadowOffsetY: 0
     }
   },
 
@@ -147,10 +176,11 @@ export const CONFIG = {
       KHUSHI: 'assets/images/khushi.png',
       ME: 'assets/images/me.png',
       ME_FRAMES: 'assets/images/me_frames.png',
-      FRIEND1: 'assets/images/friends/friend1.png',
       FRIEND2: 'assets/images/friends/friend2.png',
       FRIEND3: 'assets/images/friends/friend3.png',
+      FRIEND5: 'assets/images/friends/friend5.png',
       FRIEND6: 'assets/images/friends/friend6.png',
+      FRIEND8: 'assets/images/friends/friend8.png',
       DANUNDIE: 'assets/images/danundie.png',
       JUKEBOX: 'assets/images/jukebox.png',
       DANINJA: 'assets/images/daninja.png'

@@ -53,6 +53,9 @@ export class Game {
     this.targetFPS = 60;
     this.frameInterval = 1000 / this.targetFPS;
     
+    // Daninja dialog state
+    this.isDaninjaDialogOpen = false;
+    
     // Collision sound system
     this.lastBumpTime = 0;
     this.bumpCooldown = 150;
@@ -86,13 +89,6 @@ export class Game {
           "I love you! Happy birthday Lindo. (Anh yêu em! Chúc mừng sinh nhật Lindo.)"
         ]
       },
-      //khoa
-      'Khoa & Anne': {
-        portrait: 'friend1_portrait',
-        messages: [
-          "Khoa: Live, laugh, love! Anne: HOLY EFFIN SHIT BALLS GIRL ITS YOUR BDAY! (Khoa: Sống, cười, yêu! Anne: CHÚC MỪNG SINH NHẬT CẬU Ê! 🎉)"
-        ]
-      },
       //raza
       'Raza': {
         portrait: 'friend2_portrait',
@@ -111,7 +107,7 @@ export class Game {
       'Daninja': {
         portrait: 'daninja_portrait',
         messages: [
-          "I trained in these very trees for years. Now I emerge for your special day to deliver this letter from Danoonie! (Tôi đã luyện tập trong những cây này nhiều năm. Giờ tôi xuất hiện cho ngày đặc biệt của bạn!)"
+          "Here, take this letter! I trained in these very trees for years. Now I emerge for your special day to deliver this letter from Danoonie! (Đây, hãy lấy lá thư này! Tôi đã luyện tập trong những cây này nhiều năm. Giờ tôi xuất hiện trong ngày đặc biệt của bạn để gửi lá thư này từ Danoonie!)"
         ]
       },
       //madeline
@@ -119,6 +115,20 @@ export class Game {
         portrait: 'friend6_portrait',
         messages: [
           "Despite you never watering me, I still somehow grew to be healthy, thank you & happy birthday!!"
+        ]
+      },
+      //Nolan (friend5)
+      'Nolan': {
+        portrait: 'friend5_portrait',
+        messages: [
+          "I am going to eat this *gobble* *gobble*"
+        ]
+      },
+      //Khoa (friend8)
+      'Khoa': {
+        portrait: 'friend8_portrait',
+        messages: [
+          "Happy birthday! Wishing you all the best on your special day!"
         ]
       }
     };
@@ -128,11 +138,12 @@ export class Game {
       'Roti': 0,
       'Khushi': 0,
       'Danoonie': 0,
-      'Khoa & Anne': 0,
       'Raza': 0,
       'bố và mẹ': 0,
       'Daninja': 0,
-      'Madeline': 0
+      'Madeline': 0,
+      'Nolan': 0,
+      'Khoa': 0
     };
     
     // Track interaction counts for special behaviors
@@ -166,7 +177,7 @@ export class Game {
     const { IMAGES } = CONFIG.ASSETS;
     
     // Load all images in parallel
-    const [backgroundImage, playerFront, playerSide, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite, friend2Sprite, friend3Sprite, friend6Sprite, danundieSprite, jukeboxSprite, daninjaSprite] = await Promise.all([
+    const [backgroundImage, playerFront, playerSide, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meSprite, meFramesSprite, friend2Sprite, friend3Sprite, friend5Sprite, friend6Sprite, friend8Sprite, danundieSprite, jukeboxSprite, daninjaSprite] = await Promise.all([
       this.assetLoader.loadImage(IMAGES.BACKGROUND),
       this.assetLoader.loadImage(IMAGES.PLAYER_FRONT),
       this.assetLoader.loadImage(IMAGES.PLAYER_SIDE),
@@ -177,10 +188,11 @@ export class Game {
       this.assetLoader.loadImage(IMAGES.KHUSHI),
       this.assetLoader.loadImage(IMAGES.ME),
       this.assetLoader.loadImage(IMAGES.ME_FRAMES),
-      this.assetLoader.loadImage(IMAGES.FRIEND1),
       this.assetLoader.loadImage(IMAGES.FRIEND2),
       this.assetLoader.loadImage(IMAGES.FRIEND3),
+      this.assetLoader.loadImage(IMAGES.FRIEND5),
       this.assetLoader.loadImage(IMAGES.FRIEND6),
+      this.assetLoader.loadImage(IMAGES.FRIEND8),
       this.assetLoader.loadImage(IMAGES.DANUNDIE),
       this.assetLoader.loadImage(IMAGES.JUKEBOX),
       this.assetLoader.loadImage(IMAGES.DANINJA)
@@ -200,11 +212,11 @@ export class Game {
     // Set daninja sprite
     this.daninjaReveal.setSprite(daninjaSprite);
     
-    return { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite, friend2Sprite, friend3Sprite, friend6Sprite };
+    return { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend2Sprite, friend3Sprite, friend5Sprite, friend6Sprite, friend8Sprite };
   }
 
   async createEntities(sprites) {
-    const { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend1Sprite, friend2Sprite, friend3Sprite, friend6Sprite } = sprites;
+    const { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend2Sprite, friend3Sprite, friend5Sprite, friend6Sprite, friend8Sprite } = sprites;
     
     // Create dogs with their sprites and audio
     const rotiDog = new Dog('Roti', CONFIG.DOGS.ROTI);
@@ -219,11 +231,6 @@ export class Game {
     meDog.setSprite(meSprite); // Keep original for fallback
     meDog.setFramesSprite(meFramesSprite); // Set new animation sprite
     
-    // Create friend1 as simple dog entity
-    const friend1 = new Dog('Khoa & Anne', CONFIG.DOGS.FRIEND1);
-    friend1.setSprite(friend1Sprite);
-    friend1.setAudio(this.audioManager.getAudio('friend1Sound'));
-    
     // Create friend2 as simple dog entity
     const friend2 = new Dog('Raza', CONFIG.DOGS.FRIEND2);
     friend2.setSprite(friend2Sprite);
@@ -234,23 +241,46 @@ export class Game {
     friend3.setSprite(friend3Sprite);
     friend3.setAudio(this.audioManager.getAudio('friend3Sound'));
     
+    // Create friend5 (Nolan) with 3-frame eating animation
+    const friend5 = new Dog('Nolan', CONFIG.DOGS.FRIEND5);
+    friend5.setSprite(friend5Sprite); // Set main sprite
+    friend5.setFramesSprite(friend5Sprite); // Use same sprite for frames
+    friend5.setAudio(this.audioManager.getAudio('friend5Sound'));
+    
     // Create friend6 (Madeline) with 3-frame animation
     const friend6 = new Dog('Madeline', CONFIG.DOGS.FRIEND6);
     friend6.setSprite(friend6Sprite); // Set main sprite
     friend6.setFramesSprite(friend6Sprite); // Use same sprite for frames
     
-    console.log('🖼️ Friend1 sprite source:', friend1Sprite?.src);
+    // Create friend8 (Khoa) with 3-frame animation
+    const friend8 = new Dog('Khoa', CONFIG.DOGS.FRIEND8);
+    friend8.setSprite(friend8Sprite); // Set main sprite
+    friend8.setFramesSprite(friend8Sprite); // Use same sprite for frames
+    friend8.setAudio(this.audioManager.getAudio('friend8Sound'));
+    
     console.log('🖼️ Friend2 sprite source:', friend2Sprite?.src);
     console.log('🖼️ Friend3 sprite source:', friend3Sprite?.src);
+    console.log('🖼️ Friend5 sprite source:', friend5Sprite?.src);
     console.log('🖼️ Friend6 sprite source:', friend6Sprite?.src);
+    console.log('🖼️ Friend8 sprite source:', friend8Sprite?.src);
     
-    this.dogs = [rotiDog, khushiDog, meDog, friend1, friend2, friend3, friend6];
+    
+    this.dogs = [rotiDog, khushiDog, meDog, friend2, friend3, friend5, friend6, friend8];
+    console.log('🎮 Total dogs in array:', this.dogs.length);
+    console.log('🎮 Dog names:', this.dogs.map(dog => dog.name));
   }
 
   setupEventListeners() {
     // Input system events
     this.inputManager.on('interact', () => {
-      // Check for hidden character interaction first
+      // Check for investigation interaction first (Nolan)
+      const investigationDog = this.getNearbyInvestigationDog();
+      if (investigationDog) {
+        investigationDog.startInvestigation(this.audioManager);
+        return;
+      }
+      
+      // Check for hidden character interaction (Madeline)
       const hiddenDog = this.getNearbyHiddenDog();
       if (hiddenDog) {
         hiddenDog.reveal(this.audioManager);
@@ -267,6 +297,13 @@ export class Game {
       
       // Check for Daninja interaction (revealed)
       if (this.daninjaReveal.canTalkToDaninja(this.player)) {
+        // If Daninja dialog is already open, pressing E again opens the letter modal
+        if (this.isDaninjaDialogOpen) {
+          this.closeDialog();
+          this.openLetterModal();
+          return;
+        }
+        
         const daninjaCharacter = { name: 'Daninja' };
         this.openDialog(daninjaCharacter);
         return;
@@ -302,8 +339,9 @@ export class Game {
 
     this.inputManager.on('closeModals', () => {
       // Let MailSystem handle its own two-step escape behavior
-      // Only close dialog here
+      // Close dialog and letter modal here
       this.closeDialog();
+      this.closeLetterModal();
     });
 
     // Secret danundie streak trigger
@@ -490,9 +528,14 @@ export class Game {
       this.closeDialog();
       this.hideTalkPrompt();
       
-      // Check for hidden character interaction
-      const hiddenDog = this.getNearbyHiddenDog();
-      if (hiddenDog) {
+      // Check for investigation interaction (Nolan)
+      const investigationDog = this.getNearbyInvestigationDog();
+      if (investigationDog) {
+        this.showInvestigationPrompt(investigationDog);
+      }
+      // Check for hidden character interaction (Madeline) 
+      else if (this.getNearbyHiddenDog()) {
+        const hiddenDog = this.getNearbyHiddenDog();
         this.showHiddenCharacterPrompt(hiddenDog);
       }
       // Check for tree interaction (hidden Daninja)
@@ -560,6 +603,28 @@ export class Game {
     
     const x = rect.left + (hiddenDog.x + hiddenDog.width / 2 - 70) * canvasScale;
     const y = rect.top + (hiddenDog.y - 50) * canvasScale;
+    
+    this.prompt.style.left = `${x}px`;
+    this.prompt.style.top = `${y}px`;
+  }
+  
+  showInvestigationPrompt(investigationDog) {
+    if (this.prompt && investigationDog) {
+      this.prompt.textContent = 'Press E to investigate';
+      this.prompt.style.display = 'block';
+      this.updateInvestigationPromptPosition(investigationDog);
+    }
+  }
+  
+  updateInvestigationPromptPosition(investigationDog) {
+    const rect = this.canvas.getBoundingClientRect();
+    const canvasScale = Math.min(
+      rect.width / CONFIG.CANVAS.WIDTH,
+      rect.height / CONFIG.CANVAS.HEIGHT
+    );
+    
+    const x = rect.left + (investigationDog.x + investigationDog.width / 2 - 80) * canvasScale;
+    const y = rect.top + (investigationDog.y - 50) * canvasScale;
     
     this.prompt.style.left = `${x}px`;
     this.prompt.style.top = `${y}px`;
@@ -704,6 +769,10 @@ export class Game {
   getNearbyHiddenDog() {
     return this.dogs.find(dog => dog.isPlayerInRangeForHidden(this.player));
   }
+  
+  getNearbyInvestigationDog() {
+    return this.dogs.find(dog => dog.isPlayerInRangeForInvestigation(this.player));
+  }
 
 
   showTalkPrompt(character) {
@@ -750,6 +819,18 @@ export class Game {
   openDialog(character) {
     if (this.dialogContainer && character) {
       this.dialogContainer.style.display = 'block';
+      
+      // Special handling for Daninja - auto-open letter modal after 5 seconds
+      if (character.name === 'Daninja') {
+        this.isDaninjaDialogOpen = true;
+        setTimeout(() => {
+          // Only open letter modal if dialog is still open (user hasn't closed it)
+          if (this.dialogContainer.style.display === 'block' && this.isDaninjaDialogOpen) {
+            this.closeDialog();
+            this.openLetterModal();
+          }
+        }, 5000);
+      }
       
       // Play sound for all characters except Me
       if (character.name !== 'Danoonie' && character.audio) {
@@ -799,6 +880,13 @@ export class Game {
           }
         }
         
+        // Special behavior for Nolan - start eating animation after dialog
+        if (character.name === 'Nolan' && !character.isEating && !character.eatingComplete) {
+          setTimeout(() => {
+            character.startEatingSequence(this.audioManager);
+          }, 1500); // Start eating 1.5 seconds after dialog to give time to read
+        }
+        
         const dialogTextElement = document.getElementById('dialogText');
         if (dialogTextElement) {
           // Format the message to style Vietnamese text differently
@@ -812,6 +900,46 @@ export class Game {
   closeDialog() {
     if (this.dialogContainer) {
       this.dialogContainer.style.display = 'none';
+      // Reset Daninja dialog state when closing any dialog
+      this.isDaninjaDialogOpen = false;
+    }
+  }
+
+  /**
+   * Open the letter modal
+   */
+  openLetterModal() {
+    const letterModal = document.getElementById('letterModal');
+    if (letterModal) {
+      letterModal.style.display = 'flex';
+      
+      // Setup close button functionality - be specific to letter modal only
+      const closeBtn = letterModal.querySelector('.letter-header .close-btn');
+      if (closeBtn) {
+        closeBtn.onclick = () => this.closeLetterModal();
+      }
+      
+      // Setup backdrop click to close - use addEventListener instead of onclick
+      const backdropHandler = (e) => {
+        const letterContainer = letterModal.querySelector('.letter-container');
+        if (letterContainer && !letterContainer.contains(e.target)) {
+          this.closeLetterModal();
+        }
+      };
+      letterModal.addEventListener('click', backdropHandler, { once: true });
+      
+      console.log('📝 Letter modal opened!');
+    }
+  }
+
+  /**
+   * Close the letter modal
+   */
+  closeLetterModal() {
+    const letterModal = document.getElementById('letterModal');
+    if (letterModal) {
+      letterModal.style.display = 'none';
+      console.log('📝 Letter modal closed!');
     }
   }
 

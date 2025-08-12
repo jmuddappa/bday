@@ -167,6 +167,10 @@ export class JukeboxSystem {
     
     // Set up video player
     if (this.videoPlayer && this.videoTitle && this.videoModal) {
+      // Stop any existing video playback first
+      this.videoPlayer.pause();
+      this.videoPlayer.currentTime = 0;
+      
       this.videoTitle.textContent = video.title;
       this.videoPlayer.src = video.src;
       this.videoPlayer.load();
@@ -180,11 +184,13 @@ export class JukeboxSystem {
       // Show video modal with flex display for centering
       this.videoModal.style.display = 'flex';
       
-      // Auto-play when ready
+      // Auto-play when ready with a small delay to avoid conflicts
       this.videoPlayer.addEventListener('loadeddata', () => {
-        this.videoPlayer.play().catch(e => {
-          console.log('🎵 Video autoplay failed:', e);
-        });
+        setTimeout(() => {
+          this.videoPlayer.play().catch(e => {
+            console.log('🎵 Video autoplay failed:', e);
+          });
+        }, 100); // 100ms delay
       }, { once: true });
     }
   }

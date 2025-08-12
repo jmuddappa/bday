@@ -34,14 +34,21 @@ export class Dog extends GameObject {
     this.stateChangeTime = 0;
     this.animationDuration = 500; // ms
     
-    // 3-frame animation system for Me dog and Madeline
-    this.useFrameAnimation = this.name === 'Danoonie' || this.name === 'Madeline';
+    // Frame animation system for Me dog, Madeline, Nolan, and Khoa
+    this.useFrameAnimation = this.name === 'Danoonie' || this.name === 'Madeline' || this.name === 'Nolan' || this.name === 'Khoa';
     this.animationFrame = 0;
     this.frameCounter = 0;
     this.animationSpeed = config.animationSpeed || 30;
-    this.frameSequence = [0, 1, 2]; // sit → transition → jump
+    // Set frame sequence based on character
+    if (this.name === 'Khoa') {
+      this.frameSequence = [0, 1, 2]; // sit → transition → jump (3 frames)
+      this.activeFrameSequence = [1, 2]; // When player nearby, cycle between frame 2 and 3
+    } else {
+      this.frameSequence = [0, 1, 2]; // sit → transition → jump (3 frames)
+    }
     this.animationDirection = 1; // 1 for forward, -1 for reverse
     this.isAnimating = false;
+    this.isCyclingActive = false; // For Friend8's special cycling behavior
     
     // Interaction bob animation (only when player is nearby)
     this.interactionBobOffset = 0;
@@ -107,43 +114,67 @@ export class Dog extends GameObject {
       this.deactivate(specialAudio, bgAudio);
     }
     
-    // Update 3-frame animation for Me dog
+    // Update frame animation
     if (this.useFrameAnimation && this.isAnimating) {
       this.frameCounter++;
       if (this.frameCounter >= this.animationSpeed) {
         this.frameCounter = 0;
         
-        // Move animation frame forward or backward
-        this.animationFrame += this.animationDirection;
-        
-        // Check bounds and stop animation when complete
-        if (this.animationDirection === 1) { // Forward
-          if (this.animationFrame >= this.frameSequence.length - 1) {
-            this.animationFrame = this.frameSequence.length - 1; // Stay at jump frame
-            this.isAnimating = false;
-            
-            // If this was a growth animation, mark as fully revealed
-            if (this.isGrowing) {
-              this.isGrowing = false;
-              this.hasBeenRevealed = true;
-              console.log(`🌸 ${this.name} growth complete - ready to talk!`);
+        if (this.name === 'Khoa' && this.isCyclingActive) {
+          // Special cycling behavior for Friend8 - bounce between frames 1 and 2 (indices 1 and 2)
+          if (this.animationDirection === 1) {
+            this.animationFrame++;
+            if (this.animationFrame >= 2) { // Reached frame 3 (index 2)
+              this.animationDirection = -1; // Start going back
+            }
+          } else {
+            this.animationFrame--;
+            if (this.animationFrame <= 1) { // Reached frame 2 (index 1) 
+              this.animationDirection = 1; // Start going forward again
             }
           }
-        } else { // Reverse
-          if (this.animationFrame <= 0) {
-            this.animationFrame = 0; // Stay at sit frame
+        } else if (this.name === 'Nolan' && this.isEating) {
+          // Special eating animation - play frames 1->2->3 once and stop
+          this.animationFrame++;
+          console.log(`🍄 Nolan eating animation: frame ${this.animationFrame + 1}/3`);
+          if (this.animationFrame >= this.frameSequence.length - 1) {
+            this.animationFrame = this.frameSequence.length - 1; // Stay at final frame
             this.isAnimating = false;
+            console.log(`🍄 Nolan eating animation complete - staying on frame 3`);
+          }
+        } else {
+          // Normal animation logic for other characters
+          // Move animation frame forward or backward
+          this.animationFrame += this.animationDirection;
+          
+          // Check bounds and stop animation when complete
+          if (this.animationDirection === 1) { // Forward
+            if (this.animationFrame >= this.frameSequence.length - 1) {
+              this.animationFrame = this.frameSequence.length - 1; // Stay at jump frame
+              this.isAnimating = false;
+              
+              // If this was a growth animation, mark as fully revealed
+              if (this.isGrowing) {
+                this.isGrowing = false;
+                this.hasBeenRevealed = true;
+                console.log(`🌸 ${this.name} growth complete - ready to talk!`);
+              }
+            }
+          } else { // Reverse
+            if (this.animationFrame <= 0) {
+              this.animationFrame = 0; // Stay at sit frame
+              this.isAnimating = false;
+            }
           }
         }
       }
     }
     
-    // Update interaction bob animation for friends only
-    const isFriend = this.name.startsWith('Friend') || 
-                    this.name === 'Khoa & Anne' || 
-                    this.name === 'Raza' || 
-                    this.name === 'bố và mẹ';
-    if (isFriend) {
+    // Update interaction bob animation for simple friends only (not Nolan/Khoa which have special behaviors)
+    const isSimpleFriend = (this.name.startsWith('Friend') && this.name !== 'Nolan' && this.name !== 'Khoa') || 
+                          this.name === 'Raza' || 
+                          this.name === 'bố và mẹ';
+    if (isSimpleFriend) {
       if (this.isPlayerNearForBob) {
         // Gentle bob when player is nearby (can press E)
         this.interactionBobOffset = Math.sin(Date.now() * 0.004) * 1.5; // Very small 1.5px bob
@@ -154,6 +185,12 @@ export class Dog extends GameObject {
     
     // Update fade-out animation
     this.updateFadeOut();
+    
+    // Update phase-in animation (Nolan)
+    this.updatePhaseIn();
+    
+    // Update eating sequence (Nolan)
+    this.updateEatingSequence();
   }
 
   /**
@@ -171,6 +208,26 @@ export class Dog extends GameObject {
         this.animationDirection = 1;
         this.isAnimating = true;
         this.frameCounter = 0;
+      }
+    } else if (this.name === 'Khoa' && this.state !== 'jump') {
+      this.setState('jump');
+      this.barked = true;
+      
+      // Start cycling animation for Khoa between frames 2 and 3
+      if (this.useFrameAnimation) {
+        this.isCyclingActive = true;
+        this.animationFrame = 1; // Start at frame 2 (index 1)
+        this.animationDirection = 1;
+        this.isAnimating = true;
+        this.frameCounter = 0;
+      }
+      
+      if (this.audio) {
+        this.audio.play().then(() => {
+          console.log(`🎵 Playing audio for ${this.name}`);
+        }).catch(e => {
+          console.log('Could not play sound:', e);
+        });
       }
       
       if (bgAudio) {
@@ -191,6 +248,10 @@ export class Dog extends GameObject {
           }
         };
       }
+    } else if (this.name === 'Nolan') {
+      // Nolan stays on frame 1 when player approaches - no animation until eating sequence
+      // Just mark as barked to prevent repeated activation
+      this.barked = true;
     } else if (this.name !== 'Me' && !this.barked) {
       this.setState('jump');
       this.barked = true;
@@ -221,6 +282,16 @@ export class Dog extends GameObject {
         this.isAnimating = true;
         this.frameCounter = 0;
       }
+    } else if (this.name === 'Khoa' && this.state !== 'sit') {
+      this.setState('sit');
+      this.barked = false;
+      
+      // Stop cycling and return to frame 1 for Khoa
+      if (this.useFrameAnimation) {
+        this.isCyclingActive = false;
+        this.animationFrame = 0; // Return to frame 1 (index 0)
+        this.isAnimating = false;
+      }
       
       if (specialAudio) {
         specialAudio.pause();
@@ -229,6 +300,12 @@ export class Dog extends GameObject {
       
       if (bgAudio) {
         bgAudio.volume = 1;
+      }
+    } else if (this.name === 'Nolan') {
+      // Nolan stays on frame 1 when player moves away - no animation changes
+      // Only reset barked if not eating/dying
+      if (!this.isEating && !this.eatingComplete) {
+        this.barked = false;
       }
     } else if (this.name !== 'Me') {
       this.setState('sit');
@@ -261,9 +338,12 @@ export class Dog extends GameObject {
    * @returns {Object} Drawing data for renderer
    */
   getDrawData() {
-    // Use 3-frame animation system for Me dog and Madeline if frames sprite is available
-    if (this.useFrameAnimation && this.framesSprite && (this.name === 'Danoonie' || this.name === 'Madeline')) {
-      const config = this.name === 'Danoonie' ? CONFIG.DOGS.ME : CONFIG.DOGS.FRIEND6;
+    
+    // Use frame animation system for Me dog, Madeline, and Khoa if frames sprite is available
+    if (this.useFrameAnimation && this.framesSprite && (this.name === 'Danoonie' || this.name === 'Madeline' || this.name === 'Khoa')) {
+      const config = this.name === 'Danoonie' ? CONFIG.DOGS.ME : 
+                     this.name === 'Madeline' ? CONFIG.DOGS.FRIEND6 : 
+                     CONFIG.DOGS.FRIEND8;
       const currentFrameIndex = this.frameSequence[this.animationFrame];
       
       let sourceX;
@@ -309,6 +389,48 @@ export class Dog extends GameObject {
         }
         // DEBUG: Log current frame for debugging
         console.log(`🌱 DEBUG: Madeline showing frame ${currentFrameIndex + 1}/3 (sourceX: ${sourceX}-${sourceX + frameWidth})`);
+      } else if (this.name === 'Nolan') {
+        // Nolan's frame layout - exact 400px frames at correct positions
+        switch (currentFrameIndex) {
+          case 0: // Frame 1: 0-400px (normal)
+            sourceX = 0;
+            frameWidth = 400;
+            break;
+          case 1: // Frame 2: 400-800px (eating)
+            sourceX = 400;
+            frameWidth = 400;
+            break;
+          case 2: // Frame 3: 800-1200px (finished eating)
+            sourceX = 800;
+            frameWidth = 400;
+            break;
+          default:
+            sourceX = 0;
+            frameWidth = 400;
+        }
+        // DEBUG: Log current frame for debugging
+        console.log(`🍄 DEBUG: Nolan showing frame ${currentFrameIndex + 1}/3 (sourceX: ${sourceX}-${sourceX + frameWidth})`);
+      } else if (this.name === 'Khoa') {
+        // Friend8's frame layout - exact 500px frames at correct positions
+        switch (currentFrameIndex) {
+          case 0: // Frame 1: 0-500px
+            sourceX = 0;
+            frameWidth = 500;
+            break;
+          case 1: // Frame 2: 500-1000px
+            sourceX = 500;
+            frameWidth = 500;
+            break;
+          case 2: // Frame 3: 1000-1500px
+            sourceX = 1000;
+            frameWidth = 500;
+            break;
+          default:
+            sourceX = 0;
+            frameWidth = 500;
+        }
+        // DEBUG: Log current frame for debugging
+        console.log(`👤 DEBUG: Khoa showing frame ${currentFrameIndex + 1}/3 (sourceX: ${sourceX}-${sourceX + frameWidth})`);
       }
       
       let offsetX = 0;
@@ -340,6 +462,26 @@ export class Dog extends GameObject {
         const currentOffset = frameOffsets[currentFrameIndex] || { x: 0, y: 0 };
         offsetX = currentOffset.x;
         offsetY = currentOffset.y;
+      } else if (this.name === 'Nolan') {
+        // Nolan's offsets - use config offsets to keep frames grounded
+        const frameOffsets = {
+          0: config.sitFrameOffset || { x: 0, y: 0 },
+          1: config.transitionFrameOffset || { x: 0, y: 0 },
+          2: config.jumpFrameOffset || { x: 0, y: 0 }
+        };
+        const currentOffset = frameOffsets[currentFrameIndex] || { x: 0, y: 0 };
+        offsetX = currentOffset.x;
+        offsetY = currentOffset.y;
+      } else if (this.name === 'Khoa') {
+        // Khoa's offsets - use config offsets to keep frames grounded
+        const frameOffsets = {
+          0: config.sitFrameOffset || { x: 0, y: 0 },
+          1: config.transitionFrameOffset || { x: 0, y: 0 },
+          2: config.jumpFrameOffset || { x: 0, y: 0 }
+        };
+        const currentOffset = frameOffsets[currentFrameIndex] || { x: 0, y: 0 };
+        offsetX = currentOffset.x;
+        offsetY = currentOffset.y;
       }
 
       const renderData = {
@@ -359,17 +501,17 @@ export class Dog extends GameObject {
     }
     
     // Fallback to original 2-frame system for other dogs or if frames sprite not available
+    
     const frame = this.state === 'jump' ? this.jumpFrame : this.sitFrame;
     const offsetX = this.state === 'jump' ? this.jumpOffsetX : 0;
     const offsetY = this.state === 'jump' ? this.jumpOffsetY : 0;
 
-    // For simple friends, use full image dimensions
-    const isFriend = (this.name.startsWith('Friend') || 
-                     this.name === 'Khoa & Anne' || 
-                     this.name === 'Raza' || 
-                     this.name === 'bố và mẹ') && this.sprite;
-    const sourceWidth = isFriend ? this.sprite.naturalWidth : this.originalWidth;
-    const sourceHeight = isFriend ? this.sprite.naturalHeight : this.originalHeight;
+    // For simple friends (not Khoa), use full image dimensions
+    const isSimpleFriend = ((this.name.startsWith('Friend') && this.name !== 'Khoa') || 
+                           this.name === 'Raza' || 
+                           this.name === 'bố và mẹ') && this.sprite;
+    const sourceWidth = isSimpleFriend ? this.sprite.naturalWidth : this.originalWidth;
+    const sourceHeight = isSimpleFriend ? this.sprite.naturalHeight : this.originalHeight;
 
     return {
       sprite: this.sprite,
@@ -435,6 +577,23 @@ export class Dog extends GameObject {
     const distance = this.distanceTo(player);
     const threshold = CONFIG.DOGS.INTERACTION_DISTANCE;
     
+    
+    return distance < threshold;
+  }
+  
+  /**
+   * Check if player can investigate (for Nolan)
+   * @param {Player} player - Player entity
+   * @returns {boolean} True if player is in range for investigation
+   */
+  isPlayerInRangeForInvestigation(player) {
+    // Only for characters that need investigation and haven't been revealed
+    if (!this.needsInvestigation || this.hasBeenRevealed) {
+      return false;
+    }
+    
+    const distance = this.distanceTo(player);
+    const threshold = CONFIG.DOGS.INTERACTION_DISTANCE;
     
     return distance < threshold;
   }
@@ -580,6 +739,10 @@ export class Dog extends GameObject {
    * @returns {boolean}
    */
   isVisible() {
+    // Special case for Nolan during phase-in
+    if (this.name === 'Nolan' && this.isPhasing) {
+      return true; // Visible during phase-in but with opacity
+    }
     return !this.isVanished && !this.isHidden;
   }
 
@@ -588,7 +751,22 @@ export class Dog extends GameObject {
    * @returns {boolean}
    */
   canTalk() {
-    return this.hasBeenRevealed && !this.isGrowing && !this.isHidden;
+    // Hidden characters need to be revealed first, others are always available
+    if (this.isHidden) {
+      return this.hasBeenRevealed && !this.isGrowing;
+    }
+    
+    // Investigation characters (Nolan) need to be revealed and not eating/dying
+    if (this.needsInvestigation || (this.name === 'Nolan' && !this.hasBeenRevealed)) {
+      return false;
+    }
+    
+    // Nolan can't talk while eating or after eating (dying)
+    if (this.name === 'Nolan' && (this.isEating || this.eatingComplete)) {
+      return false;
+    }
+    
+    return true;
   }
 
   /**
@@ -601,6 +779,81 @@ export class Dog extends GameObject {
       const flicker = Math.sin(Date.now() * 0.01) * 0.1 + 0.9; // Gentle flicker between 0.8-1.0
       return Math.min(this.fadeOpacity * flicker, this.fadeOpacity);
     }
+    
+    // Handle phase-in for Nolan
+    if (this.name === 'Nolan' && this.isPhasing) {
+      return this.phaseOpacity;
+    }
+    
     return this.fadeOpacity;
+  }
+  
+  /**
+   * Start investigation sequence (for Nolan)
+   * @param {AudioManager} audioManager - Audio manager for playing sounds
+   */
+  startInvestigation(audioManager) {
+    if (this.needsInvestigation && !this.hasBeenRevealed && !this.isPhasing) {
+      console.log(`🕵️ ${this.name} investigation started - beginning phase-in!`);
+      this.needsInvestigation = false;
+      this.isHidden = false;
+      this.isPhasing = true;
+      this.phaseOpacity = 0;
+    }
+  }
+  
+  /**
+   * Update phase-in animation (for Nolan)
+   */
+  updatePhaseIn() {
+    if (this.isPhasing && this.phaseOpacity < 1) {
+      this.phaseOpacity += this.phaseSpeed;
+      
+      if (this.phaseOpacity >= 1) {
+        this.phaseOpacity = 1;
+        this.isPhasing = false;
+        this.hasBeenRevealed = true;
+        console.log(`🍄 ${this.name} phase-in complete - ready to talk!`);
+      }
+    }
+  }
+  
+  /**
+   * Start eating sequence (for Nolan)
+   * @param {AudioManager} audioManager - Audio manager for playing sounds
+   */
+  startEatingSequence(audioManager) {
+    if (this.name === 'Nolan' && !this.isEating && !this.eatingComplete) {
+      console.log(`🍄 ${this.name} starting eating sequence!`);
+      this.isEating = true;
+      this.shouldDieAfterEating = true;
+      
+      // Start eating animation (frame 1 -> 2 -> 3)
+      if (this.useFrameAnimation) {
+        this.animationDirection = 1;
+        this.isAnimating = true;
+        this.frameCounter = 0;
+        this.animationFrame = 0; // Start at frame 1
+      }
+    }
+  }
+  
+  /**
+   * Update eating sequence (for Nolan)
+   */
+  updateEatingSequence() {
+    if (this.name === 'Nolan' && this.isEating && this.useFrameAnimation) {
+      // Check if eating animation is complete (reached frame 3)
+      if (!this.isAnimating && this.animationFrame >= 2) {
+        this.isEating = false;
+        this.eatingComplete = true;
+        console.log(`🍄 ${this.name} finished eating - starting death fade!`);
+        
+        // Start fade out after eating
+        if (this.shouldDieAfterEating) {
+          this.startFadeOut(null); // No audio manager needed
+        }
+      }
+    }
   }
 }
