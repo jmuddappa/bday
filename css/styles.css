@@ -89,6 +89,84 @@ canvas {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
+/* Speech bubble styles */
+#speechBubble {
+  position: fixed;
+  transform: translateX(-50%);
+  background: #ffffff;
+  color: #ff6b35;
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 8px 16px;
+  border: 3px solid #ff6b35;
+  border-radius: 20px;
+  display: none;
+  z-index: 20;
+  animation: bounce 0.6s ease-in-out;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+}
+
+/* Speech bubble tail (arrow pointing down) */
+#speechBubble::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid #ff6b35;
+}
+
+/* Speech bubble bounce animation */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(-50%) translateY(-10px);
+    opacity: 1;
+  }
+}
+
+/* Daninja speech bubble styles (ninja theme - darker colors) */
+#speechBubbleDaninja {
+  position: fixed;
+  transform: translateX(-50%);
+  background: #2a2a2a;
+  color: #ffffff;
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 8px 16px;
+  border: 3px solid #4a90e2;
+  border-radius: 20px;
+  display: none;
+  z-index: 20;
+  animation: bounce 0.6s ease-in-out;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+}
+
+/* Daninja speech bubble tail (blue arrow pointing down) */
+#speechBubbleDaninja::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid #4a90e2;
+}
+
 /* Mail container styles */
 .mail-container {
   display: none;

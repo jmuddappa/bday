@@ -44,6 +44,8 @@ export class Game {
     // UI elements
     this.prompt = document.getElementById('prompt');
     this.talkPrompt = document.getElementById('talkPrompt');
+    this.speechBubble = document.getElementById('speechBubble');
+    this.speechBubbleDaninja = document.getElementById('speechBubbleDaninja');
     this.dialogContainer = document.getElementById('dialogContainer');
     this.audioStatus = document.getElementById('audioStatus');
     
@@ -51,6 +53,8 @@ export class Game {
     this.isRunning = false;
     this.lastFrameTime = 0;
     this.targetFPS = 60;
+    this.isSpeechBubbleActive = false;
+    this.isSpeechBubbleDaninjaActive = false;
     this.frameInterval = 1000 / this.targetFPS;
     
     // Daninja dialog state
@@ -313,6 +317,8 @@ export class Game {
       // Check for tree search (hidden Daninja)
       if (this.daninjaReveal.canInteractWithTrees(this.player)) {
         this.daninjaReveal.startReveal(this.audioManager);
+        // Show speech bubble when daninja appears
+        this.showSpeechBubbleDaninja();
         return;
       }
       
@@ -514,6 +520,14 @@ export class Game {
   }
 
   updateUI() {
+    // Update speech bubble positions if active
+    if (this.isSpeechBubbleActive) {
+      this.updateSpeechBubblePosition();
+    }
+    if (this.isSpeechBubbleDaninjaActive) {
+      this.updateSpeechBubbleDaninjaPosition();
+    }
+    
     // Handle talk prompt for any nearby dog
     const nearbyDog = this.getNearbyDog();
     
@@ -745,7 +759,98 @@ export class Game {
       });
     }
     
+    // Show speech bubble over player
+    this.showSpeechBubble();
+    
     console.log('🏃‍♂️ DANUNDIE STREAK TRIGGERED WITH SOUND!');
+  }
+
+  /**
+   * Show speech bubble over player character
+   */
+  showSpeechBubble() {
+    if (!this.speechBubble) return;
+    
+    // Mark bubble as active so it follows player
+    this.isSpeechBubbleActive = true;
+    
+    // Position speech bubble over player
+    this.updateSpeechBubblePosition();
+    
+    // Show the speech bubble
+    this.speechBubble.style.display = 'block';
+    
+    // Hide it after 2 seconds
+    setTimeout(() => {
+      if (this.speechBubble) {
+        this.speechBubble.style.display = 'none';
+        this.isSpeechBubbleActive = false;
+      }
+    }, 2000);
+  }
+
+  /**
+   * Update speech bubble position to follow player
+   */
+  updateSpeechBubblePosition() {
+    if (!this.speechBubble) return;
+    
+    const rect = this.canvas.getBoundingClientRect();
+    const canvasScale = Math.min(
+      rect.width / CONFIG.CANVAS.WIDTH,
+      rect.height / CONFIG.CANVAS.HEIGHT
+    );
+    
+    // Position above player character (center of player + offset above)
+    const x = rect.left + (this.player.x + this.player.width / 2) * canvasScale;
+    const y = rect.top + (this.player.y - 60) * canvasScale; // 60px above player
+    
+    this.speechBubble.style.left = `${x}px`;
+    this.speechBubble.style.top = `${y}px`;
+  }
+
+  /**
+   * Show Daninja speech bubble over player character
+   */
+  showSpeechBubbleDaninja() {
+    if (!this.speechBubbleDaninja) return;
+    
+    // Mark bubble as active so it follows player
+    this.isSpeechBubbleDaninjaActive = true;
+    
+    // Position speech bubble over player
+    this.updateSpeechBubbleDaninjaPosition();
+    
+    // Show the speech bubble
+    this.speechBubbleDaninja.style.display = 'block';
+    
+    // Hide it after 2 seconds
+    setTimeout(() => {
+      if (this.speechBubbleDaninja) {
+        this.speechBubbleDaninja.style.display = 'none';
+        this.isSpeechBubbleDaninjaActive = false;
+      }
+    }, 2000);
+  }
+
+  /**
+   * Update Daninja speech bubble position to follow player
+   */
+  updateSpeechBubbleDaninjaPosition() {
+    if (!this.speechBubbleDaninja) return;
+    
+    const rect = this.canvas.getBoundingClientRect();
+    const canvasScale = Math.min(
+      rect.width / CONFIG.CANVAS.WIDTH,
+      rect.height / CONFIG.CANVAS.HEIGHT
+    );
+    
+    // Position above player character (center of player + offset above)
+    const x = rect.left + (this.player.x + this.player.width / 2) * canvasScale;
+    const y = rect.top + (this.player.y - 60) * canvasScale; // 60px above player
+    
+    this.speechBubbleDaninja.style.left = `${x}px`;
+    this.speechBubbleDaninja.style.top = `${y}px`;
   }
 
   // Public API
