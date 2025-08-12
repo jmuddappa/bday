@@ -100,13 +100,6 @@ export class Game {
           "This isn't as nice as a river but I still appreciate the view. (Đây không đẹp bằng một dòng sông nhưng tôi vẫn thích cảnh này.)"
         ]
       },
-      //bome
-      'bố và mẹ': {
-        portrait: 'friend3_portrait',
-        messages: [
-          "Không thể chờ để ăn mừng với mọi người! 🥳"
-        ]
-      },
       //daninja
       'Daninja': {
         portrait: 'daninja_portrait',
@@ -135,6 +128,13 @@ export class Game {
           "HOLY SHITBALLS GIRL ITS YOUR BDAY!"
         ]
       },
+      //bố (friend9)
+      'bố': {
+        portrait: 'friend9_portrait',
+        messages: [
+          "Thương con, mẹ gọt trái ngọt, trao từng miếng yêu thương."
+        ]
+      },
       //Khoa (friend8)
       'Khoa': {
         portrait: 'friend8_portrait',
@@ -150,11 +150,11 @@ export class Game {
       'Khushi': 0,
       'Danoonie': 0,
       'Raza': 0,
-      'bố và mẹ': 0,
       'Daninja': 0,
       'Madeline': 0,
       'Nolan': 0,
       'Anne': 0,
+      'bố': 0,
       'Khoa': 0
     };
     
@@ -190,7 +190,7 @@ export class Game {
     const { IMAGES } = CONFIG.ASSETS;
     
     // Load all images in parallel
-    const [backgroundImage, playerFront, playerSide, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meSprite, meFramesSprite, friend2Sprite, friend3Sprite, friend5Sprite, friend6Sprite, friend7Sprite, friend8Sprite, danundieSprite, jukeboxSprite, daninjaSprite] = await Promise.all([
+    const [backgroundImage, playerFront, playerSide, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meSprite, meFramesSprite, friend2Sprite, friend5Sprite, friend6Sprite, friend7Sprite, friend8Sprite, friend9Sprite, danundieSprite, jukeboxSprite, daninjaSprite] = await Promise.all([
       this.assetLoader.loadImage(IMAGES.BACKGROUND),
       this.assetLoader.loadImage(IMAGES.PLAYER_FRONT),
       this.assetLoader.loadImage(IMAGES.PLAYER_SIDE),
@@ -202,11 +202,11 @@ export class Game {
       this.assetLoader.loadImage(IMAGES.ME),
       this.assetLoader.loadImage(IMAGES.ME_FRAMES),
       this.assetLoader.loadImage(IMAGES.FRIEND2),
-      this.assetLoader.loadImage(IMAGES.FRIEND3),
       this.assetLoader.loadImage(IMAGES.FRIEND5),
       this.assetLoader.loadImage(IMAGES.FRIEND6),
       this.assetLoader.loadImage(IMAGES.FRIEND7),
       this.assetLoader.loadImage(IMAGES.FRIEND8),
+      this.assetLoader.loadImage(IMAGES.FRIEND9),
       this.assetLoader.loadImage(IMAGES.DANUNDIE),
       this.assetLoader.loadImage(IMAGES.JUKEBOX),
       this.assetLoader.loadImage(IMAGES.DANINJA)
@@ -226,11 +226,11 @@ export class Game {
     // Set daninja sprite
     this.daninjaReveal.setSprite(daninjaSprite);
     
-    return { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend2Sprite, friend3Sprite, friend5Sprite, friend6Sprite, friend7Sprite, friend8Sprite };
+    return { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend2Sprite, friend5Sprite, friend6Sprite, friend7Sprite, friend8Sprite, friend9Sprite };
   }
 
   async createEntities(sprites) {
-    const { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend2Sprite, friend3Sprite, friend5Sprite, friend6Sprite, friend7Sprite, friend8Sprite } = sprites;
+    const { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend2Sprite, friend5Sprite, friend6Sprite, friend7Sprite, friend8Sprite, friend9Sprite } = sprites;
     
     // Create dogs with their sprites and audio
     const rotiDog = new Dog('Roti', CONFIG.DOGS.ROTI);
@@ -250,10 +250,6 @@ export class Game {
     friend2.setSprite(friend2Sprite);
     friend2.setAudio(this.audioManager.getAudio('friend2Sound'));
     
-    // Create friend3 as simple dog entity
-    const friend3 = new Dog('bố và mẹ', CONFIG.DOGS.FRIEND3);
-    friend3.setSprite(friend3Sprite);
-    friend3.setAudio(this.audioManager.getAudio('friend3Sound'));
     
     // Create friend5 (Nolan) with 3-frame eating animation
     const friend5 = new Dog('Nolan', CONFIG.DOGS.FRIEND5);
@@ -278,15 +274,20 @@ export class Game {
     friend8.setFramesSprite(friend8Sprite); // Use same sprite for frames
     friend8.setAudio(this.audioManager.getAudio('friend8Sound'));
     
+    // Create friend9 (bố) with 2-frame animation
+    const friend9 = new Dog('bố', CONFIG.DOGS.FRIEND9);
+    friend9.setSprite(friend9Sprite);
+    friend9.setAudio(this.audioManager.getAudio('friend9Sound'));
+    
     console.log('🖼️ Friend2 sprite source:', friend2Sprite?.src);
-    console.log('🖼️ Friend3 sprite source:', friend3Sprite?.src);
     console.log('🖼️ Friend5 sprite source:', friend5Sprite?.src);
     console.log('🖼️ Friend6 sprite source:', friend6Sprite?.src);
     console.log('🖼️ Friend7 sprite source:', friend7Sprite?.src);
     console.log('🖼️ Friend8 sprite source:', friend8Sprite?.src);
+    console.log('🖼️ Friend9 sprite source:', friend9Sprite?.src);
     
     
-    this.dogs = [rotiDog, khushiDog, meDog, friend2, friend3, friend5, friend6, friend7, friend8];
+    this.dogs = [rotiDog, khushiDog, meDog, friend2, friend5, friend6, friend7, friend8, friend9];
     console.log('🎮 Total dogs in array:', this.dogs.length);
     console.log('🎮 Dog names:', this.dogs.map(dog => dog.name));
   }

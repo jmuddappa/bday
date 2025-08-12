@@ -189,8 +189,7 @@ export class Dog extends GameObject {
     
     // Update interaction bob animation for simple friends only (not Nolan/Khoa which have special behaviors)
     const isSimpleFriend = (this.name.startsWith('Friend') && this.name !== 'Nolan' && this.name !== 'Khoa') || 
-                          this.name === 'Raza' || 
-                          this.name === 'bố và mẹ';
+                          this.name === 'Raza';
     if (isSimpleFriend) {
       if (this.isPlayerNearForBob) {
         // Gentle bob when player is nearby (can press E)
@@ -530,8 +529,7 @@ export class Dog extends GameObject {
 
     // For simple friends (not Khoa), use full image dimensions
     const isSimpleFriend = ((this.name.startsWith('Friend') && this.name !== 'Khoa') || 
-                           this.name === 'Raza' || 
-                           this.name === 'bố và mẹ') && this.sprite;
+                           this.name === 'Raza') && this.sprite;
     const sourceWidth = isSimpleFriend ? this.sprite.naturalWidth : this.originalWidth;
     const sourceHeight = isSimpleFriend ? this.sprite.naturalHeight : this.originalHeight;
 

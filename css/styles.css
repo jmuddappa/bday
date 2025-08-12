@@ -590,16 +590,14 @@ audio {
 
 /* Adaptive sizing for different portrait aspect ratios */
 .dialog-portrait.friend1_portrait,
-.dialog-portrait.friend2_portrait,
-.dialog-portrait.friend3_portrait {
+.dialog-portrait.friend2_portrait {
   width: 160px;
   height: 120px; /* Wider aspect ratio for rectangular portraits */
 }
 
 /* If some portraits are taller */
 .dialog-portrait.friend1_portrait.tall,
-.dialog-portrait.friend2_portrait.tall,
-.dialog-portrait.friend3_portrait.tall {
+.dialog-portrait.friend2_portrait.tall {
   width: 120px;
   height: 160px;
 }
@@ -624,9 +622,6 @@ audio {
   background-image: url('../assets/images/friends/friend2_portrait.png');
 }
 
-.dialog-portrait.friend3_portrait {
-  background-image: url('../assets/images/friends/friend3_portrait.png');
-}
 
 .dialog-portrait.friend5_portrait {
   background-image: url('../assets/images/friends/friend5_portrait.png');
@@ -636,9 +631,16 @@ audio {
   background-image: url('../assets/images/friends/friend6_portrait.png');
 }
 
+.dialog-portrait.friend7_portrait {
+  background-image: url('../assets/images/friends/friend7_portrait.png');
+}
 
 .dialog-portrait.friend8_portrait {
   background-image: url('../assets/images/friends/friend8_portrait.png');
+}
+
+.dialog-portrait.friend9_portrait {
+  background-image: url('../assets/images/friends/friend9_portrait.png');
 }
 
 .dialog-portrait.daninja_portrait {

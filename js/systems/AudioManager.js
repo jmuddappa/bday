@@ -25,9 +25,9 @@ export class AudioManager {
       this.audioElements.set('happybday', document.getElementById('happybday'));
       this.audioElements.set('friend1Sound', document.getElementById('friend1Sound'));
       this.audioElements.set('friend2Sound', document.getElementById('friend2Sound'));
-      this.audioElements.set('friend3Sound', document.getElementById('friend3Sound'));
       this.audioElements.set('friend6Sound', document.getElementById('friend6Sound'));
       this.audioElements.set('friend7Sound', document.getElementById('friend7Sound'));
+      this.audioElements.set('friend9Sound', document.getElementById('friend9Sound'));
       this.audioElements.set('danundieSound', document.getElementById('danundieSound'));
       this.audioElements.set('daninjaSound', document.getElementById('daninjaSound'));
       this.audioElements.set('fadeSound', document.getElementById('fadeSound'));

@@ -97,14 +97,6 @@ export const CONFIG = {
       jumpFrame: { sx: 0, sy: 0 }, // Same as sit - no animation
       shadowWidth: 40, shadowHeight: 15, shadowOffsetY: 8
     },
-    //bome
-    FRIEND3: {
-      x: 60, y: 615, scale: 1.35, // Squished down 15% (1.5 × 0.85)
-      width: 80, height: 120,
-      sitFrame: { sx: 0, sy: 0 },
-      jumpFrame: { sx: 0, sy: 0 }, // Same as sit - no animation
-      shadowWidth: 40, shadowHeight: 15, shadowOffsetY: 8
-    },
     //madeline
     FRIEND6: {
       x: 470, y: 720, scale: 0.22, // Moved left 5px and up 10px
@@ -163,10 +155,18 @@ export const CONFIG = {
     },
     //Anne
     FRIEND7: {
-      x: 30, y: 320, scale: 0.6,
+      x: 33, y: 320, scale: 0.6,
       width: 256, height: 256,
       sitFrame: { sx: 0, sy: 0 },      // Frame 1: 0-256px
       jumpFrame: { sx: 256, sy: 0 },   // Frame 2: 256-512px
+      shadowWidth: 40, shadowHeight: 15, shadowOffsetY: 8
+    },
+    //Friend9
+    FRIEND9: {
+      x: 10, y: 480, scale: 0.33,
+      width: 350, height: 512,
+      sitFrame: { sx: 0, sy: 0 },      // Frame 1: 0-350px
+      jumpFrame: { sx: 350, sy: 0 },   // Frame 2: 350-700px
       shadowWidth: 40, shadowHeight: 15, shadowOffsetY: 8
     }
   },
@@ -185,11 +185,11 @@ export const CONFIG = {
       ME: 'assets/images/me.png',
       ME_FRAMES: 'assets/images/me_frames.png',
       FRIEND2: 'assets/images/friends/friend2.png',
-      FRIEND3: 'assets/images/friends/friend3.png',
       FRIEND5: 'assets/images/friends/friend5.png',
       FRIEND6: 'assets/images/friends/friend6.png',
       FRIEND7: 'assets/images/friends/friend7.png',
       FRIEND8: 'assets/images/friends/friend8.png',
+      FRIEND9: 'assets/images/friends/friend9.png',
       DANUNDIE: 'assets/images/danundie.png',
       JUKEBOX: 'assets/images/jukebox.png',
       DANINJA: 'assets/images/daninja.png'
