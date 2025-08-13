@@ -942,11 +942,17 @@ audio {
   padding-bottom: 8px;
 }
 
+.dialog-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 20px;
+}
+
 .dialog-name {
   font-size: 48px;
   font-weight: bold;
   color: #1f3d22;
-  margin-bottom: 20px;
   /* Enhanced text styling with subtle stroke */
   text-shadow: 
     2px 2px 4px rgba(255, 255, 255, 0.6),
@@ -955,6 +961,15 @@ audio {
     -1px 1px 0px rgba(74, 63, 53, 0.3),
     1px 1px 0px rgba(74, 63, 53, 0.3);
   letter-spacing: 0.5px;
+}
+
+.dialog-counter {
+  font-size: 28px;
+  font-weight: bold;
+  color: #8b6914;
+  font-family: 'VT323', monospace;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.4);
+  opacity: 0.8;
 }
 
 .dialog-text {
@@ -986,6 +1001,80 @@ audio {
   animation: bounce 1.5s infinite;
 }
 
+/* Dialog Choice Buttons */
+.dialog-choices {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 2px solid rgba(139, 105, 20, 0.3);
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.4s ease-in-out;
+}
+
+.dialog-choices.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dialog-choice-btn {
+  font-family: 'VT323', monospace;
+  font-size: 24px;
+  padding: 12px 24px;
+  border: 3px solid;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.2),
+    inset 0 2px 4px rgba(255, 255, 255, 0.3);
+  position: relative;
+  min-width: 140px;
+  text-align: center;
+}
+
+.dialog-choice-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 12px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.4);
+}
+
+.dialog-choice-btn:active {
+  transform: translateY(0);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+.dialog-choice-yes {
+  background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
+  border-color: #006400;
+  color: white;
+}
+
+.dialog-choice-yes:hover {
+  background: linear-gradient(135deg, #32CD32 0%, #90EE90 100%);
+}
+
+.dialog-choice-no {
+  background: linear-gradient(135deg, #DC143C 0%, #FF6347 100%);
+  border-color: #8B0000;
+  color: white;
+}
+
+.dialog-choice-no:hover {
+  background: linear-gradient(135deg, #FF6347 0%, #FF4500 100%);
+}
+
+/* Hide continue arrow when choices are shown */
+.dialog-box.has-choices .dialog-continue {
+  display: none;
+}
+
 @keyframes bounce {
   0%, 20%, 50%, 80%, 100% {
     transform: translateY(0);
@@ -1015,9 +1104,17 @@ audio {
     margin-left: 12px;
   }
   
+  .dialog-header-row {
+    margin-bottom: 16px;
+  }
+  
   .dialog-name {
     font-size: 18px;
     margin-bottom: 4px;
+  }
+  
+  .dialog-counter {
+    font-size: 14px;
   }
   
   .dialog-text {
@@ -1032,6 +1129,18 @@ audio {
     font-size: 16px;
     bottom: 6px;
     right: 12px;
+  }
+  
+  .dialog-choices {
+    gap: 12px;
+    margin-top: 16px;
+    padding-top: 12px;
+  }
+  
+  .dialog-choice-btn {
+    font-size: 16px;
+    padding: 8px 16px;
+    min-width: 100px;
   }
   
   #talkPrompt {
@@ -1055,12 +1164,28 @@ audio {
     font-size: 16px;
   }
   
+  .dialog-counter {
+    font-size: 12px;
+  }
+  
   .dialog-text {
     font-size: 14px;
   }
   
   .vietnamese-text {
     font-size: 12px;
+  }
+  
+  .dialog-choices {
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+  
+  .dialog-choice-btn {
+    font-size: 14px;
+    padding: 6px 12px;
+    min-width: 120px;
   }
   
   #talkPrompt {

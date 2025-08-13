@@ -161,13 +161,20 @@
 
   <!-- Stardew Valley Style Dialog -->
   <div class="dialog-container" id="dialogContainer">
-    <div class="dialog-box">
+    <div class="dialog-box" id="dialogBox">
       <div class="dialog-portrait" id="dialogPortrait"></div>
       <div class="dialog-content">
-        <div class="dialog-name" id="dialogName">Dog</div>
+        <div class="dialog-header-row">
+          <div class="dialog-name" id="dialogName">Dog</div>
+          <div class="dialog-counter" id="dialogCounter">1/1</div>
+        </div>
         <div class="dialog-text" id="dialogText">Woof! Hello there!</div>
+        <div class="dialog-choices" id="dialogChoices" style="display: none;">
+          <button class="dialog-choice-btn dialog-choice-yes" id="dialogChoiceYes">Yes</button>
+          <button class="dialog-choice-btn dialog-choice-no" id="dialogChoiceNo">No</button>
+        </div>
       </div>
-      <div class="dialog-continue">▼</div>
+      <div class="dialog-continue" id="dialogContinue">▼</div>
     </div>
   </div>
 

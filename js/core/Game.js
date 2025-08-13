@@ -389,7 +389,7 @@ export class Game {
                       // Nolan stays normal, can be talked to again
                     }
                   });
-                }, 50); // Small delay to ensure dialog is fully closed
+                }, 350); // Wait for dialog close animation to complete (300ms + buffer)
               }
               // Anne's video choice modal
               else if (nearbyDog.name === 'Anne' && !this.characterChoices[nearbyDog.name]) {
@@ -410,8 +410,9 @@ export class Game {
                       // Nothing happens, Anne stays normal
                     }
                   });
-                }, 50); // Small delay to ensure dialog is fully closed
+                }, 350); // Wait for dialog close animation to complete (300ms + buffer)
               }
+              
               return;
             }
           }
@@ -514,18 +515,28 @@ export class Game {
 
     // Mobile touch events - close dialogs when tapping anywhere
     this.canvas.addEventListener('touchstart', (e) => {
-      // Only close dialog if one is open
+      // Only close dialog if one is open and it's NOT a choice dialog
       if (this.dialogContainer && this.dialogContainer.classList.contains('visible')) {
-        e.preventDefault();
-        this.closeDialog();
+        const dialogBox = document.getElementById('dialogBox');
+        const hasChoices = dialogBox && dialogBox.classList.contains('has-choices');
+        // Don't close if it's a choice dialog - let the choice buttons handle it
+        if (!hasChoices) {
+          e.preventDefault();
+          this.closeDialog();
+        }
       }
     });
 
     // Also handle clicks for desktop
     this.canvas.addEventListener('click', (e) => {
-      // Only close dialog if one is open
+      // Only close dialog if one is open and it's NOT a choice dialog
       if (this.dialogContainer && this.dialogContainer.classList.contains('visible')) {
-        this.closeDialog();
+        const dialogBox = document.getElementById('dialogBox');
+        const hasChoices = dialogBox && dialogBox.classList.contains('has-choices');
+        // Don't close if it's a choice dialog - let the choice buttons handle it
+        if (!hasChoices) {
+          this.closeDialog();
+        }
       }
     });
 
@@ -1197,6 +1208,14 @@ export class Game {
         if (dialogNameElement) {
           dialogNameElement.textContent = character.name;
         }
+
+        // Calculate and display dialog counter
+        const dialogCounterElement = document.getElementById('dialogCounter');
+        if (dialogCounterElement) {
+          const totalMessages = this.getTotalMessagesForCharacter(character.name);
+          const currentPosition = this.getCurrentDialogPosition(character.name);
+          dialogCounterElement.textContent = `${currentPosition}/${totalMessages}`;
+        }
         
         // Set portrait
         const dialogPortraitElement = document.getElementById('dialogPortrait');
@@ -1274,7 +1293,6 @@ export class Game {
           console.log(`🎵 Danoonie interaction count: ${this.dogInteractionCounts.Danoonie}`);
         }
         
-        // Special behavior for Nolan - now handled in interaction logic with choice modal
         
         const dialogTextElement = document.getElementById('dialogText');
         if (dialogTextElement) {
@@ -1291,14 +1309,25 @@ export class Game {
       this.hideDialogSmooth();
       // Reset Daninja dialog state when closing any dialog
       this.isDaninjaDialogOpen = false;
+      
+      // Clear choice dialog state when closing
+      const dialogBox = document.getElementById('dialogBox');
+      const dialogChoices = document.getElementById('dialogChoices');
+      if (dialogBox) {
+        dialogBox.classList.remove('has-choices');
+      }
+      if (dialogChoices) {
+        dialogChoices.classList.remove('visible');
+        dialogChoices.style.display = 'none';
+      }
     }
   }
 
   /**
-   * Show choice modal with customizable options
+   * Show choice dialog integrated into the dialog system
    * @param {Object} options - Choice options
    * @param {string} options.character - Character name for tracking
-   * @param {string} options.title - Modal title
+   * @param {string} options.title - Dialog title (unused, character name is used)
    * @param {string} options.question - Question to ask
    * @param {string} options.yesText - Text for yes button (default: "Yes")
    * @param {string} options.noText - Text for no button (default: "No")
@@ -1306,50 +1335,133 @@ export class Game {
    * @param {Function} options.onNo - Callback for no choice
    */
   showChoiceModal(options) {
-    if (!this.choiceModal || this.characterChoices[options.character]) {
+    if (this.characterChoices[options.character]) {
       return; // Don't show if choice already made
     }
 
-    // Set modal content
-    const titleElement = document.getElementById('choiceTitle');
-    const questionElement = document.getElementById('choiceQuestion');
-    const yesButton = document.getElementById('choiceYes');
-    const noButton = document.getElementById('choiceNo');
 
-    if (titleElement) titleElement.textContent = options.title || language.t('make_choice');
-    if (questionElement) questionElement.textContent = options.question || language.t('make_choice');
-    if (yesButton) yesButton.textContent = options.yesText || language.t('yes');
-    if (noButton) noButton.textContent = options.noText || language.t('no');
+    // Set up dialog content for choice
+    const dialogName = document.getElementById('dialogName');
+    const dialogText = document.getElementById('dialogText');
+    const dialogChoices = document.getElementById('dialogChoices');
+    const dialogChoiceYes = document.getElementById('dialogChoiceYes');
+    const dialogChoiceNo = document.getElementById('dialogChoiceNo');
+    const dialogBox = document.getElementById('dialogBox');
+    const dialogPortrait = document.getElementById('dialogPortrait');
 
-    // Show modal
-    this.choiceModal.classList.add('active');
+    if (dialogName) dialogName.textContent = options.character;
+    if (dialogText) dialogText.textContent = options.question || language.t('make_choice');
+    if (dialogChoiceYes) dialogChoiceYes.textContent = options.yesText || language.t('yes');
+    if (dialogChoiceNo) dialogChoiceNo.textContent = options.noText || language.t('no');
+
+    // Update counter for choice dialog (this is the final message)
+    const dialogCounterElement = document.getElementById('dialogCounter');
+    if (dialogCounterElement) {
+      const totalMessages = this.getTotalMessagesForCharacter(options.character);
+      dialogCounterElement.textContent = `${totalMessages}/${totalMessages}`; // Show final position
+    }
+
+    // Set character portrait using existing dialog system
+    if (dialogPortrait && options.character) {
+      const dialogData = this.dogDialogs[options.character];
+      if (dialogData && dialogData.portrait) {
+        // Remove existing portrait classes
+        dialogPortrait.className = 'dialog-portrait';
+        // Add the specific portrait class (this uses the existing CSS portrait system)
+        dialogPortrait.classList.add(dialogData.portrait);
+        // Clear any background image that might be set
+        dialogPortrait.style.backgroundImage = '';
+      }
+    }
+
+    // Dialog should already be open, just ensure it's visible
+    if (this.dialogContainer && this.dialogContainer.style.display === 'none') {
+      this.showDialogSmooth();
+    }
+
+    // Show choice buttons with delay for smooth transition
+    if (dialogChoices && dialogBox) {
+      // Add has-choices class immediately to protect from clicks
+      dialogBox.classList.add('has-choices');
+      dialogChoices.style.display = 'flex';
+      setTimeout(() => {
+        dialogChoices.classList.add('visible');
+      }, 300); // Delay for smooth text-to-choices transition
+    }
 
     // Set up event handlers (remove old ones first)
-    const newYesButton = yesButton.cloneNode(true);
-    const newNoButton = noButton.cloneNode(true);
-    yesButton.parentNode.replaceChild(newYesButton, yesButton);
-    noButton.parentNode.replaceChild(newNoButton, noButton);
+    const newYesButton = dialogChoiceYes.cloneNode(true);
+    const newNoButton = dialogChoiceNo.cloneNode(true);
+    dialogChoiceYes.parentNode.replaceChild(newYesButton, dialogChoiceYes);
+    dialogChoiceNo.parentNode.replaceChild(newNoButton, dialogChoiceNo);
 
     newYesButton.addEventListener('click', () => {
       this.characterChoices[options.character] = 'yes';
-      this.closeChoiceModal();
+      this.closeChoiceDialog();
       if (options.onYes) options.onYes();
     });
 
     newNoButton.addEventListener('click', () => {
       this.characterChoices[options.character] = 'no';
-      this.closeChoiceModal();
+      this.closeChoiceDialog();
       if (options.onNo) options.onNo();
     });
   }
 
+
   /**
-   * Close the choice modal
+   * Close the choice dialog and reset state
+   */
+  closeChoiceDialog() {
+    const dialogChoices = document.getElementById('dialogChoices');
+    const dialogBox = document.getElementById('dialogBox');
+
+    if (dialogChoices) {
+      dialogChoices.classList.remove('visible');
+      setTimeout(() => {
+        dialogChoices.style.display = 'none';
+        if (dialogBox) {
+          dialogBox.classList.remove('has-choices');
+        }
+        this.closeDialog();
+      }, 300); // Match transition timing
+    }
+  }
+
+  /**
+   * Get total number of messages for a character (including choice dialogs)
+   * @param {string} characterName - Character name
+   * @returns {number} Total message count
+   */
+  getTotalMessagesForCharacter(characterName) {
+    const dialogData = this.dogDialogs[characterName];
+    if (!dialogData) return 1;
+
+    let total = dialogData.messages.length;
+    
+    // Add 1 for choice dialogs (Anne, Nolan)
+    if ((characterName === 'Anne' || characterName === 'Nolan') && !this.characterChoices[characterName]) {
+      total += 1; // Choice dialog counts as additional message
+    }
+    
+    return total;
+  }
+
+  /**
+   * Get current dialog position for a character
+   * @param {string} characterName - Character name
+   * @returns {number} Current position (1-based)
+   */
+  getCurrentDialogPosition(characterName) {
+    const currentIndex = this.dogMessageIndex[characterName] || 0;
+    return currentIndex + 1; // Convert to 1-based
+  }
+
+  /**
+   * Close the choice modal (legacy compatibility)
    */
   closeChoiceModal() {
-    if (this.choiceModal) {
-      this.choiceModal.classList.remove('active');
-    }
+    this.closeChoiceDialog();
   }
 
   /**
