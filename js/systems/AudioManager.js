@@ -27,10 +27,18 @@ export class AudioManager {
       this.audioElements.set('friend2Sound', document.getElementById('friend2Sound'));
       this.audioElements.set('friend6Sound', document.getElementById('friend6Sound'));
       this.audioElements.set('friend7Sound', document.getElementById('friend7Sound'));
+      this.audioElements.set('anneSound', document.getElementById('anneSound'));
+      this.audioElements.set('khoaSound', document.getElementById('khoaSound'));
       this.audioElements.set('friend9Sound', document.getElementById('friend9Sound'));
+      this.audioElements.set('boSound', document.getElementById('boSound'));
       this.audioElements.set('momSound', document.getElementById('momSound'));
+      this.audioElements.set('friend3Sound', document.getElementById('friend3Sound'));
+      this.audioElements.set('nolanInitSound', document.getElementById('nolanInitSound'));
+      this.audioElements.set('nolanEatSound', document.getElementById('nolanEatSound'));
+      this.audioElements.set('khushiByeSound', document.getElementById('khushiByeSound'));
       this.audioElements.set('danundieSound', document.getElementById('danundieSound'));
       this.audioElements.set('daninjaSound', document.getElementById('daninjaSound'));
+      this.audioElements.set('daninjaIntSound', document.getElementById('daninjaIntSound'));
       this.audioElements.set('fadeSound', document.getElementById('fadeSound'));
       
       // Set up background music properties

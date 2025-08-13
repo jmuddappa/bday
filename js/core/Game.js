@@ -279,23 +279,23 @@ export class Game {
     // Create friend7 (Anne) with 2-frame animation
     const friend7 = new Dog('Anne', CONFIG.DOGS.FRIEND7);
     friend7.setSprite(friend7Sprite);
-    friend7.setAudio(this.audioManager.getAudio('friend7Sound'));
+    friend7.setAudio(this.audioManager.getAudio('anneSound'));
     
     // Create friend8 (Khoa) with 3-frame animation
     const friend8 = new Dog('Khoa', CONFIG.DOGS.FRIEND8);
     friend8.setSprite(friend8Sprite); // Set main sprite
     friend8.setFramesSprite(friend8Sprite); // Use same sprite for frames
-    friend8.setAudio(this.audioManager.getAudio('friend8Sound'));
+    friend8.setAudio(this.audioManager.getAudio('khoaSound'));
     
     // Create friend9 (bố) with 2-frame animation
     const friend9 = new Dog('bố', CONFIG.DOGS.FRIEND9);
     friend9.setSprite(friend9Sprite);
-    friend9.setAudio(this.audioManager.getAudio('friend9Sound'));
+    friend9.setAudio(this.audioManager.getAudio('boSound'));
     
     // Create mom (mẹ) with 2-frame animation
     const mom = new Dog('mẹ', CONFIG.DOGS.MOM);
     mom.setSprite(momSprite);
-    mom.setAudio(this.audioManager.getAudio('momSound'));
+    mom.setAudio(this.audioManager.getAudio('friend3Sound'));
     
     console.log('🖼️ Friend2 sprite source:', friend2Sprite?.src);
     console.log('🖼️ Friend5 sprite source:', friend5Sprite?.src);
@@ -347,8 +347,8 @@ export class Game {
                 setTimeout(() => {
                   this.showChoiceModal({
                     character: 'Nolan',
-                    title: 'Nolan\'s Mushroom',
-                    question: 'Should Nolan eat the mushroom?',
+                    title: 'Nolan\'s Request',
+                    question: 'Let Nolan eat the mushroom?',
                     yesText: 'Yes, eat it',
                     noText: 'No, don\'t eat it',
                     onYes: () => {
@@ -1021,6 +1021,10 @@ export class Game {
       // Special handling for Daninja - auto-open letter modal after 5 seconds
       if (character.name === 'Daninja') {
         this.isDaninjaDialogOpen = true;
+        
+        // Play Daninja interaction sound
+        this.audioManager.play('daninjaIntSound');
+        
         setTimeout(() => {
           // Only open letter modal if dialog is still open (user hasn't closed it)
           if (this.dialogContainer.style.display === 'block' && this.isDaninjaDialogOpen) {
@@ -1098,9 +1102,37 @@ export class Game {
           this.dogInteractionCounts.Khushi++;
           console.log(`🐱 Khushi interaction count: ${this.dogInteractionCounts.Khushi}`);
           
-          // Check if Khushi should start fading after 5+ interactions
-          if (this.dogInteractionCounts.Khushi >= 5) {
+          // If player previously chose "No" and this is their next interaction, make her disappear
+          if (this.characterChoices['Khushi'] === 'no' && !character.isVanished && !character.isFading) {
+            console.log('Player chose No before - Khushi disappearing on next interaction');
+            this.audioManager.play('khushiByeSound');
             character.startFadeOut(this.audioManager);
+            return;
+          }
+          
+          // Show choice modal at 5th interaction instead of auto-fading
+          if (this.dogInteractionCounts.Khushi >= 5 && !character.isVanished && !character.isFading) {
+            setTimeout(() => {
+              this.showChoiceModal({
+                character: 'Khushi',
+                title: 'Bothering Khushi',
+                question: 'Are you sure you want to bother Khushi again?',
+                yesText: 'Yes, keep bothering',
+                noText: 'No, leave her alone',
+                onYes: () => {
+                  console.log('Player chose: Keep bothering Khushi - starting disappearance');
+                  // Play goodbye sound and make Khushi disappear
+                  this.audioManager.play('khushiByeSound');
+                  character.startFadeOut(this.audioManager);
+                },
+                onNo: () => {
+                  console.log('Player chose: Leave Khushi alone - will disappear on next interaction');
+                  // Mark that player chose "No" - she'll disappear on next interaction
+                  this.characterChoices['Khushi'] = 'no';
+                  this.dogInteractionCounts.Khushi = 0;
+                }
+              });
+            }, 100); // Small delay after dialog interaction
           }
         }
         

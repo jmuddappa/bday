@@ -834,6 +834,11 @@ export class Dog extends GameObject {
       this.phaseOpacity = 0;
       // Mark as revealed immediately so he can be talked to during phase-in
       this.hasBeenRevealed = true;
+      
+      // Play Nolan init sound when he first appears
+      if (this.name === 'Nolan' && audioManager) {
+        audioManager.play('nolanInitSound');
+      }
     }
   }
   
@@ -862,6 +867,11 @@ export class Dog extends GameObject {
       console.log(`🍄 ${this.name} starting eating sequence!`);
       this.isEating = true;
       this.shouldDieAfterEating = true;
+      
+      // Play Nolan eating sound when he starts eating
+      if (audioManager) {
+        audioManager.play('nolanEatSound');
+      }
       
       // Start eating animation (frame 1 -> 2 -> 3)
       if (this.useFrameAnimation) {
