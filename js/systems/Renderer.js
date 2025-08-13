@@ -223,6 +223,7 @@ export class Renderer {
       if (dog.name === 'Anne') configKey = 'FRIEND7';
       if (dog.name === 'bố') configKey = 'FRIEND9';
       if (dog.name === 'mẹ') configKey = 'MOM';
+      if (dog.name === 'Nat') configKey = 'FRIEND10';
       
       const config = CONFIG.DOGS[configKey];
       

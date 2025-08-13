@@ -647,6 +647,10 @@ audio {
   background-image: url('../assets/images/friends/mom_portrait.png');
 }
 
+.dialog-portrait.friend10_portrait {
+  background-image: url('../assets/images/friends/friend10_portrait.png');
+}
+
 .dialog-portrait.daninja_portrait {
   background-image: url('../assets/images/daninja_portrait.png');
 }

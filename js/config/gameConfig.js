@@ -171,11 +171,28 @@ export const CONFIG = {
     },
     //Mom
     MOM: {
-      x: 100, y: 495, scale: 0.3,
+      x: 120, y: 655, scale: 0.3,
       width: 350, height: 512,
       sitFrame: { sx: 0, sy: 0 },      // Frame 1: 0-350px
       jumpFrame: { sx: 350, sy: 0 },   // Frame 2: 350-700px
       shadowWidth: 40, shadowHeight: 15, shadowOffsetY: 8
+    },
+    //Nat
+    FRIEND10: {
+      x: 940, y: 250, scale: 0.5,
+      width: 300, height: 500, // Source dimensions for each frame (300x500 each)
+      // 3-frame animation system like Khoa
+      totalWidth: 900, // Total sprite width (300px per frame * 3 frames)
+      frameHeight: 500, // Source frame height
+      sitFrame: { sx: 0, sy: 0 },        // Frame 1: 0-300px (static)
+      transitionFrame: { sx: 300, sy: 0 }, // Frame 2: 300-600px  
+      jumpFrame: { sx: 600, sy: 0 },    // Frame 3: 600-900px
+      animationSpeed: 18, // 40% slower than 12 (12 * 1.4 = 16.8 ≈ 17)
+      // Frame position offsets - all frames render at exact same position
+      sitFrameOffset: { x: 0, y: 0 },        // Frame 1 - no offset
+      transitionFrameOffset: { x: 0, y: 0 }, // Frame 2 - no offset
+      jumpFrameOffset: { x: 0, y: 0 },       // Frame 3 - no offset
+      shadowWidth: 45, shadowHeight: 15, shadowOffsetY: 8
     }
   },
 
@@ -198,6 +215,7 @@ export const CONFIG = {
       FRIEND7: 'assets/images/friends/friend7.png',
       FRIEND8: 'assets/images/friends/friend8.png',
       FRIEND9: 'assets/images/friends/friend9.png',
+      FRIEND10: 'assets/images/friends/friend10.png',
       MOM: 'assets/images/friends/mom.png',
       DANUNDIE: 'assets/images/danundie.png',
       JUKEBOX: 'assets/images/jukebox.png',

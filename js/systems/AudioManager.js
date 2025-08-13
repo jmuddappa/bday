@@ -11,6 +11,9 @@ export class AudioManager {
     this.audioElements = new Map();
     this.musicStarted = false;
     this.audioStatus = document.getElementById('audioStatus');
+    this.lastPlayedTimes = new Map(); // Track when each audio was last played
+    this.originalBgVolume = CONFIG.AUDIO.DEFAULT_VOLUME; // Store original bg volume
+    this.activeAudioElements = new Set(); // Track currently playing audio
     
     this.setupAudioElements();
     this.setupMusicTrigger();
@@ -23,19 +26,16 @@ export class AudioManager {
       this.audioElements.set('barkRoti', document.getElementById('barkRoti'));
       this.audioElements.set('barkKhushi', document.getElementById('barkKhushi'));
       this.audioElements.set('happybday', document.getElementById('happybday'));
-      this.audioElements.set('friend1Sound', document.getElementById('friend1Sound'));
       this.audioElements.set('friend2Sound', document.getElementById('friend2Sound'));
       this.audioElements.set('friend6Sound', document.getElementById('friend6Sound'));
-      this.audioElements.set('friend7Sound', document.getElementById('friend7Sound'));
       this.audioElements.set('anneSound', document.getElementById('anneSound'));
       this.audioElements.set('khoaSound', document.getElementById('khoaSound'));
-      this.audioElements.set('friend9Sound', document.getElementById('friend9Sound'));
       this.audioElements.set('boSound', document.getElementById('boSound'));
-      this.audioElements.set('momSound', document.getElementById('momSound'));
       this.audioElements.set('friend3Sound', document.getElementById('friend3Sound'));
       this.audioElements.set('nolanInitSound', document.getElementById('nolanInitSound'));
       this.audioElements.set('nolanEatSound', document.getElementById('nolanEatSound'));
       this.audioElements.set('khushiByeSound', document.getElementById('khushiByeSound'));
+      this.audioElements.set('natSound', document.getElementById('natSound'));
       this.audioElements.set('danundieSound', document.getElementById('danundieSound'));
       this.audioElements.set('daninjaSound', document.getElementById('daninjaSound'));
       this.audioElements.set('daninjaIntSound', document.getElementById('daninjaIntSound'));
@@ -124,12 +124,52 @@ export class AudioManager {
         return;
       }
 
+      // Define exceptions that bypass cooldown
+      const cooldownExceptions = ['bgMusic', 'fadeSound', 'plantGrowSound'];
+      const bypassCooldown = cooldownExceptions.includes(audioKey) || options.restart;
+      
+      // Check cooldown (5 seconds = 5000ms) unless bypassed
+      if (!bypassCooldown) {
+        const lastPlayed = this.lastPlayedTimes.get(audioKey);
+        const now = Date.now();
+        const cooldownPeriod = 5000; // 5 seconds
+        
+        if (lastPlayed && (now - lastPlayed) < cooldownPeriod) {
+          const remainingCooldown = Math.ceil((cooldownPeriod - (now - lastPlayed)) / 1000);
+          console.log(`🔇 Audio '${audioKey}' is on cooldown. ${remainingCooldown}s remaining.`);
+          return;
+        }
+        
+        // Update last played time for non-exception audio
+        this.lastPlayedTimes.set(audioKey, now);
+      }
+
       if (options.restart) {
         audio.currentTime = 0;
       }
 
       if (options.volume !== undefined) {
         audio.volume = Math.max(0, Math.min(1, options.volume));
+      }
+
+      // Duck background music when other audio plays (except bg music itself and system sounds)
+      const noDuckingExceptions = ['bgMusic', 'fadeSound', 'plantGrowSound'];
+      if (!noDuckingExceptions.includes(audioKey)) {
+        this.duckBackgroundMusic();
+        
+        // Track this audio element and set up restoration when it ends
+        this.activeAudioElements.add(audioKey);
+        
+        // Set up event listener to restore bg music when audio ends
+        const restoreOnEnd = () => {
+          this.activeAudioElements.delete(audioKey);
+          if (this.activeAudioElements.size === 0) {
+            this.restoreBackgroundMusic();
+          }
+          audio.removeEventListener('ended', restoreOnEnd);
+        };
+        
+        audio.addEventListener('ended', restoreOnEnd);
       }
 
       return audio.play().catch(e => {
@@ -151,6 +191,11 @@ export class AudioManager {
       const audio = this.audioElements.get(audioKey);
       if (audio) {
         audio.pause();
+        // Clean up tracking if this was ducking bg music
+        this.activeAudioElements.delete(audioKey);
+        if (this.activeAudioElements.size === 0) {
+          this.restoreBackgroundMusic();
+        }
       }
     } catch (error) {
       ErrorHandler.handleError(error, `AudioManager.pause(${audioKey})`);
@@ -167,6 +212,11 @@ export class AudioManager {
       if (audio) {
         audio.pause();
         audio.currentTime = 0;
+        // Clean up tracking if this was ducking bg music
+        this.activeAudioElements.delete(audioKey);
+        if (this.activeAudioElements.size === 0) {
+          this.restoreBackgroundMusic();
+        }
       }
     } catch (error) {
       ErrorHandler.handleError(error, `AudioManager.stop(${audioKey})`);
@@ -284,6 +334,29 @@ export class AudioManager {
   }
 
   /**
+   * Duck background music volume (reduce by 80%)
+   */
+  duckBackgroundMusic() {
+    const bgMusic = this.audioElements.get('bgMusic');
+    if (bgMusic && this.musicStarted) {
+      const duckedVolume = this.originalBgVolume * 0.2; // 80% reduction
+      bgMusic.volume = duckedVolume;
+      console.log(`🔉 Background music ducked to ${Math.round(duckedVolume * 100)}% volume`);
+    }
+  }
+
+  /**
+   * Restore background music to original volume
+   */
+  restoreBackgroundMusic() {
+    const bgMusic = this.audioElements.get('bgMusic');
+    if (bgMusic && this.musicStarted) {
+      bgMusic.volume = this.originalBgVolume;
+      console.log(`🔊 Background music restored to ${Math.round(this.originalBgVolume * 100)}% volume`);
+    }
+  }
+
+  /**
    * Clean up audio manager
    */
   destroy() {
@@ -293,5 +366,6 @@ export class AudioManager {
       }
     });
     this.audioElements.clear();
+    this.activeAudioElements.clear();
   }
 }

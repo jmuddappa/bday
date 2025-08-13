@@ -34,14 +34,14 @@ export class Dog extends GameObject {
     this.stateChangeTime = 0;
     this.animationDuration = 500; // ms
     
-    // Frame animation system for Me dog, Madeline, Nolan, and Khoa
-    this.useFrameAnimation = this.name === 'Danoonie' || this.name === 'Madeline' || this.name === 'Nolan' || this.name === 'Khoa';
+    // Frame animation system for Me dog, Madeline, Nolan, Khoa, and Nat
+    this.useFrameAnimation = this.name === 'Danoonie' || this.name === 'Madeline' || this.name === 'Nolan' || this.name === 'Khoa' || this.name === 'Nat';
     this.animationFrame = 0;
     this.frameCounter = 0;
     this.animationSpeed = config.animationSpeed || 30;
     
     // Set frame sequence based on character
-    if (this.name === 'Khoa') {
+    if (this.name === 'Khoa' || this.name === 'Nat') {
       this.frameSequence = [0, 1, 2]; // sit → transition → jump (3 frames)
       this.activeFrameSequence = [1, 2]; // When player nearby, cycle between frame 2 and 3
     } else {
@@ -104,8 +104,9 @@ export class Dog extends GameObject {
    * Set the audio element for this dog's sounds
    * @param {HTMLAudioElement} audio - Audio element
    */
-  setAudio(audio) {
+  setAudio(audio, audioKey = null) {
     this.audio = audio;
+    this.audioKey = audioKey; // Store the key for AudioManager
   }
 
   /**
@@ -113,8 +114,9 @@ export class Dog extends GameObject {
    * @param {Player} player - Player entity
    * @param {HTMLAudioElement} specialAudio - Special audio for 'Me' dog
    * @param {HTMLAudioElement} bgAudio - Background music audio
+   * @param {AudioManager} audioManager - Audio manager for cooldown control
    */
-  update(player, specialAudio = null, bgAudio = null) {
+  update(player, specialAudio = null, bgAudio = null, audioManager = null) {
     const distance = this.distanceTo(player);
     const threshold = this.name === 'Danoonie' ? 
       CONFIG.DOGS.ME_INTERACTION_DISTANCE : 
@@ -124,7 +126,7 @@ export class Dog extends GameObject {
     this.isPlayerNearForBob = distance < threshold;
 
     if (distance < threshold) {
-      this.activate(specialAudio, bgAudio);
+      this.activate(specialAudio, bgAudio, audioManager);
     } else {
       this.deactivate(specialAudio, bgAudio);
     }
@@ -135,8 +137,8 @@ export class Dog extends GameObject {
       if (this.frameCounter >= this.animationSpeed) {
         this.frameCounter = 0;
         
-        if (this.name === 'Khoa' && this.isCyclingActive) {
-          // Special cycling behavior for Friend8 - bounce between frames 1 and 2 (indices 1 and 2)
+        if ((this.name === 'Khoa' || this.name === 'Nat') && this.isCyclingActive) {
+          // Special cycling behavior for Khoa and Nat - bounce between frames 1 and 2 (indices 1 and 2)
           if (this.animationDirection === 1) {
             this.animationFrame++;
             if (this.animationFrame >= 2) { // Reached frame 3 (index 2)
@@ -192,8 +194,12 @@ export class Dog extends GameObject {
                           this.name === 'Raza';
     if (isSimpleFriend) {
       if (this.isPlayerNearForBob) {
-        // Gentle bob when player is nearby (can press E)
-        this.interactionBobOffset = Math.sin(Date.now() * 0.004) * 1.5; // Very small 1.5px bob
+        // River-like bobbing for Raza, gentle bob for others
+        if (this.name === 'Raza') {
+          this.interactionBobOffset = Math.sin(Date.now() * 0.004) * 1.95; // 30% increase: 1.5 * 1.3 = 1.95px bob
+        } else {
+          this.interactionBobOffset = Math.sin(Date.now() * 0.004) * 1.5; // Very small 1.5px bob
+        }
       } else {
         this.interactionBobOffset = 0; // No bob when player is away
       }
@@ -213,8 +219,9 @@ export class Dog extends GameObject {
    * Activate dog (player is nearby)
    * @param {HTMLAudioElement} specialAudio - Special audio for 'Me' dog
    * @param {HTMLAudioElement} bgAudio - Background music audio
+   * @param {AudioManager} audioManager - Audio manager for cooldown control
    */
-  activate(specialAudio = null, bgAudio = null) {
+  activate(specialAudio = null, bgAudio = null, audioManager = null) {
     if (this.name === 'Danoonie' && this.state !== 'jump') {
       this.setState('jump');
       this.barked = true;
@@ -225,11 +232,11 @@ export class Dog extends GameObject {
         this.isAnimating = true;
         this.frameCounter = 0;
       }
-    } else if (this.name === 'Khoa' && this.state !== 'jump') {
+    } else if ((this.name === 'Khoa' || this.name === 'Nat') && this.state !== 'jump') {
       this.setState('jump');
       this.barked = true;
       
-      // Start cycling animation for Khoa between frames 2 and 3
+      // Start cycling animation for Khoa and Nat between frames 2 and 3
       if (this.useFrameAnimation) {
         this.isCyclingActive = true;
         this.animationFrame = 1; // Start at frame 2 (index 1)
@@ -272,9 +279,12 @@ export class Dog extends GameObject {
       this.setState('jump');
       this.barked = true;
       
-      if (this.audio) {
+      if (audioManager && this.audioKey) {
+        audioManager.play(this.audioKey);
+        console.log(`🐕 Playing bark audio for ${this.name} via AudioManager`);
+      } else if (this.audio) {
         this.audio.play().then(() => {
-          console.log(`🐕 Playing bark audio for ${this.name}`);
+          console.log(`🐕 Playing bark audio for ${this.name} (fallback)`);
         }).catch(e => {
           ErrorHandler.handleError(e, `Dog.activate(${this.name})`);
         });
@@ -308,11 +318,11 @@ export class Dog extends GameObject {
         this.isAnimating = true;
         this.frameCounter = 0;
       }
-    } else if (this.name === 'Khoa' && this.state !== 'sit') {
+    } else if ((this.name === 'Khoa' || this.name === 'Nat') && this.state !== 'sit') {
       this.setState('sit');
       this.barked = false;
       
-      // Stop cycling and return to frame 1 for Khoa
+      // Stop cycling and return to frame 1 for Khoa and Nat
       if (this.useFrameAnimation) {
         this.isCyclingActive = false;
         this.animationFrame = 0; // Return to frame 1 (index 0)
@@ -365,11 +375,12 @@ export class Dog extends GameObject {
    */
   getDrawData() {
     
-    // Use frame animation system for Me dog, Madeline, Nolan, and Khoa if frames sprite is available
-    if (this.useFrameAnimation && this.framesSprite && (this.name === 'Danoonie' || this.name === 'Madeline' || this.name === 'Nolan' || this.name === 'Khoa')) {
+    // Use frame animation system for Me dog, Madeline, Nolan, Khoa, and Nat if frames sprite is available
+    if (this.useFrameAnimation && this.framesSprite && (this.name === 'Danoonie' || this.name === 'Madeline' || this.name === 'Nolan' || this.name === 'Khoa' || this.name === 'Nat')) {
       const config = this.name === 'Danoonie' ? CONFIG.DOGS.ME : 
                      this.name === 'Madeline' ? CONFIG.DOGS.FRIEND6 : 
                      this.name === 'Nolan' ? CONFIG.DOGS.FRIEND5 :
+                     this.name === 'Nat' ? CONFIG.DOGS.FRIEND10 :
                      CONFIG.DOGS.FRIEND8;
       const currentFrameIndex = this.frameSequence[this.animationFrame];
       
@@ -452,6 +463,25 @@ export class Dog extends GameObject {
             sourceX = 0;
             frameWidth = 500;
         }
+      } else if (this.name === 'Nat') {
+        // Nat's frame layout - exact 300px frames at correct positions
+        switch (currentFrameIndex) {
+          case 0: // Frame 1: 0-300px
+            sourceX = 0;
+            frameWidth = 300;
+            break;
+          case 1: // Frame 2: 300-600px
+            sourceX = 300;
+            frameWidth = 300;
+            break;
+          case 2: // Frame 3: 600-900px
+            sourceX = 600;
+            frameWidth = 300;
+            break;
+          default:
+            sourceX = 0;
+            frameWidth = 300;
+        }
       }
       
       let offsetX = 0;
@@ -495,6 +525,16 @@ export class Dog extends GameObject {
         offsetY = currentOffset.y;
       } else if (this.name === 'Khoa') {
         // Khoa's offsets - use config offsets to keep frames grounded
+        const frameOffsets = {
+          0: config.sitFrameOffset || { x: 0, y: 0 },
+          1: config.transitionFrameOffset || { x: 0, y: 0 },
+          2: config.jumpFrameOffset || { x: 0, y: 0 }
+        };
+        const currentOffset = frameOffsets[currentFrameIndex] || { x: 0, y: 0 };
+        offsetX = currentOffset.x;
+        offsetY = currentOffset.y;
+      } else if (this.name === 'Nat') {
+        // Nat's offsets - use config offsets to keep frames grounded
         const frameOffsets = {
           0: config.sitFrameOffset || { x: 0, y: 0 },
           1: config.transitionFrameOffset || { x: 0, y: 0 },

@@ -15,12 +15,12 @@ export class DanundieStreak {
     // Position and movement
     this.x = -100; // Start off-screen left
     this.y = 400; // Middle of screen
-    this.speed = 9.6; // Fast horizontal movement (20% slower)
+    this.speed = 7.68; // Fast horizontal movement (40% slower total)
     
     // Animation properties
     this.currentFrame = 0;
     this.frameCounter = 0;
-    this.animationSpeed = 4.8; // Change frame every 4.8 game ticks (20% slower)
+    this.animationSpeed = 3.84; // Change frame every 3.84 game ticks (40% slower total)
     this.frameWidth = 270; // Each frame is 270px wide
     this.frameHeight = 0; // Will be set when sprite loads
     
