@@ -120,6 +120,10 @@ export class Dog extends GameObject {
     const distance = this.distanceTo(player);
     const threshold = this.name === 'Danoonie' ? 
       CONFIG.DOGS.ME_INTERACTION_DISTANCE : 
+      this.name === 'Nat' ?
+      CONFIG.DOGS.NAT_INTERACTION_DISTANCE :
+      this.name === 'Khoa' ?
+      CONFIG.DOGS.KHOA_INTERACTION_DISTANCE :
       CONFIG.DOGS.INTERACTION_DISTANCE;
 
     // Update interaction state for bob animation
@@ -388,23 +392,23 @@ export class Dog extends GameObject {
       let frameWidth;
       
       if (this.name === 'Danoonie') {
-        // Danoonie's frame layout (original system)
+        // Danoonie's 3-frame layout (me_frames.png)
         switch (currentFrameIndex) {
-          case 0: // sit frame (1058-end)
-            sourceX = 1058;
-            frameWidth = config.totalWidth - 1058;
+          case 0: // sit frame (1200-1800px)
+            sourceX = 1200;
+            frameWidth = 600;
             break;
-          case 1: // transition frame (512-1058px)
-            sourceX = 512;
-            frameWidth = 546;
+          case 1: // transition frame (600-1200px)
+            sourceX = 600;
+            frameWidth = 600;
             break;
-          case 2: // jump frame (0-512px)
+          case 2: // jump frame (0-600px)
             sourceX = 0;
-            frameWidth = 512;
+            frameWidth = 600;
             break;
           default:
-            sourceX = 1058;
-            frameWidth = config.totalWidth - 1058;
+            sourceX = 1200;
+            frameWidth = 600;
         }
       } else if (this.name === 'Madeline') {
         // Madeline's frame layout - exact 400px frames at correct positions
@@ -488,19 +492,15 @@ export class Dog extends GameObject {
       let offsetY = 0;
       
       if (this.name === 'Danoonie') {
-        // Danoonie's offsets (original system)
+        // Danoonie's 2-frame offsets
         switch (currentFrameIndex) {
-          case 0: // sit frame - no offset needed
+          case 0: // sit frame
             offsetX = 0;
             offsetY = 0;
             break;
-          case 1: // transition frame - adjust position to align with sit frame
-            offsetX = -1;
-            offsetY = 3;
-            break;
-          case 2: // jump frame - use original jump offsets
-            offsetX = this.jumpOffsetX - 1;
-            offsetY = this.jumpOffsetY + 3;
+          case 1: // jump frame
+            offsetX = 0;
+            offsetY = 0;
             break;
         }
       } else if (this.name === 'Madeline') {
@@ -618,6 +618,10 @@ export class Dog extends GameObject {
     const distance = this.distanceTo(player);
     const threshold = this.name === 'Danoonie' ? 
       CONFIG.DOGS.ME_INTERACTION_DISTANCE : 
+      this.name === 'Nat' ?
+      CONFIG.DOGS.NAT_INTERACTION_DISTANCE :
+      this.name === 'Khoa' ?
+      CONFIG.DOGS.KHOA_INTERACTION_DISTANCE :
       CONFIG.DOGS.INTERACTION_DISTANCE;
     
     return distance < threshold;

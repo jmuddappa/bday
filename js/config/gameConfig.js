@@ -53,10 +53,23 @@ export const CONFIG = {
     SCALE: 0.13
   },
 
+  // Cake configuration
+  CAKE: {
+    X: 900,
+    Y: 700,
+    INTERACTION_DISTANCE: 120,
+    PROMPT_OFFSET_X: 200,
+    PROMPT_OFFSET_Y: 50,
+    ROTATION_SPEED: 0.02,
+    SCALE: 0.07
+  },
+
   // Dog behavior settings
   DOGS: {
     INTERACTION_DISTANCE: 100,
-    ME_INTERACTION_DISTANCE: 150,
+    ME_INTERACTION_DISTANCE: 100, // Same as others instead of 150
+    NAT_INTERACTION_DISTANCE: 120, // 20px larger hitbox for earlier animation
+    KHOA_INTERACTION_DISTANCE: 130, // 30px larger hitbox for Khoa
     ROTI: {
       x: 300, y: 400, scale: 0.12,
       width: 450, height: 800,
@@ -73,19 +86,14 @@ export const CONFIG = {
       shadowWidth: 50, shadowHeight: 18, shadowOffsetY: 8
     },
     ME: {
-      x: 860, y: 432, scale: 0.19,
-      width: 550, height: 990,
-      // Original frames (fallback)
-      sitFrame: { sx: 541, sy: 77 },
-      jumpFrame: { sx: 2, sy: 62 },
-      jumpOffsetX: -15,
-      jumpOffsetY: -3,
-      // New 3-frame animation system
-      totalWidth: 1536, // Total sprite width
-      frameHeight: 1024,
-      sitFrameNew: { sx: 1024, sy: 0 },      // Frame 1 (rest/sit)
-      transitionFrame: { sx: 512, sy: 0 },   // Frame 2 (transition)  
-      jumpFrameNew: { sx: 0, sy: 0 },        // Frame 3 (jump/singing)
+      x: 860, y: 405, scale: 0.55,
+      width: 200, height: 300, // Much smaller hitbox dimensions
+      // 3-frame animation system
+      totalWidth: 1800, // Total sprite width (600px per frame * 3 frames)
+      frameHeight: 879, // Source frame height
+      sitFrame: { sx: 1200, sy: 0 },      // Frame 1: 1200-1800px (static)
+      transitionFrame: { sx: 600, sy: 0 }, // Frame 2: 600-1200px
+      jumpFrame: { sx: 0, sy: 0 },         // Frame 3: 0-600px
       animationSpeed: 8, // frames between transitions
       shadowWidth: 70, shadowHeight: 25, shadowOffsetY: 10
     },
@@ -138,7 +146,7 @@ export const CONFIG = {
     },
     //Khoa
     FRIEND8: {
-      x: 900, y: 750, scale: 0.35, // Reduced by another 30% (0.56 * 0.7 ≈ 0.39)
+      x: 900, y: 850, scale: 0.35, // Reduced by another 30% (0.56 * 0.7 ≈ 0.39)
       width: 500, height: 527, // Source dimensions for each frame (500x527 each)
       // 3-frame animation system
       totalWidth: 1500, // Total sprite width (500px per frame * 3 frames)
@@ -219,7 +227,8 @@ export const CONFIG = {
       MOM: 'assets/images/friends/mom.png',
       DANUNDIE: 'assets/images/danundie.png',
       JUKEBOX: 'assets/images/jukebox.png',
-      DANINJA: 'assets/images/daninja.png'
+      DANINJA: 'assets/images/daninja.png',
+      CAKE: 'assets/images/cake.png'
     },
     AUDIO: {
       BG_MUSIC: 'assets/audio/bg.mp3',

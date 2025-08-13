@@ -512,6 +512,115 @@ export class Renderer {
   }
 
   /**
+   * Draw rotating cake
+   * @param {Cake} cake - Cake entity
+   */
+  drawCake(cake) {
+    if (!cake) return;
+
+    try {
+      const drawData = cake.getDrawData();
+      if (!drawData) return;
+
+      this.ctx.save();
+
+      // Apply opacity for fade effect
+      if (drawData.opacity !== undefined && drawData.opacity < 1) {
+        this.ctx.globalAlpha = drawData.opacity;
+      }
+
+      // Apply rotation if cake is rotating
+      if (drawData.rotation !== 0) {
+        this.ctx.translate(drawData.centerX, drawData.centerY);
+        this.ctx.rotate(drawData.rotation);
+        this.ctx.translate(-drawData.centerX, -drawData.centerY);
+      }
+
+      // Draw shadow first
+      const shadowX = drawData.destX + drawData.destWidth / 2;
+      const shadowY = drawData.destY + drawData.destHeight - 5;
+      this.drawShadow(shadowX, shadowY, 40, 15, 0.3);
+
+      // Draw cake
+      this.ctx.drawImage(
+        drawData.sprite,
+        drawData.sourceX,
+        drawData.sourceY,
+        drawData.sourceWidth,
+        drawData.sourceHeight,
+        drawData.destX,
+        drawData.destY,
+        drawData.destWidth,
+        drawData.destHeight
+      );
+
+      this.ctx.restore();
+
+      // Debug mode - show bounds and rotation center
+      if (this.debugMode) {
+        this.ctx.save();
+        this.ctx.strokeStyle = 'orange';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(drawData.destX, drawData.destY, drawData.destWidth, drawData.destHeight);
+        
+        // Show rotation center
+        this.ctx.fillStyle = 'red';
+        this.ctx.fillRect(drawData.centerX - 2, drawData.centerY - 2, 4, 4);
+        this.ctx.restore();
+      }
+    } catch (error) {
+      ErrorHandler.handleError(error, 'Renderer.drawCake');
+    }
+  }
+
+  /**
+   * Draw debug visualization for cake (always visible for debugging)
+   * @param {Cake} cake - Cake entity
+   */
+  drawCakeDebug(cake) {
+    if (!cake) return;
+
+    try {
+      this.ctx.save();
+      
+      // Draw interaction area
+      this.ctx.strokeStyle = 'lime';
+      this.ctx.lineWidth = 3;
+      this.ctx.setLineDash([5, 5]);
+      const interactionSize = cake.constructor.name === 'Cake' ? 120 : 100; // Use cake's interaction distance
+      this.ctx.strokeRect(
+        cake.x - interactionSize/2, 
+        cake.y - interactionSize/2, 
+        cake.width + interactionSize, 
+        cake.height + interactionSize
+      );
+      
+      // Draw cake bounds
+      this.ctx.strokeStyle = cake.isVisible() ? 'blue' : 'red';
+      this.ctx.lineWidth = 2;
+      this.ctx.setLineDash([]);
+      this.ctx.strokeRect(cake.x, cake.y, cake.width, cake.height);
+      
+      // Draw center point
+      this.ctx.fillStyle = 'yellow';
+      this.ctx.fillRect(cake.x + cake.width/2 - 3, cake.y + cake.height/2 - 3, 6, 6);
+      
+      // Draw status text
+      this.ctx.fillStyle = 'white';
+      this.ctx.strokeStyle = 'black';
+      this.ctx.lineWidth = 1;
+      this.ctx.font = '12px monospace';
+      const statusText = `Cake: ${cake.isVisible() ? 'VISIBLE' : 'HIDDEN'} ${cake.hasBeenRevealed ? 'REVEALED' : 'NOT_REVEALED'}`;
+      this.ctx.strokeText(statusText, cake.x, cake.y - 10);
+      this.ctx.fillText(statusText, cake.x, cake.y - 10);
+      
+      this.ctx.restore();
+    } catch (error) {
+      console.log('Error in drawCakeDebug:', error);
+    }
+  }
+
+  /**
    * Draw Danundie streak animation
    * @param {DanundieStreak} danundieStreak - Danundie streak entity
    */

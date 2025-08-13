@@ -14,6 +14,7 @@ import { Player } from '../entities/Player.js';
 import { Dog } from '../entities/Dog.js';
 import { Mailbox } from '../entities/Mailbox.js';
 import { Jukebox } from '../entities/Jukebox.js';
+import { Cake } from '../entities/Cake.js';
 import { DanundieStreak } from '../entities/DanundieStreak.js';
 import { DaninjaReveal } from '../entities/DaninjaReveal.js';
 import { JukeboxSystem } from '../features/JukeboxSystem.js';
@@ -38,6 +39,7 @@ export class Game {
     this.dogs = [];
     this.mailbox = new Mailbox();
     this.jukebox = new Jukebox();
+    this.cake = new Cake();
     this.danundieStreak = new DanundieStreak();
     this.daninjaReveal = new DaninjaReveal();
     
@@ -209,7 +211,7 @@ export class Game {
     const { IMAGES } = CONFIG.ASSETS;
     
     // Load all images in parallel
-    const [backgroundImage, playerFront, playerSide, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meSprite, meFramesSprite, friend2Sprite, friend5Sprite, friend6Sprite, friend7Sprite, friend8Sprite, friend9Sprite, friend10Sprite, momSprite, danundieSprite, jukeboxSprite, daninjaSprite] = await Promise.all([
+    const [backgroundImage, playerFront, playerSide, playerMovement, playerUp, playerDown, rotiSprite, khushiSprite, meFramesSprite, friend2Sprite, friend5Sprite, friend6Sprite, friend7Sprite, friend8Sprite, friend9Sprite, friend10Sprite, momSprite, danundieSprite, jukeboxSprite, cakeSprite, daninjaSprite] = await Promise.all([
       this.assetLoader.loadImage(IMAGES.BACKGROUND),
       this.assetLoader.loadImage(IMAGES.PLAYER_FRONT),
       this.assetLoader.loadImage(IMAGES.PLAYER_SIDE),
@@ -218,7 +220,6 @@ export class Game {
       this.assetLoader.loadImage(IMAGES.PLAYER_DOWN),
       this.assetLoader.loadImage(IMAGES.ROTI),
       this.assetLoader.loadImage(IMAGES.KHUSHI),
-      this.assetLoader.loadImage(IMAGES.ME),
       this.assetLoader.loadImage(IMAGES.ME_FRAMES),
       this.assetLoader.loadImage(IMAGES.FRIEND2),
       this.assetLoader.loadImage(IMAGES.FRIEND5),
@@ -230,6 +231,7 @@ export class Game {
       this.assetLoader.loadImage(IMAGES.MOM),
       this.assetLoader.loadImage(IMAGES.DANUNDIE),
       this.assetLoader.loadImage(IMAGES.JUKEBOX),
+      this.assetLoader.loadImage(IMAGES.CAKE),
       this.assetLoader.loadImage(IMAGES.DANINJA)
     ]);
 
@@ -244,14 +246,17 @@ export class Game {
     // Set jukebox sprite
     this.jukebox.setSprite(jukeboxSprite);
     
+    // Set cake sprite
+    this.cake.setSprite(cakeSprite);
+    
     // Set daninja sprite
     this.daninjaReveal.setSprite(daninjaSprite);
     
-    return { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend2Sprite, friend5Sprite, friend6Sprite, friend7Sprite, friend8Sprite, friend9Sprite, friend10Sprite, momSprite };
+    return { rotiSprite, khushiSprite, meFramesSprite, friend2Sprite, friend5Sprite, friend6Sprite, friend7Sprite, friend8Sprite, friend9Sprite, friend10Sprite, momSprite };
   }
 
   async createEntities(sprites) {
-    const { rotiSprite, khushiSprite, meSprite, meFramesSprite, friend2Sprite, friend5Sprite, friend6Sprite, friend7Sprite, friend8Sprite, friend9Sprite, friend10Sprite, momSprite } = sprites;
+    const { rotiSprite, khushiSprite, meFramesSprite, friend2Sprite, friend5Sprite, friend6Sprite, friend7Sprite, friend8Sprite, friend9Sprite, friend10Sprite, momSprite } = sprites;
     
     // Create dogs with their sprites and audio
     const rotiDog = new Dog('Roti', CONFIG.DOGS.ROTI);
@@ -263,8 +268,8 @@ export class Game {
     khushiDog.setAudio(this.audioManager.getAudio('barkKhushi'), 'barkKhushi');
     
     const meDog = new Dog('Danoonie', CONFIG.DOGS.ME);
-    meDog.setSprite(meSprite); // Keep original for fallback
-    meDog.setFramesSprite(meFramesSprite); // Set new animation sprite
+    meDog.setSprite(meFramesSprite); // Main sprite
+    meDog.setFramesSprite(meFramesSprite); // Use me_frames.png for frame animation
     
     // Create friend2 as simple dog entity
     const friend2 = new Dog('Raza', CONFIG.DOGS.FRIEND2);
@@ -340,6 +345,12 @@ export class Game {
       if (hiddenDog) {
         hiddenDog.reveal(this.audioManager);
         // Don't open dialog immediately - wait for growth animation to complete
+        return;
+      }
+
+      // Then check for hidden cake
+      if (this.isNearbyHiddenCake()) {
+        this.cake.reveal();
         return;
       }
 
@@ -437,7 +448,26 @@ export class Game {
       // Then check jukebox
       if (this.jukebox.isPlayerInRange(this.player)) {
         this.jukeboxSystem.openJukebox();
+        return;
       }
+      
+      // Then check revealed cake for eating
+      if (this.cake.isPlayerInRange(this.player) && this.cake.isVisible() && !this.cake.isArcing) {
+        const result = this.cake.eat();
+        console.log('🎂 Eating cake:', result.message);
+        
+        // Play nolan eating sound
+        const eatSound = this.audioManager.getAudio('nolanEatSound');
+        if (eatSound) {
+          eatSound.currentTime = 0;
+          eatSound.play().then(() => {
+            console.log('🎵 Playing cake eating sound!');
+          }).catch(e => {
+            console.log('Could not play eating sound:', e);
+          });
+        }
+      }
+      
     });
 
     this.inputManager.on('toggleDebug', () => {
@@ -551,6 +581,7 @@ export class Game {
       this.updateDanundie();
       this.updateDaninja();
       this.updateJukebox();
+      this.updateCake();
       this.updatePoops();
       this.updateUI();
     } catch (error) {
@@ -612,6 +643,10 @@ export class Game {
     this.jukebox.update(this.player);
   }
 
+  updateCake() {
+    this.cake.update(this.player);
+  }
+
   updatePoops() {
     // Find Roti dog and update poop system
     const rotiDog = this.dogs.find(dog => dog.name === 'Roti');
@@ -659,6 +694,10 @@ export class Game {
         const hiddenDog = this.getNearbyHiddenDog();
         this.showHiddenCharacterPrompt(hiddenDog);
       }
+      // Check for hidden cake interaction
+      else if (this.isNearbyHiddenCake()) {
+        this.showHiddenCakePrompt();
+      }
       // Check for tree interaction (hidden Daninja)
       else if (this.daninjaReveal.canInteractWithTrees(this.player)) {
         this.showTreeSearchPrompt();
@@ -667,6 +706,9 @@ export class Game {
       } else if (this.jukebox.isPlayerInRange(this.player)) {
         // Show prompt for jukebox
         this.showJukeboxPrompt();
+      } else if (this.cake.isPlayerInRange(this.player) && this.cake.isVisible() && !this.cake.isArcing) {
+        // Show prompt for eating cake
+        this.showCakeEatPrompt();
       } else {
         this.hidePrompt();
       }
@@ -705,6 +747,36 @@ export class Game {
     const pos = this.jukebox.getPromptPosition(this.canvas);
     this.prompt.style.left = `${pos.x}px`;
     this.prompt.style.top = `${pos.y}px`;
+  }
+
+  showCakePrompt() {
+    if (this.prompt) {
+      this.prompt.textContent = 'Press E to investigate';
+      this.prompt.style.display = 'block';
+      this.updateCakePromptPosition();
+    }
+  }
+
+  updateCakePromptPosition() {
+    const pos = this.cake.getPromptPosition();
+    this.prompt.style.left = `${pos.x}px`;
+    this.prompt.style.top = `${pos.y}px`;
+  }
+
+  showHiddenCakePrompt() {
+    if (this.prompt) {
+      this.prompt.textContent = 'Press E to investigate';
+      this.prompt.style.display = 'block';
+      this.updateCakePromptPosition();
+    }
+  }
+
+  showCakeEatPrompt() {
+    if (this.prompt) {
+      this.prompt.textContent = 'Press E to eat cake';
+      this.prompt.style.display = 'block';
+      this.updateCakePromptPosition();
+    }
   }
 
   showHiddenCharacterPrompt(hiddenDog) {
@@ -805,6 +877,11 @@ export class Game {
       
       // Draw jukebox
       this.renderer.drawJukebox(this.jukebox);
+      
+      // Draw cake (only if visible)
+      if (this.cake.isVisible()) {
+        this.renderer.drawCake(this.cake);
+      }
       
       // Draw poops (before player so player walks over them)
       this.renderer.drawPoops(this.poopSystem);
@@ -984,6 +1061,10 @@ export class Game {
   
   getNearbyInvestigationDog() {
     return this.dogs.find(dog => dog.isPlayerInRangeForInvestigation(this.player));
+  }
+
+  isNearbyHiddenCake() {
+    return this.cake.isPlayerInRangeForHidden(this.player);
   }
 
 
