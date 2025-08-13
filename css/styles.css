@@ -43,6 +43,62 @@ canvas {
   }
 }
 
+/* New gentle pulse animation for interaction prompts */
+@keyframes gentlePulse {
+  0%, 100% { 
+    transform: translateX(-50%) scale(1); 
+  }
+  50% { 
+    transform: translateX(-50%) scale(1.05); 
+  }
+}
+
+/* Fade in/out animations for smooth transitions */
+@keyframes fadeInPrompt {
+  0% { 
+    opacity: 0;
+    transform: translateX(-50%) scale(0.9);
+  }
+  100% { 
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+@keyframes fadeOutPrompt {
+  0% { 
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+  100% { 
+    opacity: 0;
+    transform: translateX(-50%) scale(0.9);
+  }
+}
+
+/* Dialog entrance animations */
+@keyframes slideUpFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(60px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0px) scale(1);
+  }
+}
+
+@keyframes slideDownFadeOut {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(40px) scale(0.95);
+  }
+}
+
 @keyframes buttonPress {
   0% { 
     transform: scale(1); 
@@ -54,24 +110,27 @@ canvas {
   }
 }
 
-/* Game prompt styles */
+/* Game prompt styles - Enhanced with polish */
 #prompt {
   position: fixed;
   transform: translateX(-50%);
-  background: #fff2d4;
-  color: #8b6914;
-  font-family: monospace;
-  font-size: 14px;
-  padding: 6px 12px;
-  border: 2px solid #8b6914;
-  border-style: outset;
+  background: #2c5530;
+  color: #ffffff;
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  padding: 10px 16px;
+  border: 2px solid #4a7c59;
+  border-radius: 10px;
   display: none;
   z-index: 10;
-  animation: mailboxPulse 1.2s infinite ease-in-out;
+  animation: gentlePulse 2.5s infinite ease-in-out;
   pointer-events: none;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+  transition: opacity 0.4s ease-in-out;
+  opacity: 0;
 }
 
-/* Talk prompt styles */
+/* Talk prompt styles - Enhanced with polish */
 #talkPrompt {
   position: fixed;
   transform: translateX(-50%);
@@ -79,14 +138,21 @@ canvas {
   color: #ffffff;
   font-family: 'VT323', monospace;
   font-size: 16px;
-  padding: 8px 16px;
-  border: 3px solid #ffffff;
-  border-radius: 8px;
+  padding: 10px 16px;
+  border: 2px solid #4a7c59;
+  border-radius: 10px;
   display: none;
   z-index: 15;
-  animation: pulse 1.5s infinite ease-in-out;
+  animation: gentlePulse 2.5s infinite ease-in-out;
   pointer-events: none;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+  transition: opacity 0.4s ease-in-out;
+  opacity: 0;
+}
+
+/* Visible states for smooth transitions */
+#prompt.visible, #talkPrompt.visible {
+  opacity: 1;
 }
 
 /* Speech bubble styles */
@@ -558,21 +624,60 @@ audio {
   z-index: 1500;
   width: 90%;
   max-width: 1600px;
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+
+.dialog-container.visible {
+  opacity: 1;
+  animation: slideUpFadeIn 0.4s ease-out forwards;
+}
+
+.dialog-container.hiding {
+  animation: slideDownFadeOut 0.3s ease-in forwards;
 }
 
 .dialog-box {
-  background: linear-gradient(135deg, #e8dcc0 0%, #d4c4a0 100%);
+  /* Enhanced gradient with subtle texture feel */
+  background: 
+    linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.1) 0%, 
+      transparent 25%, 
+      rgba(139, 105, 20, 0.05) 50%, 
+      transparent 75%, 
+      rgba(0, 0, 0, 0.03) 100%
+    ),
+    linear-gradient(45deg, #f2e6c8 0%, #e8dcc0 25%, #d4c4a0 75%, #c9b896 100%);
   border: 8px solid #8b6914;
   border-radius: 24px;
+  /* Enhanced shadow for more depth */
   box-shadow: 
-    0 16px 40px rgba(0, 0, 0, 0.4),
-    inset 0 4px 8px rgba(255, 255, 255, 0.3),
-    inset 0 -4px 8px rgba(0, 0, 0, 0.1);
+    0 20px 50px rgba(0, 0, 0, 0.35),
+    0 8px 20px rgba(0, 0, 0, 0.2),
+    inset 0 6px 12px rgba(255, 255, 255, 0.4),
+    inset 0 -6px 12px rgba(139, 105, 20, 0.15),
+    inset 0 1px 3px rgba(255, 255, 255, 0.6);
   display: flex;
   align-items: center;
-  padding: 32px 40px;
+  padding: 40px 48px;
   position: relative;
   font-family: 'VT323', monospace;
+  /* Subtle texture overlay */
+  position: relative;
+}
+
+.dialog-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(139, 105, 20, 0.05) 0%, transparent 50%);
+  border-radius: 16px;
+  pointer-events: none;
 }
 
 .dialog-portrait {
@@ -580,12 +685,31 @@ audio {
   height: 128px;
   border: 6px solid #4a3f35;
   border-radius: 16px;
-  margin-left: 32px;
+  margin-left: 40px;
   flex-shrink: 0;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   order: 2;
+  /* Enhanced frame with inner shadow and depth */
+  box-shadow: 
+    0 8px 16px rgba(0, 0, 0, 0.3),
+    inset 0 4px 8px rgba(0, 0, 0, 0.2),
+    inset 0 -2px 4px rgba(255, 255, 255, 0.1),
+    0 0 0 2px rgba(139, 105, 20, 0.3);
+  position: relative;
+}
+
+.dialog-portrait::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 18px;
+  pointer-events: none;
 }
 
 /* Adaptive sizing for different portrait aspect ratios */
@@ -778,23 +902,39 @@ audio {
 .dialog-content {
   flex: 1;
   padding-left: 0;
-  padding-right: 80px;
+  padding-right: 90px;
   order: 1;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 .dialog-name {
-  font-size: 44px;
+  font-size: 48px;
   font-weight: bold;
-  color: #2c5530;
-  margin-bottom: 12px;
-  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+  color: #1f3d22;
+  margin-bottom: 20px;
+  /* Enhanced text styling with subtle stroke */
+  text-shadow: 
+    2px 2px 4px rgba(255, 255, 255, 0.6),
+    -1px -1px 0px rgba(74, 63, 53, 0.3),
+    1px -1px 0px rgba(74, 63, 53, 0.3),
+    -1px 1px 0px rgba(74, 63, 53, 0.3),
+    1px 1px 0px rgba(74, 63, 53, 0.3);
+  letter-spacing: 0.5px;
 }
 
 .dialog-text {
-  font-size: 36px;
-  color: #2c2c2c;
-  line-height: 1.4;
-  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
+  font-size: 38px;
+  color: #1a1a1a;
+  line-height: 1.5;
+  /* Enhanced readability with subtle text stroke */
+  text-shadow: 
+    1px 1px 3px rgba(255, 255, 255, 0.4),
+    -0.5px -0.5px 0px rgba(74, 63, 53, 0.2),
+    0.5px -0.5px 0px rgba(74, 63, 53, 0.2),
+    -0.5px 0.5px 0px rgba(74, 63, 53, 0.2),
+    0.5px 0.5px 0px rgba(74, 63, 53, 0.2);
+  margin-top: 4px;
 }
 
 .vietnamese-text {

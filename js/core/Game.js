@@ -337,6 +337,7 @@ export class Game {
       // Check for investigation interaction first (Nolan)
       const investigationDog = this.getNearbyInvestigationDog();
       if (investigationDog) {
+        this.hidePromptSmooth(this.prompt);
         investigationDog.startInvestigation(this.audioManager);
         return;
       }
@@ -344,6 +345,7 @@ export class Game {
       // Check for hidden character interaction (Madeline)
       const hiddenDog = this.getNearbyHiddenDog();
       if (hiddenDog) {
+        this.hidePromptSmooth(this.prompt);
         hiddenDog.reveal(this.audioManager);
         // Don't open dialog immediately - wait for growth animation to complete
         return;
@@ -351,6 +353,7 @@ export class Game {
 
       // Then check for hidden cake
       if (this.isNearbyHiddenCake()) {
+        this.hidePromptSmooth(this.prompt);
         this.cake.reveal();
         return;
       }
@@ -359,7 +362,7 @@ export class Game {
       const nearbyDog = this.getNearbyDog();
       if (nearbyDog) {
         // If dialog is already open with the same character, check if they have only one message
-        if (this.dialogContainer && this.dialogContainer.style.display === 'block') {
+        if (this.dialogContainer && this.dialogContainer.classList.contains('visible')) {
           const currentDialogName = document.getElementById('dialogName')?.textContent;
           if (currentDialogName === nearbyDog.name) {
             // Check if this character has only one message
@@ -434,6 +437,7 @@ export class Game {
       
       // Check for tree search (hidden Daninja)
       if (this.daninjaReveal.canInteractWithTrees(this.player)) {
+        this.hidePromptSmooth(this.prompt);
         this.daninjaReveal.startReveal(this.audioManager);
         // Show speech bubble when daninja appears
         this.showSpeechBubbleDaninja();
@@ -442,18 +446,21 @@ export class Game {
       
       // Then check mailbox
       if (this.mailbox.isPlayerNearby(this.player)) {
+        this.hidePromptSmooth(this.prompt);
         this.mailSystem.openMailbox();
         return;
       }
       
       // Then check jukebox
       if (this.jukebox.isPlayerInRange(this.player)) {
+        this.hidePromptSmooth(this.prompt);
         this.jukeboxSystem.openJukebox();
         return;
       }
       
       // Then check revealed cake for eating
       if (this.cake.isPlayerInRange(this.player) && this.cake.isVisible() && !this.cake.isArcing) {
+        this.hidePromptSmooth(this.prompt);
         const result = this.cake.eat();
         console.log('🎂 Eating cake:', result.message);
         
@@ -508,7 +515,7 @@ export class Game {
     // Mobile touch events - close dialogs when tapping anywhere
     this.canvas.addEventListener('touchstart', (e) => {
       // Only close dialog if one is open
-      if (this.dialogContainer && this.dialogContainer.style.display === 'block') {
+      if (this.dialogContainer && this.dialogContainer.classList.contains('visible')) {
         e.preventDefault();
         this.closeDialog();
       }
@@ -517,7 +524,7 @@ export class Game {
     // Also handle clicks for desktop
     this.canvas.addEventListener('click', (e) => {
       // Only close dialog if one is open
-      if (this.dialogContainer && this.dialogContainer.style.display === 'block') {
+      if (this.dialogContainer && this.dialogContainer.classList.contains('visible')) {
         this.closeDialog();
       }
     });
@@ -535,10 +542,10 @@ export class Game {
 
     // Prompt repositioning on resize
     window.addEventListener('resize', () => {
-      if (this.prompt && this.prompt.style.display === 'block') {
+      if (this.prompt && this.prompt.classList.contains('visible')) {
         this.updatePromptPosition();
       }
-      if (this.talkPrompt && this.talkPrompt.style.display === 'block') {
+      if (this.talkPrompt && this.talkPrompt.classList.contains('visible')) {
         this.updateTalkPromptPosition();
       }
     });
@@ -726,14 +733,14 @@ export class Game {
   showPrompt() {
     if (this.prompt) {
       this.prompt.textContent = language.t('press_e_check_mail');
-      this.prompt.style.display = 'block';
       this.updatePromptPosition();
+      this.showPromptSmooth(this.prompt);
     }
   }
 
   hidePrompt() {
     if (this.prompt) {
-      this.prompt.style.display = 'none';
+      this.hidePromptSmooth(this.prompt);
     }
   }
 
@@ -746,8 +753,8 @@ export class Game {
   showJukeboxPrompt() {
     if (this.prompt) {
       this.prompt.textContent = language.t('press_e_jukebox');
-      this.prompt.style.display = 'block';
       this.updateJukeboxPromptPosition();
+      this.showPromptSmooth(this.prompt);
     }
   }
 
@@ -759,9 +766,9 @@ export class Game {
 
   showCakePrompt() {
     if (this.prompt) {
-      this.prompt.textContent = 'Press E to investigate';
-      this.prompt.style.display = 'block';
+      this.prompt.textContent = language.t('press_e_investigate');
       this.updateCakePromptPosition();
+      this.showPromptSmooth(this.prompt);
     }
   }
 
@@ -774,24 +781,24 @@ export class Game {
   showHiddenCakePrompt() {
     if (this.prompt) {
       this.prompt.textContent = language.t('press_e_investigate');
-      this.prompt.style.display = 'block';
       this.updateCakePromptPosition();
+      this.showPromptSmooth(this.prompt);
     }
   }
 
   showCakeEatPrompt() {
     if (this.prompt) {
       this.prompt.textContent = language.t('press_e_eat_cake');
-      this.prompt.style.display = 'block';
       this.updateCakePromptPosition();
+      this.showPromptSmooth(this.prompt);
     }
   }
 
   showHiddenCharacterPrompt(hiddenDog) {
     if (this.prompt && hiddenDog) {
       this.prompt.textContent = language.t('press_e_dig');
-      this.prompt.style.display = 'block';
       this.updateHiddenCharacterPromptPosition(hiddenDog);
+      this.showPromptSmooth(this.prompt);
     }
   }
 
@@ -802,7 +809,7 @@ export class Game {
       rect.height / CONFIG.CANVAS.HEIGHT
     );
     
-    const x = rect.left + (hiddenDog.x + hiddenDog.width / 2 - 10) * canvasScale;
+    const x = rect.left + (hiddenDog.x + hiddenDog.width / 2) * canvasScale;
     const y = rect.top + (hiddenDog.y - 50) * canvasScale;
     
     this.prompt.style.left = `${x}px`;
@@ -812,8 +819,8 @@ export class Game {
   showInvestigationPrompt(investigationDog) {
     if (this.prompt && investigationDog) {
       this.prompt.textContent = language.t('press_e_investigate');
-      this.prompt.style.display = 'block';
       this.updateInvestigationPromptPosition(investigationDog);
+      this.showPromptSmooth(this.prompt);
     }
   }
   
@@ -824,7 +831,7 @@ export class Game {
       rect.height / CONFIG.CANVAS.HEIGHT
     );
     
-    const x = rect.left + (investigationDog.x + investigationDog.width / 2 - 20) * canvasScale;
+    const x = rect.left + (investigationDog.x + investigationDog.width / 2) * canvasScale;
     const y = rect.top + (investigationDog.y - 50) * canvasScale;
     
     this.prompt.style.left = `${x}px`;
@@ -834,8 +841,8 @@ export class Game {
   showTreeSearchPrompt() {
     if (this.prompt) {
       this.prompt.textContent = language.t('press_e_search_trees');
-      this.prompt.style.display = 'block';
       this.updateTreeSearchPromptPosition();
+      this.showPromptSmooth(this.prompt);
     }
   }
 
@@ -846,7 +853,7 @@ export class Game {
       rect.height / CONFIG.CANVAS.HEIGHT
     );
     
-    const x = rect.left + (252 - 70) * canvasScale; // Center on interaction zone (moved 60px left)
+    const x = rect.left + 252 * canvasScale; // Center on interaction zone
     const y = rect.top + (983 - 50) * canvasScale; // Above interaction zone
     
     this.prompt.style.left = `${x}px`;
@@ -855,8 +862,9 @@ export class Game {
 
   showDaninjaTalkPrompt() {
     if (this.talkPrompt) {
-      this.talkPrompt.style.display = 'block';
+      this.talkPrompt.textContent = language.t('press_e_talk');
       this.updateDaninjaTalkPromptPosition();
+      this.showPromptSmooth(this.talkPrompt);
     }
   }
 
@@ -867,7 +875,7 @@ export class Game {
       rect.height / CONFIG.CANVAS.HEIGHT
     );
     
-    const x = rect.left + (317 - 50) * canvasScale; // Above Daninja (moved 20px right)
+    const x = rect.left + 317 * canvasScale; // Above Daninja
     const y = rect.top + (830 - 162 - 60) * canvasScale; // Above sprite top (moved 10px up)
     
     this.talkPrompt.style.left = `${x}px`;
@@ -1080,14 +1088,14 @@ export class Game {
   showTalkPrompt(character) {
     if (this.talkPrompt && character) {
       this.talkPrompt.textContent = language.t('press_e_talk');
-      this.talkPrompt.style.display = 'block';
       this.updateTalkPromptPosition(character);
+      this.showPromptSmooth(this.talkPrompt);
     }
   }
 
   hideTalkPrompt() {
     if (this.talkPrompt) {
-      this.talkPrompt.style.display = 'none';
+      this.hidePromptSmooth(this.talkPrompt);
     }
   }
 
@@ -1112,7 +1120,7 @@ export class Game {
     };
     const yOffset = friendOffsets[character.name] || -80;
     
-    const x = rect.left + (character.x + character.width / 2 - 70) * canvasScale;
+    const x = rect.left + (character.x + character.width / 2) * canvasScale;
     const y = rect.top + (character.y + yOffset) * canvasScale;
     
     this.talkPrompt.style.left = `${x}px`;
@@ -1121,7 +1129,11 @@ export class Game {
 
   openDialog(character) {
     if (this.dialogContainer && character) {
-      this.dialogContainer.style.display = 'block';
+      // Hide all prompts when opening dialog
+      this.hidePromptSmooth(this.prompt);
+      this.hidePromptSmooth(this.talkPrompt);
+      
+      this.showDialogSmooth();
       
       // Special handling for Daninja - auto-open letter modal after 5 seconds
       if (character.name === 'Daninja') {
@@ -1132,7 +1144,7 @@ export class Game {
         
         setTimeout(() => {
           // Only open letter modal if dialog is still open (user hasn't closed it)
-          if (this.dialogContainer.style.display === 'block' && this.isDaninjaDialogOpen) {
+          if (this.dialogContainer.classList.contains('visible') && this.isDaninjaDialogOpen) {
             this.closeDialog();
             this.openLetterModal();
           }
@@ -1276,7 +1288,7 @@ export class Game {
 
   closeDialog() {
     if (this.dialogContainer) {
-      this.dialogContainer.style.display = 'none';
+      this.hideDialogSmooth();
       // Reset Daninja dialog state when closing any dialog
       this.isDaninjaDialogOpen = false;
     }
@@ -1483,8 +1495,64 @@ export class Game {
     }
     
     // Update any visible talk prompts
-    if (this.talkPrompt && this.talkPrompt.style.display === 'block') {
+    if (this.talkPrompt && this.talkPrompt.classList.contains('visible')) {
       this.talkPrompt.textContent = language.t('press_e_talk');
+    }
+  }
+
+  /**
+   * Show prompt with smooth fade transition
+   */
+  showPromptSmooth(element) {
+    if (element) {
+      element.style.display = 'block';
+      // Force a repaint before adding the class
+      element.offsetHeight;
+      element.classList.add('visible');
+    }
+  }
+
+  /**
+   * Hide prompt with smooth fade transition
+   */
+  hidePromptSmooth(element) {
+    if (element) {
+      element.classList.remove('visible');
+      // Wait for transition to complete before hiding
+      setTimeout(() => {
+        if (!element.classList.contains('visible')) {
+          element.style.display = 'none';
+        }
+      }, 400); // Match CSS transition duration
+    }
+  }
+
+  /**
+   * Show dialog with smooth slide up animation
+   */
+  showDialogSmooth() {
+    if (this.dialogContainer) {
+      this.dialogContainer.style.display = 'block';
+      // Force a repaint before adding the class
+      this.dialogContainer.offsetHeight;
+      this.dialogContainer.classList.add('visible');
+    }
+  }
+
+  /**
+   * Hide dialog with smooth slide down animation
+   */
+  hideDialogSmooth() {
+    if (this.dialogContainer) {
+      this.dialogContainer.classList.remove('visible');
+      this.dialogContainer.classList.add('hiding');
+      // Wait for animation to complete before hiding
+      setTimeout(() => {
+        if (this.dialogContainer.classList.contains('hiding')) {
+          this.dialogContainer.style.display = 'none';
+          this.dialogContainer.classList.remove('hiding');
+        }
+      }, 300); // Match CSS animation duration
     }
   }
 
