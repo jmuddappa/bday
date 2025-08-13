@@ -47,6 +47,7 @@ export class Game {
     this.speechBubble = document.getElementById('speechBubble');
     this.speechBubbleDaninja = document.getElementById('speechBubbleDaninja');
     this.dialogContainer = document.getElementById('dialogContainer');
+    this.choiceModal = document.getElementById('choiceModal');
     this.audioStatus = document.getElementById('audioStatus');
     
     // Game state
@@ -104,14 +105,14 @@ export class Game {
       'Daninja': {
         portrait: 'daninja_portrait',
         messages: [
-          "Here, take this letter! I trained in these very trees for years. Now I emerge for your special day to deliver this letter from Danoonie! (Đây, hãy lấy lá thư này! Tôi đã luyện tập trong những cây này nhiều năm. Giờ tôi xuất hiện trong ngày đặc biệt của bạn để gửi lá thư này từ Danoonie!)"
+          "I trained in these very trees for years. Now I emerge for your special day to deliver this letter from Danoonie! (Đây, hãy lấy lá thư này! Tôi đã luyện tập trong những cây này nhiều năm. Giờ tôi xuất hiện trong ngày đặc biệt của bạn để gửi lá thư này từ Danoonie!)"
         ]
       },
       //madeline
       'Madeline': {
         portrait: 'friend6_portrait',
         messages: [
-          "Despite you never watering me, I still somehow grew to be healthy, thank you & happy birthday!!"
+          "Despite you never watering me, I still somehow grew to be healthy, thank you for nothing & happy birthday!!"
         ]
       },
       //Nolan (friend5)
@@ -125,7 +126,7 @@ export class Game {
       'Anne': {
         portrait: 'friend7_portrait',
         messages: [
-          "HOLY SHITBALLS GIRL ITS YOUR BDAY!"
+          "HOLY FUCK GIRL ITS YOUR BDAY! I MADE YOU SOMETHING REALLY COOL WANNA SEE?"
         ]
       },
       //bố (friend9)
@@ -165,6 +166,9 @@ export class Game {
       'mẹ': 0,
       'Khoa': 0
     };
+    
+    // Track choice interactions (character -> choice made)
+    this.characterChoices = {};
     
     // Track interaction counts for special behaviors
     this.dogInteractionCounts = {
@@ -328,6 +332,62 @@ export class Game {
       // Check for dialog with any visible dog
       const nearbyDog = this.getNearbyDog();
       if (nearbyDog) {
+        // If dialog is already open with the same character, check if they have only one message
+        if (this.dialogContainer && this.dialogContainer.style.display === 'block') {
+          const currentDialogName = document.getElementById('dialogName')?.textContent;
+          if (currentDialogName === nearbyDog.name) {
+            // Check if this character has only one message
+            const dialogData = this.dogDialogs[nearbyDog.name];
+            if (dialogData && dialogData.messages.length === 1) {
+              // Close dialog for single-message characters when E is pressed again
+              this.closeDialog();
+              
+              // Special case: Show choice modal for specific characters after dialog closes
+              if (nearbyDog.name === 'Nolan' && !this.characterChoices[nearbyDog.name] && !nearbyDog.isEating && !nearbyDog.eatingComplete) {
+                setTimeout(() => {
+                  this.showChoiceModal({
+                    character: 'Nolan',
+                    title: 'Nolan\'s Mushroom',
+                    question: 'Should Nolan eat the mushroom?',
+                    yesText: 'Yes, eat it',
+                    noText: 'No, don\'t eat it',
+                    onYes: () => {
+                      console.log('Player chose: Let Nolan eat the mushroom');
+                      nearbyDog.startEatingSequence(this.audioManager);
+                    },
+                    onNo: () => {
+                      console.log('Player chose: Don\'t let Nolan eat the mushroom');
+                      // Nolan stays normal, can be talked to again
+                    }
+                  });
+                }, 50); // Small delay to ensure dialog is fully closed
+              }
+              // Anne's video choice modal
+              else if (nearbyDog.name === 'Anne' && !this.characterChoices[nearbyDog.name]) {
+                setTimeout(() => {
+                  this.showChoiceModal({
+                    character: 'Anne',
+                    title: 'Anne\'s Video',
+                    question: 'Do you want to watch Anne\'s video?\n⚠️ WARNING: GRAPHIC CONTENT',
+                    yesText: 'Yes, watch',
+                    noText: 'No, skip',
+                    onYes: () => {
+                      console.log('Player chose: Watch Anne\'s video');
+                      // Play friend21.mov directly (not through mail system)
+                      this.playDirectVideo('videos/friend21.mov', 'Anne\'s Video');
+                    },
+                    onNo: () => {
+                      console.log('Player chose: Skip Anne\'s video');
+                      // Nothing happens, Anne stays normal
+                    }
+                  });
+                }, 50); // Small delay to ensure dialog is fully closed
+              }
+              return;
+            }
+          }
+        }
+        
         this.openDialog(nearbyDog);
         return;
       }
@@ -713,8 +773,8 @@ export class Game {
       rect.height / CONFIG.CANVAS.HEIGHT
     );
     
-    const x = rect.left + (317 - 70) * canvasScale; // Above Daninja
-    const y = rect.top + (830 - 162 - 20) * canvasScale; // Above sprite top
+    const x = rect.left + (317 - 50) * canvasScale; // Above Daninja (moved 20px right)
+    const y = rect.top + (830 - 162 - 60) * canvasScale; // Above sprite top (moved 10px up)
     
     this.talkPrompt.style.left = `${x}px`;
     this.talkPrompt.style.top = `${y}px`;
@@ -1049,12 +1109,7 @@ export class Game {
           console.log(`🎵 Danoonie interaction count: ${this.dogInteractionCounts.Danoonie}`);
         }
         
-        // Special behavior for Nolan - start eating animation after dialog
-        if (character.name === 'Nolan' && !character.isEating && !character.eatingComplete) {
-          setTimeout(() => {
-            character.startEatingSequence(this.audioManager);
-          }, 1500); // Start eating 1.5 seconds after dialog to give time to read
-        }
+        // Special behavior for Nolan - now handled in interaction logic with choice modal
         
         const dialogTextElement = document.getElementById('dialogText');
         if (dialogTextElement) {
@@ -1071,6 +1126,116 @@ export class Game {
       this.dialogContainer.style.display = 'none';
       // Reset Daninja dialog state when closing any dialog
       this.isDaninjaDialogOpen = false;
+    }
+  }
+
+  /**
+   * Show choice modal with customizable options
+   * @param {Object} options - Choice options
+   * @param {string} options.character - Character name for tracking
+   * @param {string} options.title - Modal title
+   * @param {string} options.question - Question to ask
+   * @param {string} options.yesText - Text for yes button (default: "Yes")
+   * @param {string} options.noText - Text for no button (default: "No")
+   * @param {Function} options.onYes - Callback for yes choice
+   * @param {Function} options.onNo - Callback for no choice
+   */
+  showChoiceModal(options) {
+    if (!this.choiceModal || this.characterChoices[options.character]) {
+      return; // Don't show if choice already made
+    }
+
+    // Set modal content
+    const titleElement = document.getElementById('choiceTitle');
+    const questionElement = document.getElementById('choiceQuestion');
+    const yesButton = document.getElementById('choiceYes');
+    const noButton = document.getElementById('choiceNo');
+
+    if (titleElement) titleElement.textContent = options.title || 'Make a Choice';
+    if (questionElement) questionElement.textContent = options.question || 'What would you like to do?';
+    if (yesButton) yesButton.textContent = options.yesText || 'Yes';
+    if (noButton) noButton.textContent = options.noText || 'No';
+
+    // Show modal
+    this.choiceModal.classList.add('active');
+
+    // Set up event handlers (remove old ones first)
+    const newYesButton = yesButton.cloneNode(true);
+    const newNoButton = noButton.cloneNode(true);
+    yesButton.parentNode.replaceChild(newYesButton, yesButton);
+    noButton.parentNode.replaceChild(newNoButton, noButton);
+
+    newYesButton.addEventListener('click', () => {
+      this.characterChoices[options.character] = 'yes';
+      this.closeChoiceModal();
+      if (options.onYes) options.onYes();
+    });
+
+    newNoButton.addEventListener('click', () => {
+      this.characterChoices[options.character] = 'no';
+      this.closeChoiceModal();
+      if (options.onNo) options.onNo();
+    });
+  }
+
+  /**
+   * Close the choice modal
+   */
+  closeChoiceModal() {
+    if (this.choiceModal) {
+      this.choiceModal.classList.remove('active');
+    }
+  }
+
+  /**
+   * Play a video directly (bypassing mail system)
+   * @param {string} videoSrc - Path to video file
+   * @param {string} title - Video title
+   */
+  playDirectVideo(videoSrc, title) {
+    try {
+      const videoModal = document.getElementById('videoModal');
+      const videoPlayer = document.getElementById('videoPlayer');
+      const videoTitle = document.getElementById('videoTitle');
+
+      if (!videoModal || !videoPlayer || !videoTitle) {
+        console.error('Video elements not found');
+        return;
+      }
+
+      // Set video properties
+      videoTitle.textContent = title;
+      videoPlayer.style.transform = ''; // No rotation for direct videos
+      videoPlayer.src = videoSrc;
+
+      // Show modal and manage audio
+      videoModal.style.display = 'flex';
+      
+      if (this.audioManager.musicStarted) {
+        this.audioManager.setVolume('bgMusic', 0);
+      }
+      
+      // Play video
+      const playPromise = videoPlayer.play();
+      if (playPromise) {
+        playPromise
+          .then(() => {
+            console.log(`🎬 Playing direct video: ${title}`);
+          })
+          .catch(e => {
+            console.error('Error playing direct video:', e);
+          });
+      }
+
+      // Setup video end handler
+      videoPlayer.onended = () => {
+        if (this.audioManager.musicStarted) {
+          this.audioManager.setVolume('bgMusic', 0.6);
+        }
+      };
+
+    } catch (error) {
+      console.error('Error in playDirectVideo:', error);
     }
   }
 
