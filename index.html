@@ -64,12 +64,34 @@
     </div>
   </div>
 
-  <!-- Jukebox Modal -->
+  <!-- Enhanced Jukebox Modal -->
   <div class="jukebox-container" id="jukeboxContainer">
     <div class="jukebox-header">
-      <span>🎵 Jukebox 🎵</span>
-      <span class="close-btn">✕</span>
+      <div class="jukebox-title-row">
+        <div class="jukebox-title">Vintage Jukebox</div>
+        <span class="close-btn">✕</span>
+      </div>
+      <div class="jukebox-controls">
+        <input type="text" class="jukebox-search" id="jukeboxSearch" placeholder="Search songs...">
+        <div class="volume-control">
+          <span>🔊</span>
+          <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="60">
+        </div>
+      </div>
     </div>
+    
+    <!-- Now Playing Section -->
+    <div class="now-playing" id="nowPlaying">
+      <div class="now-playing-label">Now Playing</div>
+      <div class="now-playing-song" id="nowPlayingSong">No song selected</div>
+    </div>
+    
+    <!-- Queue Section -->
+    <div class="queue-section" id="queueSection">
+      <div class="queue-label">Up Next</div>
+      <div class="queue-item" id="nextSong">Queue is empty</div>
+    </div>
+    
     <div id="jukeboxList"></div>
   </div>
 

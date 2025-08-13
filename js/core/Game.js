@@ -1556,6 +1556,37 @@ export class Game {
     }
   }
 
+  /**
+   * Show jukebox with smooth slide up animation
+   */
+  showJukeboxSmooth() {
+    const jukeboxContainer = document.getElementById('jukeboxContainer');
+    if (jukeboxContainer) {
+      jukeboxContainer.style.display = 'block';
+      // Force a repaint before adding the class
+      jukeboxContainer.offsetHeight;
+      jukeboxContainer.classList.add('visible');
+    }
+  }
+
+  /**
+   * Hide jukebox with smooth slide down animation
+   */
+  hideJukeboxSmooth() {
+    const jukeboxContainer = document.getElementById('jukeboxContainer');
+    if (jukeboxContainer) {
+      jukeboxContainer.classList.remove('visible');
+      jukeboxContainer.classList.add('hiding');
+      // Wait for animation to complete before hiding
+      setTimeout(() => {
+        if (jukeboxContainer.classList.contains('hiding')) {
+          jukeboxContainer.style.display = 'none';
+          jukeboxContainer.classList.remove('hiding');
+        }
+      }, 400); // Match CSS animation duration
+    }
+  }
+
   destroy() {
     this.isRunning = false;
     

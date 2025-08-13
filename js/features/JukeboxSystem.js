@@ -10,8 +10,8 @@ import { language } from '../utils/Language.js';
 export class JukeboxSystem {
   constructor(audioManager) {
     this.audioManager = audioManager;
-    this.mailContainer = null;
-    this.mailList = null;
+    this.jukeboxContainer = null;
+    this.jukeboxList = null;
     this.videoModal = null;
     this.videoPlayer = null;
     this.videoTitle = null;
@@ -27,25 +27,45 @@ export class JukeboxSystem {
   }
 
   setupElements() {
-    // Reuse existing mail modal elements
-    this.mailContainer = document.getElementById('mailContainer');
-    this.mailList = document.getElementById('mailList');
+    // Use dedicated jukebox container
+    this.jukeboxContainer = document.getElementById('jukeboxContainer');
+    this.jukeboxList = document.getElementById('jukeboxList');
+    this.jukeboxSearch = document.getElementById('jukeboxSearch');
+    this.volumeSlider = document.getElementById('volumeSlider');
+    this.nowPlaying = document.getElementById('nowPlaying');
+    this.nowPlayingSong = document.getElementById('nowPlayingSong');
+    this.queueSection = document.getElementById('queueSection');
+    this.nextSong = document.getElementById('nextSong');
     
     // Get existing video modal elements
     this.videoModal = document.getElementById('videoModal');
     this.videoPlayer = document.getElementById('videoPlayer');
     this.videoTitle = document.getElementById('videoTitle');
     
-    if (!this.mailContainer) {
-      console.warn('🎵 Mail container not found for jukebox');
+    if (!this.jukeboxContainer) {
+      console.warn('🎵 Jukebox container not found');
+    }
+    
+    // Setup search functionality
+    if (this.jukeboxSearch) {
+      this.jukeboxSearch.addEventListener('input', (e) => {
+        this.filterSongs(e.target.value);
+      });
+    }
+    
+    // Setup volume control
+    if (this.volumeSlider) {
+      this.volumeSlider.addEventListener('input', (e) => {
+        this.setVolume(e.target.value / 100);
+      });
     }
   }
 
   setupEventListeners() {
-    // Close button functionality for mail container when used as jukebox
+    // Close button functionality for jukebox container
     document.addEventListener('click', (e) => {
       if (e.target.classList.contains('close-btn') && 
-          e.target.closest('.mail-container') && this.isOpen) {
+          e.target.closest('.jukebox-container') && this.isOpen) {
         this.closeJukebox();
       }
       
@@ -93,21 +113,23 @@ export class JukeboxSystem {
    * Open the jukebox song selection modal (reusing mail container)
    */
   openJukebox() {
-    if (!this.mailContainer) {
-      console.error('🎵 Mail container not found');
+    if (!this.jukeboxContainer) {
+      console.error('🎵 Jukebox container not found');
       return;
     }
 
     console.log('🎵 Opening jukebox');
     this.isOpen = true;
     
-    // Change mail header to jukebox header
-    const mailHeader = this.mailContainer.querySelector('.mail-header span:first-child');
-    if (mailHeader) {
-      mailHeader.textContent = '🎵 Jukebox 🎵';
+    // Use smooth animation from Game.js
+    const game = window.game; // Assuming game instance is accessible
+    if (game && game.showJukeboxSmooth) {
+      game.showJukeboxSmooth();
+    } else {
+      this.jukeboxContainer.style.display = 'block';
+      this.jukeboxContainer.classList.add('visible');
     }
     
-    this.mailContainer.style.display = 'block';
     this.populateJukeboxList();
     
     // Request audio permission if needed
@@ -118,34 +140,49 @@ export class JukeboxSystem {
    * Close the jukebox modal
    */
   closeJukebox() {
-    if (!this.mailContainer) return;
+    if (!this.jukeboxContainer) return;
     
     console.log('🎵 Closing jukebox');
     this.isOpen = false;
     
-    // Restore original mail header
-    const mailHeader = this.mailContainer.querySelector('.mail-header span:first-child');
-    if (mailHeader) {
-      mailHeader.textContent = language.t('birthday_mailbox');
+    // Use smooth animation from Game.js
+    const game = window.game; // Assuming game instance is accessible
+    if (game && game.hideJukeboxSmooth) {
+      game.hideJukeboxSmooth();
+    } else {
+      this.jukeboxContainer.classList.remove('visible');
+      this.jukeboxContainer.classList.add('hiding');
+      setTimeout(() => {
+        this.jukeboxContainer.style.display = 'none';
+        this.jukeboxContainer.classList.remove('hiding');
+      }, 400);
     }
-    
-    this.mailContainer.style.display = 'none';
   }
 
   /**
-   * Populate the jukebox song list (reusing mail list)
+   * Populate the jukebox song list with enhanced styling
    */
   populateJukeboxList() {
-    if (!this.mailList) return;
+    if (!this.jukeboxList) return;
     
-    this.mailList.innerHTML = '';
+    this.jukeboxList.innerHTML = '';
     
     this.videos.forEach((song, index) => {
       const songItem = document.createElement('div');
-      songItem.className = 'mail-item'; // Reuse mail-item class for styling
+      songItem.className = 'jukebox-item';
       songItem.innerHTML = `
-        <div class="mail-icon">${song.icon}</div>
-        <div class="mail-sender">${song.title}</div>
+        <div class="jukebox-icon">${song.icon}</div>
+        <div class="jukebox-content">
+          <div class="jukebox-song-title">${song.title}</div>
+          <div class="jukebox-artist">${song.artist || 'Unknown Artist'}</div>
+        </div>
+        <div class="playing-indicator" style="display: none;">
+          <div class="equalizer">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+          </div>
+        </div>
       `;
       
       // Add click handler
@@ -153,7 +190,7 @@ export class JukeboxSystem {
         this.playVideo(index);
       });
       
-      this.mailList.appendChild(songItem);
+      this.jukeboxList.appendChild(songItem);
     });
   }
 
@@ -235,6 +272,39 @@ export class JukeboxSystem {
    */
   getTotalSongs() {
     return this.videos.length;
+  }
+
+  /**
+   * Filter songs based on search query
+   * @param {string} query - Search query
+   */
+  filterSongs(query) {
+    if (!this.jukeboxList) return;
+    
+    const items = this.jukeboxList.querySelectorAll('.jukebox-item');
+    const searchTerm = query.toLowerCase();
+    
+    items.forEach(item => {
+      const title = item.querySelector('.jukebox-song-title').textContent.toLowerCase();
+      const artist = item.querySelector('.jukebox-artist').textContent.toLowerCase();
+      
+      if (title.includes(searchTerm) || artist.includes(searchTerm)) {
+        item.style.display = 'flex';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  }
+
+  /**
+   * Set volume for video playback
+   * @param {number} volume - Volume level (0-1)
+   */
+  setVolume(volume) {
+    if (this.videoPlayer) {
+      this.videoPlayer.volume = volume;
+    }
+    console.log(`🎵 Volume set to: ${Math.round(volume * 100)}%`);
   }
 
   /**
