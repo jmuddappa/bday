@@ -20,6 +20,7 @@ import { DaninjaReveal } from '../entities/DaninjaReveal.js';
 import { JukeboxSystem } from '../features/JukeboxSystem.js';
 import { PoopSystem } from '../systems/PoopSystem.js';
 import { ErrorHandler } from '../utils/ErrorHandler.js';
+import { language } from '../utils/Language.js';
 
 export class Game {
   constructor() {
@@ -72,90 +73,90 @@ export class Game {
       'Roti': {
         portrait: 'roti',
         messages: [
-          "Thank you for adopting me, despite what papa said about my ugly nose! (Cảm ơn vì đã nhận nuôi con, mặc dù bố nói mũi con xấu!)",
-          "I'm sorry I dug up your vegetables. You should go check those empty spots out! (Con yêu bạn hơn cả mạng sống của mình)",
-          "Can I crawl inside you?! (Con có thể chui vào trong người bạn không?!)",
-          "I just pissed and pooped on the rug inside! (Con vừa đi tiểu và đại tiện lên thảm trong nhà!)"
+          'dialog_roti_1',
+          'dialog_roti_2',
+          'dialog_roti_3',
+          'dialog_roti_4'
         ]
       },
       'Khushi': {
         portrait: 'khushi',
         messages: [
-          "hmm? is something special about today? (hmm? hôm nay có gì đặc biệt không?)",
-          "sup? (sao?)",
-          "um, can you give me some space? (ừm... cho tôi chút không gian được không)",
-          "... (...)"
+          'dialog_khushi_1',
+          'dialog_khushi_2',
+          'dialog_khushi_3',
+          'dialog_khushi_4'
         ]
       },
       'Danoonie': {
         portrait: 'me',
         messages: [
-          "Don't move or else I'll stop singing and we have to start this all over again & torture our guests. (Đừng di chuyển không thì tôi sẽ ngừng hát và chúng ta phải bắt đầu lại từ đầu & tra tấn khách của chúng ta.)",
-          "I am your farm husband! I just stand here all day and watch you farm - realistic right? (Tôi là chồng nông trại của bạn! Tôi chỉ đứng đây cả ngày và xem bạn làm nông - thực tế đúng không?)",
-          "Wanna see something cool? Press ; to see the collision boxes that prevent you from bumping into things! (Muốn thấy điều gì đó thú vị không? Nhấn ; để xem các hộp va chạm ngăn bạn đâm vào đồ vật!)",
-          "I love you! Happy birthday Lindo. (Anh yêu em! Chúc mừng sinh nhật Lindo.)"
+          'dialog_danoonie_1',
+          'dialog_danoonie_2',
+          'dialog_danoonie_3',
+          'dialog_danoonie_4'
         ]
       },
       //raza
       'Raza': {
         portrait: 'friend2_portrait',
         messages: [
-          "This isn't as nice as a river but I still appreciate the view. (Đây không đẹp bằng một dòng sông nhưng tôi vẫn thích cảnh này.)"
+          'dialog_raza_1'
         ]
       },
       //daninja
       'Daninja': {
         portrait: 'daninja_portrait',
         messages: [
-          "I trained in these very trees for years. Now I emerge for your special day to deliver this letter from Danoonie! (Đây, hãy lấy lá thư này! Tôi đã luyện tập trong những cây này nhiều năm. Giờ tôi xuất hiện trong ngày đặc biệt của bạn để gửi lá thư này từ Danoonie!)"
+          'dialog_daninja_1'
         ]
       },
       //madeline
       'Madeline': {
         portrait: 'friend6_portrait',
         messages: [
-          "Despite you never watering me, I still somehow grew to be healthy, thank you for nothing & happy birthday!!"
+          'dialog_madeline_1'
         ]
       },
       //Nolan (friend5)
       'Nolan': {
         portrait: 'friend5_portrait',
         messages: [
-          "I am going to eat this *gobble* *gobble*"
+          'dialog_nolan_1'
         ]
       },
       //Anne (friend7)
       'Anne': {
         portrait: 'friend7_portrait',
         messages: [
-          "HOLY FUCK GIRL ITS YOUR BDAY! I MADE YOU SOMETHING REALLY COOL WANNA SEE?"
+          'dialog_anne_1'
         ]
       },
       //bố (friend9)
       'bố': {
         portrait: 'friend9_portrait',
         messages: [
-          "Thương con, mẹ gọt trái ngọt, trao từng miếng yêu thương."
+          'dialog_bo_1'
         ]
       },
       //mẹ (mom)
       'mẹ': {
         portrait: 'mom_portrait',
         messages: [
-          "Sinh nhật vui vẻ, nhớ ăn rau nhé con!"
+          'dialog_me_1'
         ]
       },
       'Nat': {
         portrait: 'friend10_portrait',
         messages: [
-          "Happy Birthday! Did you check the well for the present I got you?"
+          'dialog_nat_1'
         ]
       },
       //Khoa (friend8)
       'Khoa': {
         portrait: 'friend8_portrait',
         messages: [
-          "Hey sister! I've been working real hard on the right words to say to you and this is what I have so far: 'live, laugh, love!'"
+          'dialog_khoa_1'
         ]
       }
     };
@@ -372,10 +373,10 @@ export class Game {
                 setTimeout(() => {
                   this.showChoiceModal({
                     character: 'Nolan',
-                    title: 'Nolan\'s Request',
-                    question: 'Let Nolan eat the mushroom?',
-                    yesText: 'Yes, eat it',
-                    noText: 'No, don\'t eat it',
+                    title: language.t('nolan_request'),
+                    question: language.t('let_nolan_eat'),
+                    yesText: language.t('yes_eat_it'),
+                    noText: language.t('no_dont_eat'),
                     onYes: () => {
                       console.log('Player chose: Let Nolan eat the mushroom');
                       nearbyDog.startEatingSequence(this.audioManager);
@@ -392,10 +393,10 @@ export class Game {
                 setTimeout(() => {
                   this.showChoiceModal({
                     character: 'Anne',
-                    title: 'Anne\'s Video',
-                    question: 'Do you want to watch Anne\'s video?\n⚠️ WARNING: GRAPHIC CONTENT',
-                    yesText: 'Yes, watch',
-                    noText: 'No, skip',
+                    title: language.t('anne_video'),
+                    question: language.t('watch_anne_video'),
+                    yesText: language.t('yes_watch'),
+                    noText: language.t('no_skip'),
                     onYes: () => {
                       console.log('Player chose: Watch Anne\'s video');
                       // Play friend21.mov directly (not through mail system)
@@ -492,6 +493,12 @@ export class Game {
       this.triggerDanundieStreak();
     });
 
+    // Language toggle (L key)
+    this.inputManager.on('toggleLanguage', () => {
+      language.toggle();
+      this.updateUITranslations();
+      console.log(`🌐 Language switched to: ${language.getCurrentLanguage() === 'en' ? 'English' : 'Vietnamese'}`);
+    });
 
     // Audio system events
     this.inputManager.on('audioRequested', () => {
@@ -718,7 +725,7 @@ export class Game {
 
   showPrompt() {
     if (this.prompt) {
-      this.prompt.textContent = 'Press E to check mail';
+      this.prompt.textContent = language.t('press_e_check_mail');
       this.prompt.style.display = 'block';
       this.updatePromptPosition();
     }
@@ -738,7 +745,7 @@ export class Game {
 
   showJukeboxPrompt() {
     if (this.prompt) {
-      this.prompt.textContent = 'Press E for jukebox';
+      this.prompt.textContent = language.t('press_e_jukebox');
       this.prompt.style.display = 'block';
       this.updateJukeboxPromptPosition();
     }
@@ -766,7 +773,7 @@ export class Game {
 
   showHiddenCakePrompt() {
     if (this.prompt) {
-      this.prompt.textContent = 'Press E to investigate';
+      this.prompt.textContent = language.t('press_e_investigate');
       this.prompt.style.display = 'block';
       this.updateCakePromptPosition();
     }
@@ -774,7 +781,7 @@ export class Game {
 
   showCakeEatPrompt() {
     if (this.prompt) {
-      this.prompt.textContent = 'Press E to eat cake';
+      this.prompt.textContent = language.t('press_e_eat_cake');
       this.prompt.style.display = 'block';
       this.updateCakePromptPosition();
     }
@@ -782,7 +789,7 @@ export class Game {
 
   showHiddenCharacterPrompt(hiddenDog) {
     if (this.prompt && hiddenDog) {
-      this.prompt.textContent = 'Press E to Dig';
+      this.prompt.textContent = language.t('press_e_dig');
       this.prompt.style.display = 'block';
       this.updateHiddenCharacterPromptPosition(hiddenDog);
     }
@@ -795,7 +802,7 @@ export class Game {
       rect.height / CONFIG.CANVAS.HEIGHT
     );
     
-    const x = rect.left + (hiddenDog.x + hiddenDog.width / 2 - 70) * canvasScale;
+    const x = rect.left + (hiddenDog.x + hiddenDog.width / 2 - 10) * canvasScale;
     const y = rect.top + (hiddenDog.y - 50) * canvasScale;
     
     this.prompt.style.left = `${x}px`;
@@ -804,7 +811,7 @@ export class Game {
   
   showInvestigationPrompt(investigationDog) {
     if (this.prompt && investigationDog) {
-      this.prompt.textContent = 'Press E to investigate';
+      this.prompt.textContent = language.t('press_e_investigate');
       this.prompt.style.display = 'block';
       this.updateInvestigationPromptPosition(investigationDog);
     }
@@ -817,7 +824,7 @@ export class Game {
       rect.height / CONFIG.CANVAS.HEIGHT
     );
     
-    const x = rect.left + (investigationDog.x + investigationDog.width / 2 - 80) * canvasScale;
+    const x = rect.left + (investigationDog.x + investigationDog.width / 2 - 20) * canvasScale;
     const y = rect.top + (investigationDog.y - 50) * canvasScale;
     
     this.prompt.style.left = `${x}px`;
@@ -826,7 +833,7 @@ export class Game {
 
   showTreeSearchPrompt() {
     if (this.prompt) {
-      this.prompt.textContent = 'Press E to search trees';
+      this.prompt.textContent = language.t('press_e_search_trees');
       this.prompt.style.display = 'block';
       this.updateTreeSearchPromptPosition();
     }
@@ -1072,6 +1079,7 @@ export class Game {
 
   showTalkPrompt(character) {
     if (this.talkPrompt && character) {
+      this.talkPrompt.textContent = language.t('press_e_talk');
       this.talkPrompt.style.display = 'block';
       this.updateTalkPromptPosition(character);
     }
@@ -1188,8 +1196,24 @@ export class Game {
         }
         
         // Get current message and cycle to next
-        const currentIndex = this.dogMessageIndex[character.name];
-        const currentMessage = dialogData.messages[currentIndex];
+        let currentIndex = this.dogMessageIndex[character.name];
+        let messageKey;
+        
+        // Special conditional logic for Nat based on cake state
+        if (character.name === 'Nat') {
+          if (this.cake.isEaten) {
+            // Cake has been eaten - use the "you ate the whole cake" message
+            messageKey = 'dialog_nat_2';
+          } else {
+            // Cake hasn't been found/eaten yet - use original message  
+            messageKey = 'dialog_nat_1';
+          }
+        } else {
+          // Regular dialog cycling for other characters
+          messageKey = dialogData.messages[currentIndex];
+        }
+        
+        const currentMessage = language.t(messageKey);
         
         // Advance to next message for next interaction
         this.dogMessageIndex[character.name] = (currentIndex + 1) % dialogData.messages.length;
@@ -1212,10 +1236,10 @@ export class Game {
             setTimeout(() => {
               this.showChoiceModal({
                 character: 'Khushi',
-                title: 'Bothering Khushi',
-                question: 'Are you sure you want to bother Khushi again?',
-                yesText: 'Yes, keep bothering',
-                noText: 'No, leave her alone',
+                title: language.t('bothering_khushi'),
+                question: language.t('bother_khushi_question'),
+                yesText: language.t('yes_keep_bothering'),
+                noText: language.t('no_leave_alone'),
                 onYes: () => {
                   console.log('Player chose: Keep bothering Khushi - starting disappearance');
                   // Play goodbye sound and make Khushi disappear
@@ -1280,10 +1304,10 @@ export class Game {
     const yesButton = document.getElementById('choiceYes');
     const noButton = document.getElementById('choiceNo');
 
-    if (titleElement) titleElement.textContent = options.title || 'Make a Choice';
-    if (questionElement) questionElement.textContent = options.question || 'What would you like to do?';
-    if (yesButton) yesButton.textContent = options.yesText || 'Yes';
-    if (noButton) noButton.textContent = options.noText || 'No';
+    if (titleElement) titleElement.textContent = options.title || language.t('make_choice');
+    if (questionElement) questionElement.textContent = options.question || language.t('make_choice');
+    if (yesButton) yesButton.textContent = options.yesText || language.t('yes');
+    if (noButton) noButton.textContent = options.noText || language.t('no');
 
     // Show modal
     this.choiceModal.classList.add('active');
@@ -1440,6 +1464,28 @@ export class Game {
         ctx.restore();
       }
     });
+  }
+
+  /**
+   * Update UI translations when language is toggled
+   */
+  updateUITranslations() {
+    // Update Birthday Mailbox header
+    const mailboxHeaderSpan = document.querySelector('.mail-container .mail-header span:first-child');
+    if (mailboxHeaderSpan) {
+      mailboxHeaderSpan.textContent = language.t('birthday_mailbox');
+    }
+    
+    // Update letter title "30 Things I Love About You"
+    const letterTitle = document.querySelector('.letter-title');
+    if (letterTitle) {
+      letterTitle.textContent = language.t('letter_title_30_things');
+    }
+    
+    // Update any visible talk prompts
+    if (this.talkPrompt && this.talkPrompt.style.display === 'block') {
+      this.talkPrompt.textContent = language.t('press_e_talk');
+    }
   }
 
   destroy() {

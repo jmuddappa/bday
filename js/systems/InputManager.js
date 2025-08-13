@@ -64,13 +64,17 @@ export class InputManager extends EventEmitter {
       case 'D':
         this.emit('danundieStreak');
         break;
+      case 'l':
+      case 'L':
+        this.emit('toggleLanguage');
+        break;
     }
   }
 
   isGameKey(key) {
     const gameKeys = [
       'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
-      'w', 'a', 's', 'd', 'e', 'E', 'F3', ';', 'Escape', 'D'
+      'w', 'a', 's', 'd', 'e', 'E', 'F3', ';', 'Escape', 'D', 'L', 'l'
     ];
     return gameKeys.includes(key);
   }

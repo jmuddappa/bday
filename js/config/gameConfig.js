@@ -70,7 +70,7 @@ export const CONFIG = {
     ME_INTERACTION_DISTANCE: 100, // Same as others instead of 150
     NAT_INTERACTION_DISTANCE: 120, // 20px larger hitbox for earlier animation
     KHOA_INTERACTION_DISTANCE: 130, // 30px larger hitbox for Khoa
-    NOLAN_INTERACTION_DISTANCE: 140, // 40px larger hitbox for Nolan
+    NOLAN_INTERACTION_DISTANCE: 125, // 40px larger hitbox for Nolan
     ROTI: {
       x: 300, y: 400, scale: 0.12,
       width: 450, height: 800,

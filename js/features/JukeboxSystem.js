@@ -5,6 +5,7 @@
 
 import { JUKEBOX_DATA } from '../config/jukeboxData.js';
 import { ErrorHandler } from '../utils/ErrorHandler.js';
+import { language } from '../utils/Language.js';
 
 export class JukeboxSystem {
   constructor(audioManager) {
@@ -125,7 +126,7 @@ export class JukeboxSystem {
     // Restore original mail header
     const mailHeader = this.mailContainer.querySelector('.mail-header span:first-child');
     if (mailHeader) {
-      mailHeader.textContent = '🎂 Birthday Mailbox 🎂';
+      mailHeader.textContent = language.t('birthday_mailbox');
     }
     
     this.mailContainer.style.display = 'none';
