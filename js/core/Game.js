@@ -148,7 +148,7 @@ export class Game {
       'Nat': {
         portrait: 'friend10_portrait',
         messages: [
-          "Happy Birthday!"
+          "Happy Birthday! Did you check the well for the present I got you?"
         ]
       },
       //Khoa (friend8)
@@ -491,6 +491,7 @@ export class Game {
     this.inputManager.on('danundieStreak', () => {
       this.triggerDanundieStreak();
     });
+
 
     // Audio system events
     this.inputManager.on('audioRequested', () => {
@@ -897,7 +898,8 @@ export class Game {
       this.renderer.drawDebugInfo(this.player, this.dogs);
       this.renderer.drawDebugCollisions(CONFIG.COLLISION_BOXES, this.player);
       
-      // Hidden character hitboxes removed for production
+      // Debug hitboxes for hidden character interactions (only in debug mode)
+      this.renderer.drawHiddenCharacterHitboxes(this.dogs);
       
     } catch (error) {
       ErrorHandler.handleError(error, 'Game.render');

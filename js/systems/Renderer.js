@@ -722,6 +722,60 @@ export class Renderer {
   }
 
   /**
+   * Draw debug hitboxes for Nolan investigation
+   * @param {Array} dogs - Array of dog entities
+   */
+  drawHiddenCharacterHitboxes(dogs) {
+    if (!this.debugMode) return;
+
+    try {
+      this.ctx.save();
+      this.ctx.font = '12px monospace';
+      
+      // Find Nolan specifically and draw his hitbox
+      const nolan = dogs.find(dog => dog.name === 'Nolan');
+      if (nolan) {
+        const threshold = CONFIG.DOGS.NOLAN_INTERACTION_DISTANCE || 140;
+        
+        // Calculate hitbox bounds
+        const centerX = nolan.x + nolan.width / 2;
+        const centerY = nolan.y + nolan.height / 2;
+        const hitboxX = centerX - threshold;
+        const hitboxY = centerY - threshold;
+        const hitboxWidth = threshold * 2;
+        const hitboxHeight = threshold * 2;
+        
+        // Draw hitbox - always visible for Nolan
+        this.ctx.strokeStyle = '#FFA500'; // Orange
+        this.ctx.lineWidth = 3;
+        this.ctx.setLineDash([5, 5]);
+        this.ctx.strokeRect(hitboxX, hitboxY, hitboxWidth, hitboxHeight);
+        
+        // Draw center point
+        this.ctx.fillStyle = '#FFA500';
+        this.ctx.fillRect(centerX - 3, centerY - 3, 6, 6);
+        
+        // Draw prompt position indicator
+        const promptX = nolan.x + nolan.width / 2 - 80;
+        const promptY = nolan.y - 50;
+        this.ctx.fillStyle = '#FFFF00'; // Yellow
+        this.ctx.fillRect(promptX - 4, promptY - 4, 8, 8);
+        
+        // Draw text
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.strokeStyle = '#000000';
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeText(`NOLAN INVESTIGATE (${threshold}px)`, promptX + 12, promptY);
+        this.ctx.fillText(`NOLAN INVESTIGATE (${threshold}px)`, promptX + 12, promptY);
+      }
+      
+      this.ctx.restore();
+    } catch (error) {
+      ErrorHandler.handleError(error, 'Renderer.drawHiddenCharacterHitboxes');
+    }
+  }
+
+  /**
    * Get rendering context
    * @returns {CanvasRenderingContext2D}
    */

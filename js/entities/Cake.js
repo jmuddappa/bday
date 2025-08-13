@@ -41,6 +41,10 @@ export class Cake extends GameObject {
     // Investigation prompt
     this.showPrompt = false;
     
+    // Bounce animation when player is near (ready to eat)
+    this.bounceOffset = 0;
+    this.isPlayerNearForEating = false;
+    
     // Fade out system (when eaten)
     this.isFading = false;
     this.fadeOpacity = 1.0;
@@ -80,6 +84,21 @@ export class Cake extends GameObject {
     const threshold = CONFIG.CAKE.INTERACTION_DISTANCE;
     
     this.isPlayerNear = distance < threshold;
+    
+    // Update bounce animation state
+    if (this.hasBeenRevealed && !this.isArcing && !this.isFading && !this.isEaten) {
+      this.isPlayerNearForEating = this.isPlayerNear;
+    } else {
+      this.isPlayerNearForEating = false;
+    }
+    
+    // Update bounce animation
+    if (this.isPlayerNearForEating) {
+      // Small bounce animation - 3px up and down
+      this.bounceOffset = Math.sin(Date.now() * 0.008) * 3; // Gentle bounce
+    } else {
+      this.bounceOffset = 0; // No bounce when player is away
+    }
     
     // Show different prompts based on cake state
     if (this.isHidden && !this.hasBeenRevealed) {
@@ -157,12 +176,12 @@ export class Cake extends GameObject {
       sourceWidth: this.sprite.naturalWidth,
       sourceHeight: this.sprite.naturalHeight,
       destX: this.x,
-      destY: this.y,
+      destY: this.y + this.bounceOffset, // Add bounce offset to Y position
       destWidth: this.width,
       destHeight: this.height,
       rotation: this.rotation,
       centerX: this.x + this.width / 2,
-      centerY: this.y + this.height / 2,
+      centerY: this.y + this.height / 2 + this.bounceOffset, // Also apply to center for rotation
       opacity: this.fadeOpacity
     };
   }

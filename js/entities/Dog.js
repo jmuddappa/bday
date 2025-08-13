@@ -124,6 +124,8 @@ export class Dog extends GameObject {
       CONFIG.DOGS.NAT_INTERACTION_DISTANCE :
       this.name === 'Khoa' ?
       CONFIG.DOGS.KHOA_INTERACTION_DISTANCE :
+      this.name === 'Nolan' ?
+      CONFIG.DOGS.NOLAN_INTERACTION_DISTANCE :
       CONFIG.DOGS.INTERACTION_DISTANCE;
 
     // Update interaction state for bob animation
@@ -622,6 +624,8 @@ export class Dog extends GameObject {
       CONFIG.DOGS.NAT_INTERACTION_DISTANCE :
       this.name === 'Khoa' ?
       CONFIG.DOGS.KHOA_INTERACTION_DISTANCE :
+      this.name === 'Nolan' ?
+      CONFIG.DOGS.NOLAN_INTERACTION_DISTANCE :
       CONFIG.DOGS.INTERACTION_DISTANCE;
     
     return distance < threshold;
@@ -657,7 +661,9 @@ export class Dog extends GameObject {
     }
     
     const distance = this.distanceTo(player);
-    const threshold = CONFIG.DOGS.INTERACTION_DISTANCE;
+    const threshold = this.name === 'Nolan' ?
+      CONFIG.DOGS.NOLAN_INTERACTION_DISTANCE :
+      CONFIG.DOGS.INTERACTION_DISTANCE;
     
     return distance < threshold;
   }
