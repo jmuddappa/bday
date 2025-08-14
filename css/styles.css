@@ -191,7 +191,7 @@ canvas {
   border: 2px solid #4a7c59;
   border-radius: 10px;
   display: none;
-  z-index: 10;
+  z-index: 850;
   animation: gentlePulse 2.5s infinite ease-in-out;
   pointer-events: none;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
@@ -211,7 +211,7 @@ canvas {
   border: 2px solid #4a7c59;
   border-radius: 10px;
   display: none;
-  z-index: 15;
+  z-index: 850;
   animation: gentlePulse 2.5s infinite ease-in-out;
   pointer-events: none;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
@@ -2027,7 +2027,37 @@ audio {
   
   /* Adjust dialog position to avoid overlap with mobile controls */
   .dialog-container {
-    bottom: max(20px, min(calc(22vh + 120px), 50vh)) !important;
+    bottom: 160px !important; /* Fixed position to avoid E button overlap */
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  /* Make dialog tappable on mobile */
+  .dialog-box {
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .dialog-box:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+  
+  /* Add visual hint that dialog is interactive */
+  .dialog-box::after {
+    content: "👆 Tap to continue";
+    position: absolute;
+    bottom: -25px;
+    right: 10px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    opacity: 0;
+    animation: fadeInOut 2s ease-in-out infinite;
+  }
+  
+  @keyframes fadeInOut {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 0.6; }
   }
   
   /* Improve close button touch targets for mobile */
@@ -2056,7 +2086,9 @@ audio {
 /* Handle landscape orientation on mobile devices */
 @media (hover: none) and (pointer: coarse) and (orientation: landscape) {
   .dialog-container {
-    bottom: max(15px, min(calc(25vh + 100px), 40vh)) !important;
+    bottom: 140px !important; /* Fixed position for smaller screens */
+    left: 50%;
+    transform: translateX(-50%);
   }
 }
 
@@ -2585,10 +2617,11 @@ audio {
 @media (max-width: 768px) {
   .jukebox-container {
     width: fit-content;
-    min-width: min(630px, calc(100vw - 16px));
-    max-width: calc(100vw - 16px);
-    bottom: 20px;
-    max-height: calc(100vh - 60px);
+    min-width: min(320px, calc(100vw - 20px));
+    max-width: calc(100vw - 20px);
+    bottom: 10px;
+    max-height: calc(100vh - 80px);
+    font-size: 14px;
   }
   
   .jukebox-header {
@@ -2621,6 +2654,47 @@ audio {
   
   .jukebox-arrow {
     font-size: 24px;
+  }
+  
+  .jukebox-song-title {
+    font-size: 18px;
+  }
+  
+  .jukebox-artist {
+    font-size: 14px;
+  }
+}
+
+/* Extra small mobile screens */
+@media (max-width: 480px) {
+  .jukebox-container {
+    min-width: calc(100vw - 16px);
+    max-width: calc(100vw - 16px);
+    bottom: 5px;
+    max-height: calc(100vh - 60px);
+  }
+  
+  .jukebox-header {
+    font-size: 24px;
+    padding: 12px 16px;
+  }
+  
+  .jukebox-item {
+    padding: 12px 16px;
+  }
+  
+  .jukebox-icon {
+    font-size: 24px;
+    margin-right: 12px;
+    min-width: 30px;
+  }
+  
+  .jukebox-song-title {
+    font-size: 16px;
+  }
+  
+  .jukebox-artist {
+    font-size: 12px;
   }
 }
 

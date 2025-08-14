@@ -547,6 +547,36 @@ export class Game {
       }
     });
 
+    // Add dialog touch/click interaction for mobile
+    if (this.dialogContainer) {
+      // Touch/click on dialog box to continue
+      const dialogBox = this.dialogContainer.querySelector('.dialog-box');
+      if (dialogBox) {
+        dialogBox.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          // Only continue if dialog is visible and not a choice dialog
+          if (this.dialogContainer.classList.contains('visible')) {
+            const hasChoices = dialogBox.classList.contains('has-choices');
+            if (!hasChoices) {
+              // Simulate E key press to continue dialog
+              this.inputManager.emit('interact');
+              console.log('📱 Dialog tap - continuing conversation');
+            }
+          }
+        });
+      }
+      
+      // Touch/click outside dialog (on backdrop) to close
+      this.dialogBackdrop.addEventListener('click', (e) => {
+        if (e.target === this.dialogBackdrop) {
+          this.closeDialog();
+          console.log('📱 Dialog backdrop tap - closing dialog');
+        }
+      });
+    }
+
     // Window events
     window.addEventListener('beforeunload', () => this.destroy());
     
