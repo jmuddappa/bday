@@ -45,18 +45,21 @@
     <div id="mailList"></div>
   </div>
 
-  <!-- Video Modal -->
+  <!-- Enhanced Video Modal -->
   <div class="video-modal" id="videoModal">
     <div class="video-container">
       <div class="video-header">
-        <span id="videoTitle">Message from Friend</span>
+        <div class="video-sender-name" id="videoSenderName">Message from Friend</div>
+        <div class="video-progress" id="videoProgress">1 of 28</div>
         <span class="close-btn">✕</span>
       </div>
       <div class="video-content">
         <div class="video-nav-arrow video-nav-left" id="videoNavLeft">
           <span>◀</span>
         </div>
-        <video id="videoPlayer" controls></video>
+        <div class="video-wrapper" id="videoWrapper">
+          <video id="videoPlayer" controls></video>
+        </div>
         <div class="video-nav-arrow video-nav-right" id="videoNavRight">
           <span>▶</span>
         </div>
@@ -99,45 +102,56 @@
   <div class="letter-modal" id="letterModal">
     <div class="letter-container">
       <div class="letter-header">
-        <span>💌 A Letter from Danoonie 💌</span>
+        <span>30 Things I Love About You</span>
         <span class="close-btn">✕</span>
       </div>
       <div class="letter-content">
-        <div class="letter-title">30 Things I Love About You</div>
-        <div class="letter-list" id="letterList">
-          <div class="letter-item">1. You are the funniest person I know. You make me laugh every single day.</div>
-          <div class="letter-item">2. The way you always remember the little details about people.</div>
-          <div class="letter-item">3. Your incredible kindness to everyone you meet</div>
-          <div class="letter-item">4. Your ability to just cook any cuisine and your efficiency at doing so</div>
-          <div class="letter-item">5. Your talent for making people feel heard and valued</div>
-          <div class="letter-item">6. The creativity you bring to everything you do</div>
-          <div class="letter-item">7. Your ability to find joy in simple moments is something I can learn from every day</div>
-          <div class="letter-item">8. How you never give up on the people you love</div>
-          <div class="letter-item">9. The way you can charm the pants off of almost anyone</div>
-          <div class="letter-item">10. The way your face lights up when you're excited about something</div>
-          <div class="letter-item">11. Your endless genorisity</div>
-          <div class="letter-item">12. How you make ordinary days feel special and bad days feel tolerable</div>
-          <div class="letter-item">13. Your thoughtfulness, you truly get the most joy from caring for people</div>
-          <div class="letter-item">14. Your endless capacity for patience</div>
-          <div class="letter-item">15. Your taste in food, clothing, film, everything really</div>
-          <div class="letter-item">16. How you create warm, welcoming spaces wherever you go. You make people feel like they belong.</div>
-          <div class="letter-item">17. Your dedication to the things that matter to you</div>
-          <div class="letter-item">18. You are a fantastic, loving dog mom</div>
-          <div class="letter-item">19. Your adventurous spirit and openness to new experiences</div>
-          <div class="letter-item">20. Your seemingly undless amounts of energy energizes me on a daily basis</div>
-          <div class="letter-item">21. Your wisdom & partnership is integral to all our success</div>
-          <div class="letter-item">22. Your ability to make a house, a home</div>
-          <div class="letter-item">23. Your ability to turn roll your sleeves up and get the dirty work done</div>
-          <div class="letter-item">24. How you inspire others to be their best selves</div>
-          <div class="letter-item">25. Your genuine curiosity about the world and people</div>
-          <div class="letter-item">26. Your timeless style, I love the way you dress.</div>
-          <div class="letter-item">27. Your fierce determination to standing up for what's right</div>
-          <div class="letter-item">28. Your caring nature and incredible teaching ability</div>
-          <div class="letter-item">29. Oh did I forget to mention - you are really cute, like truly adorable</div>
-          <div class="letter-item">30. The love and joy you bring to this family</div>
+        <div class="letter-greeting">My Dearest Lindo,</div>
+        
+        <div class="letter-intro">
+          Here are thirty of the countless things that make my heart skip a beat...
         </div>
-        <div class="letter-signature">
-          <p>With all my love,<br/>Always your Danoonie 💕</p>
+
+        <div class="letter-body">
+          <ol class="letter-list">
+            <li>You are the funniest person I know. You make me laugh every single day.</li>
+            <li>The way you always remember the little details about people amazes me.</li>
+            <li>Your incredible kindness to everyone you meet lights up every room.</li>
+            <li>Your ability to just cook any cuisine and your efficiency at doing so.</li>
+            <li>Your talent for making people feel heard and valued is truly a gift.</li>
+            <li>The creativity you bring to everything you do inspires me daily.</li>
+            <li>Your ability to find joy in simple moments is something I learn from every day.</li>
+            <li>How you never give up on the people you love shows the depth of your heart.</li>
+            <li>The way you can charm the pants off of almost anyone.</li>
+            <li>The way your face lights up when you're excited about something.</li>
+            <li>Your endless generosity knows no bounds.</li>
+            <li>How you make ordinary days feel special and bad days feel tolerable</li>
+            <li>Your thoughtfulness - you truly get the most joy from caring for people. One day, I'll understand it too.</li>
+            <li>Your endless capacity for patience, especially with me.</li>
+            <li>Your taste in food, clothing, film, everything really - impeccable.</li>
+            <li>How you create warm, welcoming spaces wherever you go. You make people feel like they belong.</li>
+            <li>Your dedication to the things that matter to you - even if sometimes they are silly</li>
+            <li>You are a fantastic, loving dog mom. I can't believe you birthed Khushi just 5 years ago.</li>
+            <li>Your adventurous spirit and openness to new experiences keeps life exciting.</li>
+            <li>Your seemingly endless amounts of energy energizes me on a daily basis.</li>
+            <li>Your wisdom & partnership is integral to all our success.</li>
+            <li>Your ability to make a house, a home. Our home.</li>
+            <li>Your ability to roll your sleeves up and get the dirty work done when needed.</li>
+            <li>How you inspire others to be their best selves without even trying.</li>
+            <li>Your genuine curiosity about the world and people around you.</li>
+            <li>Your immaculate, timeless style</li>
+            <li>Your fierce determination in standing up for what's right.</li>
+            <li>Your caring nature and incredible teaching ability touch so many lives.</li>
+            <li>Oh, did I forget to mention? You are really cute, like truly adorable.</li>
+            <li>The love and joy you bring to our family</li>
+          </ol>
+        </div>
+
+        <div class="letter-closing">
+          <div class="letter-signature">
+            <p>Love,</p>
+            <div class="signature-name">Always your Danoonie</div>
+          </div>
         </div>
       </div>
     </div>
@@ -193,6 +207,18 @@
       <button class="interact-btn" id="interactBtn">E</button>
     </div>
   </div>
+
+  <!-- Dialog Backdrop -->
+  <div class="dialog-backdrop" id="dialogBackdrop"></div>
+  
+  <!-- Mail Backdrop -->
+  <div class="mail-backdrop" id="mailBackdrop"></div>
+  
+  <!-- Jukebox Backdrop -->
+  <div class="jukebox-backdrop" id="jukeboxBackdrop"></div>
+  
+  <!-- Video Backdrop -->
+  <div class="video-backdrop" id="videoBackdrop"></div>
 
   <!-- Main Entry Point -->
   <script type="module" src="js/main.js"></script>

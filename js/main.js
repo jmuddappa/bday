@@ -14,11 +14,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const game = new Game();
     await game.initialize();
     
-    // Expose game to global scope for debugging
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      window.game = game;
-      console.log('🔧 Game instance available as window.game');
-    }
+    // Expose game to global scope
+    window.game = game;
+    console.log('🔧 Game instance available as window.game');
     
     console.log('✅ Game initialized successfully!');
     

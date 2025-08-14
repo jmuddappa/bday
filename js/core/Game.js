@@ -50,6 +50,7 @@ export class Game {
     this.speechBubble = document.getElementById('speechBubble');
     this.speechBubbleDaninja = document.getElementById('speechBubbleDaninja');
     this.dialogContainer = document.getElementById('dialogContainer');
+    this.dialogBackdrop = document.getElementById('dialogBackdrop');
     this.choiceModal = document.getElementById('choiceModal');
     this.audioStatus = document.getElementById('audioStatus');
     
@@ -1473,17 +1474,31 @@ export class Game {
     try {
       const videoModal = document.getElementById('videoModal');
       const videoPlayer = document.getElementById('videoPlayer');
-      const videoTitle = document.getElementById('videoTitle');
+      const videoSenderName = document.getElementById('videoSenderName');
+      const videoProgress = document.getElementById('videoProgress');
 
-      if (!videoModal || !videoPlayer || !videoTitle) {
+      if (!videoModal || !videoPlayer || !videoSenderName || !videoProgress) {
         console.error('Video elements not found');
         return;
       }
 
       // Set video properties
-      videoTitle.textContent = title;
+      videoSenderName.textContent = title;
+      videoProgress.textContent = ''; // No progress for direct videos
       videoPlayer.style.transform = ''; // No rotation for direct videos
       videoPlayer.src = videoSrc;
+
+      // Hide navigation arrows for direct videos
+      const leftArrow = document.getElementById('videoNavLeft');
+      const rightArrow = document.getElementById('videoNavRight');
+      if (leftArrow) {
+        leftArrow.classList.add('hidden');
+        leftArrow.style.display = '';  // Clear inline style
+      }
+      if (rightArrow) {
+        rightArrow.classList.add('hidden');
+        rightArrow.style.display = '';  // Clear inline style
+      }
 
       // Show modal and manage audio
       videoModal.style.display = 'flex';
@@ -1644,6 +1659,13 @@ export class Game {
    */
   showDialogSmooth() {
     if (this.dialogContainer) {
+      // Show backdrop first
+      if (this.dialogBackdrop) {
+        this.dialogBackdrop.style.display = 'block';
+        this.dialogBackdrop.offsetHeight; // Force repaint
+        this.dialogBackdrop.classList.add('visible');
+      }
+      
       this.dialogContainer.style.display = 'block';
       // Force a repaint before adding the class
       this.dialogContainer.offsetHeight;
@@ -1656,6 +1678,11 @@ export class Game {
    */
   hideDialogSmooth() {
     if (this.dialogContainer) {
+      // Hide backdrop
+      if (this.dialogBackdrop) {
+        this.dialogBackdrop.classList.remove('visible');
+      }
+      
       this.dialogContainer.classList.remove('visible');
       this.dialogContainer.classList.add('hiding');
       // Wait for animation to complete before hiding
@@ -1663,6 +1690,11 @@ export class Game {
         if (this.dialogContainer.classList.contains('hiding')) {
           this.dialogContainer.style.display = 'none';
           this.dialogContainer.classList.remove('hiding');
+          
+          // Hide backdrop completely after dialog is hidden
+          if (this.dialogBackdrop) {
+            this.dialogBackdrop.style.display = 'none';
+          }
         }
       }, 300); // Match CSS animation duration
     }

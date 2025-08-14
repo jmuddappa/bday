@@ -58,8 +58,8 @@ export const CONFIG = {
     X: 900,
     Y: 700,
     INTERACTION_DISTANCE: 120,
-    PROMPT_OFFSET_X: 200,
-    PROMPT_OFFSET_Y: 50,
+    PROMPT_OFFSET_X: 650,
+    PROMPT_OFFSET_Y: 20,
     ROTATION_SPEED: 0.02,
     SCALE: 0.07
   },
@@ -67,9 +67,9 @@ export const CONFIG = {
   // Dog behavior settings
   DOGS: {
     INTERACTION_DISTANCE: 100,
-    ME_INTERACTION_DISTANCE: 100, // Same as others instead of 150
+    ME_INTERACTION_DISTANCE: 130, // Same as others instead of 150
     NAT_INTERACTION_DISTANCE: 120, // 20px larger hitbox for earlier animation
-    KHOA_INTERACTION_DISTANCE: 130, // 30px larger hitbox for Khoa
+    KHOA_INTERACTION_DISTANCE: 130, // 30px larger hitbox for Khoas
     NOLAN_INTERACTION_DISTANCE: 125, // 40px larger hitbox for Nolan
     ROTI: {
       x: 300, y: 400, scale: 0.12,
@@ -100,7 +100,7 @@ export const CONFIG = {
     },
     //raza
     FRIEND2: {
-      x: 900, y: 150, scale: 1.5,
+      x: 880, y: 150, scale: 1.5,
       width: 80, height: 120,
       sitFrame: { sx: 0, sy: 0 },
       jumpFrame: { sx: 0, sy: 0 }, // Same as sit - no animation
