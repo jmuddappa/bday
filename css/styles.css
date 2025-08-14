@@ -490,22 +490,27 @@ canvas {
   border-top: 10px solid #4a90e2;
 }
 
-/* Modern Mail Container - Clean & Polished */
+/* Rich Mail Container - Matching jukebox depth */
 .mail-container {
   display: none;
-  background: linear-gradient(135deg, #faf8f4 0%, #f5f1eb 100%);
-  border: 1px solid rgba(139, 115, 85, 0.2);
-  border-radius: 16px;
+  /* Rich layered background like jukebox */
+  background: 
+    linear-gradient(45deg, rgba(139, 115, 85, 0.1) 0%, transparent 25%, rgba(74, 63, 53, 0.1) 50%, transparent 75%, rgba(139, 115, 85, 0.05) 100%),
+    linear-gradient(135deg, #f9f3e7 0%, #f4e4c1 25%, #f0deb5 75%, #f2e6c8 100%);
+  border-radius: 24px;
   padding: 0;
   max-width: min(95vw, 975px);
   width: fit-content;
   min-width: min(600px, 90vw);
   max-height: 80vh;
   overflow: hidden;
+  /* Enhanced shadows for premium depth like jukebox */
   box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.12),
-    0 8px 25px rgba(139, 115, 85, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    0 25px 60px rgba(0, 0, 0, 0.3),
+    0 12px 25px rgba(74, 63, 53, 0.2),
+    inset 0 6px 12px rgba(255, 255, 255, 0.4),
+    inset 0 -6px 12px rgba(139, 115, 85, 0.2),
+    inset 0 2px 4px rgba(255, 255, 255, 0.6);
   position: fixed;
   top: 50%;
   left: 50%;
@@ -515,6 +520,7 @@ canvas {
   backdrop-filter: blur(1px);
   animation: mailboxFadeIn 0.4s ease-out;
 }
+
 
 @keyframes mailboxFadeIn {
   from { 
@@ -528,7 +534,10 @@ canvas {
 }
 
 .mail-header {
-  background: linear-gradient(135deg, #8b7355 0%, #a68968 100%);
+  /* Rich layered background like jukebox header */
+  background: 
+    linear-gradient(45deg, rgba(139, 115, 85, 0.1) 0%, transparent 25%, rgba(166, 137, 104, 0.1) 50%, transparent 75%, rgba(139, 115, 85, 0.05) 100%),
+    linear-gradient(135deg, #6d5a47 0%, #8b7355 25%, #a68968 75%, #8b7355 100%);
   color: #faf8f4;
   padding: 24px 28px;
   text-align: center;
@@ -537,9 +546,14 @@ canvas {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-radius: 16px 16px 0 0;
-  box-shadow: 0 2px 8px rgba(139, 115, 85, 0.15);
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+  border-radius: 24px 24px 0 0;
+  /* Enhanced shadows for premium depth */
+  box-shadow: 
+    0 6px 16px rgba(0, 0, 0, 0.3),
+    inset 0 4px 8px rgba(255, 255, 255, 0.2),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .close-btn {
