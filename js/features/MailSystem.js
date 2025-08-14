@@ -200,6 +200,13 @@ export class MailSystem {
           this.mailList.appendChild(mailItem);
         }
       });
+      
+      // Add spacer element at the end to ensure last items are fully visible
+      const spacerElement = document.createElement('div');
+      spacerElement.className = 'mail-list-spacer';
+      spacerElement.style.height = '200px'; // Increased height to ensure #30 is visible
+      spacerElement.style.flexShrink = '0';
+      this.mailList.appendChild(spacerElement);
     } catch (error) {
       ErrorHandler.handleError(error, 'MailSystem.initializeMailList');
     }

@@ -312,7 +312,7 @@ canvas {
   max-width: min(95vw, 975px);
   width: fit-content;
   min-width: min(600px, 90vw);
-  max-height: 60vh;
+  max-height: 80vh;
   overflow: hidden;
   box-shadow: 
     0 20px 60px rgba(0, 0, 0, 0.12),
@@ -403,6 +403,13 @@ canvas {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+/* Mail list spacer element styling */
+.mail-list-spacer {
+  height: 200px; /* Increased to ensure last item is fully visible */
+  flex-shrink: 0;
+  pointer-events: none;
 }
 
 /* Custom Scrollbar */
@@ -807,6 +814,11 @@ audio {
     gap: 10px;
   }
   
+  /* Smaller spacer for medium screens */
+  .mail-list-spacer {
+    height: 120px;
+  }
+  
   .mail-item {
     padding: 16px 18px;
     gap: 14px;
@@ -923,6 +935,11 @@ audio {
     gap: 8px;
   }
   
+  /* Even smaller spacer for small screens */
+  .mail-list-spacer {
+    height: 100px;
+  }
+  
   .mail-item {
     padding: 14px 16px;
     gap: 12px;
@@ -1021,6 +1038,11 @@ audio {
   #mailList {
     padding: 12px 16px 16px 16px;
     gap: 6px;
+  }
+  
+  /* Smallest spacer for extra small screens */
+  .mail-list-spacer {
+    height: 80px;
   }
   
   .mail-item {
@@ -2671,7 +2693,7 @@ audio {
     min-width: calc(100vw - 16px);
     max-width: calc(100vw - 16px);
     bottom: 5px;
-    max-height: calc(100vh - 60px);
+    max-height: calc(100vh - 80px);
   }
   
   .jukebox-header {
@@ -2695,6 +2717,12 @@ audio {
   
   .jukebox-artist {
     font-size: 12px;
+  }
+  
+  /* Make jukebox list scrollable on very small screens */
+  #jukeboxList {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
   }
 }
 

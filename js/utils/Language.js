@@ -38,8 +38,8 @@ export class Language {
         vi: 'Ấn E để nói chuyện'
       },
       'birthday_mailbox': {
-        en: '🎂 Birthday Mailbox 🎂',
-        vi: '🎂 Thư sinh nhật 🎂'
+        en: '🎉 30 Wishes for Your 30th 🎉',
+        vi: '🎉 30 điều ước cho tuổi 30 🎉'
       },
       'letter_title_30_things': {
         en: '30 Things I Love About You',
@@ -190,8 +190,8 @@ export class Language {
         vi: "Chúc mừng sinh nhật! Đã kiểm tra giếng tìm món quà anh mua cho em chưa?"
       },
       'dialog_nat_2': {
-        en: "I can't believe you ate that entire cake without sharing it with me!",
-        vi: "Không tin nổi em ăn hết cái bánh mà không chia cho anh!"
+        en: "I can't believe you ate that entire cake that I got for you!",
+        vi: "Không tin nổi em ăn hết cái bánh mà anh mua cho em!"
       },
       'dialog_khoa_1': {
         en: "Hey sister! I've been working real hard on the right words to say to you and this is what I have so far: 'live, laugh, love!'",
