@@ -12,6 +12,11 @@ export class DanundieStreak {
     this.lastStreakTime = 0;
     this.cooldownDuration = 90000; // 1m30 seconds in milliseconds
     
+    // Initial spawn delay - 30 seconds at game start
+    this.initialSpawnDelay = 30000; // 30 seconds in milliseconds  
+    this.gameStartTime = Date.now();
+    this.hasInitiallySpawned = false;
+    
     // Position and movement
     this.x = -100; // Start off-screen left
     this.y = 400; // Middle of screen
@@ -74,6 +79,20 @@ export class DanundieStreak {
    */
   startStreak(startY = 400) {
     if (this.isActive) return; // Don't start if already streaking
+    
+    // Check initial spawn delay (30s at game start)
+    if (!this.hasInitiallySpawned) {
+      const currentTime = Date.now();
+      if (currentTime - this.gameStartTime < this.initialSpawnDelay) {
+        const remainingDelay = Math.ceil((this.initialSpawnDelay - (currentTime - this.gameStartTime)) / 1000);
+        console.log(`🏃‍♂️ Danundie is getting ready! Initial spawn delay: ${remainingDelay}s remaining`);
+        return;
+      } else {
+        this.hasInitiallySpawned = true;
+        console.log('🏃‍♂️ Danundie initial spawn delay complete - ready to streak!');
+      }
+    }
+    
     if (this.isOnCooldown()) {
       console.log(`🏃‍♂️ Danundie is resting! Cooldown: ${this.getCooldownRemaining()}s remaining`);
       return;

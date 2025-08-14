@@ -1081,6 +1081,16 @@ export class Game {
       return;
     }
     
+    // Check initial spawn delay (30s at game start) - same logic as DanundieStreak
+    if (!this.danundieStreak.hasInitiallySpawned) {
+      const currentTime = Date.now();
+      if (currentTime - this.danundieStreak.gameStartTime < this.danundieStreak.initialSpawnDelay) {
+        const remainingDelay = Math.ceil((this.danundieStreak.initialSpawnDelay - (currentTime - this.danundieStreak.gameStartTime)) / 1000);
+        console.log(`🏃‍♂️ Danundie is getting ready! Initial spawn delay: ${remainingDelay}s remaining`);
+        return;
+      }
+    }
+    
     if (this.danundieStreak.isOnCooldown()) {
       console.log(`🏃‍♂️ Danundie is resting! ${this.danundieStreak.getCooldownRemaining()}s remaining`);
       return;
