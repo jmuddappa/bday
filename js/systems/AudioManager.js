@@ -10,10 +10,10 @@ export class AudioManager {
   constructor() {
     this.audioElements = new Map();
     this.musicStarted = false;
-    this.audioStatus = document.getElementById('audioStatus');
     this.lastPlayedTimes = new Map(); // Track when each audio was last played
     this.originalBgVolume = CONFIG.AUDIO.DEFAULT_VOLUME; // Store original bg volume
     this.activeAudioElements = new Set(); // Track currently playing audio
+    this.isMobile = this.detectMobile();
     
     this.setupAudioElements();
     this.setupMusicTrigger();
@@ -53,21 +53,27 @@ export class AudioManager {
     }
   }
 
+  detectMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+           ('ontouchstart' in window && navigator.maxTouchPoints > 0);
+  }
+
   setupMusicTrigger() {
     // Start music on first user interaction
     const startMusic = () => {
       this.tryStartAudio();
     };
 
-    // Multiple trigger points for better UX
+    // Multiple trigger points for better UX, especially for mobile
     window.addEventListener('keydown', startMusic, { once: true });
     window.addEventListener('click', startMusic, { once: true });
     window.addEventListener('touchstart', startMusic, { once: true });
+    window.addEventListener('touchend', startMusic, { once: true });
     
-    // Add click handler for audio status indicator
-    if (this.audioStatus) {
-      this.audioStatus.addEventListener('click', () => this.tryStartAudio());
-      this.audioStatus.style.cursor = 'pointer';
+    // Additional mobile-specific triggers
+    if (this.isMobile) {
+      window.addEventListener('touchmove', startMusic, { once: true });
+      window.addEventListener('gesturestart', startMusic, { once: true });
     }
   }
 
@@ -84,11 +90,20 @@ export class AudioManager {
         .then(() => {
           console.log('🎵 Background music started');
           this.musicStarted = true;
-          this.updateStatus();
         })
         .catch(e => {
-          console.log('🔇 Music play failed:', e);
-          this.updateStatus();
+          console.log('🔇 Music play failed, retrying...', e);
+          // For mobile, try again after a short delay
+          if (this.isMobile) {
+            setTimeout(() => {
+              bgMusic.play().then(() => {
+                console.log('🎵 Background music started on retry');
+                this.musicStarted = true;
+              }).catch(retryError => {
+                console.log('🔇 Music retry failed:', retryError);
+              });
+            }, 500);
+          }
         });
     };
 
@@ -99,17 +114,6 @@ export class AudioManager {
     }
   }
 
-  updateStatus() {
-    if (!this.audioStatus) return;
-    
-    if (this.musicStarted) {
-      this.audioStatus.textContent = 'Audio: ON 🔊';
-      this.audioStatus.style.background = 'rgba(0,100,0,0.7)';
-    } else {
-      this.audioStatus.textContent = 'Audio: Click to enable 🔇';
-      this.audioStatus.style.background = 'rgba(100,0,0,0.7)';
-    }
-  }
 
   /**
    * Play audio with options
@@ -148,8 +152,17 @@ export class AudioManager {
         audio.currentTime = 0;
       }
 
-      if (options.volume !== undefined) {
-        audio.volume = Math.max(0, Math.min(1, options.volume));
+      // Apply custom volume adjustments for specific audio keys
+      let targetVolume = options.volume;
+      if (audioKey === 'boSound') {
+        // Reduce Bo's sound by 30% (multiply by 0.7)
+        const baseVolume = targetVolume !== undefined ? targetVolume : audio.volume || 1.0;
+        targetVolume = baseVolume * 0.7;
+        console.log(`🔊 Reducing Bo's audio volume by 30%: ${baseVolume.toFixed(2)} → ${targetVolume.toFixed(2)}`);
+      }
+      
+      if (targetVolume !== undefined) {
+        audio.volume = Math.max(0, Math.min(1, targetVolume));
       }
 
       // Duck background music when other audio plays (except bg music itself and system sounds)

@@ -24,6 +24,41 @@ canvas {
   max-height: 100vh;
 }
 
+/* Language Toggle Button */
+.language-toggle {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1000;
+}
+
+.lang-btn {
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  border: 2px solid #4CAF50;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 48px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lang-btn:hover {
+  background: rgba(76, 175, 80, 0.2);
+  border-color: #66BB6A;
+  transform: scale(1.05);
+}
+
+.lang-btn:active {
+  transform: scale(0.95);
+}
+
 /* Animations */
 @keyframes mailboxPulse {
   0%, 100% { 
@@ -757,6 +792,16 @@ audio {
     border-radius: 12px 12px 0 0;
   }
   
+  .mail-header .close-btn {
+    font-size: 24px;
+    min-width: 48px;
+    min-height: 48px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
   #mailList {
     padding: 16px 20px 20px 20px;
     gap: 10px;
@@ -1153,11 +1198,11 @@ audio {
 }
 
 .dialog-portrait {
-  width: 128px;
-  height: 128px;
-  border: 6px solid #4a3f35;
-  border-radius: 16px;
-  margin-left: 40px;
+  width: 120px;
+  height: 120px;
+  border: 4px solid #4a3f35;
+  border-radius: 12px;
+  margin-left: 24px;
   flex-shrink: 0;
   background-size: cover;
   background-position: center;
@@ -1165,38 +1210,26 @@ audio {
   order: 2;
   /* Enhanced frame with inner shadow and depth */
   box-shadow: 
-    0 8px 16px rgba(0, 0, 0, 0.3),
-    inset 0 4px 8px rgba(0, 0, 0, 0.2),
-    inset 0 -2px 4px rgba(255, 255, 255, 0.1),
-    0 0 0 2px rgba(139, 105, 20, 0.3);
+    0 6px 12px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.1),
+    0 0 0 1px rgba(139, 105, 20, 0.3);
   position: relative;
 }
 
 .dialog-portrait::after {
   content: '';
   position: absolute;
-  top: -3px;
-  left: -3px;
-  right: -3px;
-  bottom: -3px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 18px;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
   pointer-events: none;
 }
 
-/* Adaptive sizing for different portrait aspect ratios */
-.dialog-portrait.friend1_portrait,
-.dialog-portrait.friend2_portrait {
-  width: 160px;
-  height: 120px; /* Wider aspect ratio for rectangular portraits */
-}
-
-/* If some portraits are taller */
-.dialog-portrait.friend1_portrait.tall,
-.dialog-portrait.friend2_portrait.tall {
-  width: 120px;
-  height: 160px;
-}
+/* Standardized portrait sizing - all portraits same size */
 
 .dialog-portrait.khushi {
   background-image: url('../assets/images/khushi_portrait.png');
@@ -1529,7 +1562,7 @@ audio {
 @media (max-width: 768px) {
   .dialog-container {
     width: 95%;
-    bottom: 15px;
+    bottom: max(15px, calc(22vh + 100px));
   }
   
   .dialog-box {
@@ -1537,9 +1570,11 @@ audio {
   }
   
   .dialog-portrait {
-    width: 48px;
-    height: 48px;
-    margin-left: 12px;
+    width: 60px;
+    height: 60px;
+    margin-left: 16px;
+    border: 3px solid #4a3f35;
+    border-radius: 8px;
   }
   
   .dialog-header-row {
@@ -1598,9 +1633,11 @@ audio {
   }
   
   .dialog-portrait {
-    width: 40px;
-    height: 40px;
-    margin-left: 10px;
+    width: 50px;
+    height: 50px;
+    margin-left: 12px;
+    border: 2px solid #4a3f35;
+    border-radius: 6px;
   }
   
   .dialog-name {
@@ -1863,6 +1900,12 @@ audio {
   
   .letter-header .close-btn {
     font-size: 24px;
+    min-width: 48px;
+    min-height: 48px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   .letter-content {
@@ -1980,6 +2023,40 @@ audio {
 @media (hover: none) and (pointer: coarse) {
   .mobile-controls {
     display: block;
+  }
+  
+  /* Adjust dialog position to avoid overlap with mobile controls */
+  .dialog-container {
+    bottom: max(20px, min(calc(22vh + 120px), 50vh)) !important;
+  }
+  
+  /* Improve close button touch targets for mobile */
+  .close-btn {
+    min-width: 48px !important;
+    min-height: 48px !important;
+    padding: 12px !important;
+    font-size: 24px !important;
+    border-radius: 8px !important;
+  }
+  
+  .jukebox-header .close-btn,
+  .mail-header .close-btn {
+    min-width: 48px !important;
+    min-height: 48px !important;
+    padding: 12px !important;
+    font-size: 24px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 8px !important;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1) !important;
+  }
+}
+
+/* Handle landscape orientation on mobile devices */
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) {
+  .dialog-container {
+    bottom: max(15px, min(calc(25vh + 100px), 40vh)) !important;
   }
 }
 
@@ -2520,7 +2597,13 @@ audio {
   }
   
   .jukebox-header .close-btn {
-    font-size: 32px;
+    font-size: 28px;
+    min-width: 48px;
+    min-height: 48px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   .jukebox-item {

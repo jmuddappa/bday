@@ -4,7 +4,8 @@
 
 export class Language {
   constructor() {
-    this.currentLanguage = 'en'; // Default to English
+    // Default to Vietnamese for mobile, English for PC
+    this.currentLanguage = this.detectMobile() ? 'vi' : 'en';
     
     this.translations = {
       // UI Prompts
@@ -197,6 +198,14 @@ export class Language {
         vi: "Chào chị! Anh nghĩ mãi không biết nói gì với chị, cuối cùng nghĩ ra được: 'sống, cười, yêu!'"
       }
     };
+  }
+  
+  /**
+   * Detect if user is on mobile device
+   */
+  detectMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+           ('ontouchstart' in window && navigator.maxTouchPoints > 0);
   }
   
   /**

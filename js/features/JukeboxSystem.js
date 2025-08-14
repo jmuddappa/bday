@@ -81,10 +81,13 @@ export class JukeboxSystem {
         e.stopPropagation();
         console.log('🎵 Jukebox handling video close - returning to jukebox');
         
-        // Restore background music
+        // Only restore background music if video is not playing
         const bgMusic = this.audioManager.getAudio('bgMusic');
-        if (bgMusic) {
+        if (bgMusic && this.videoPlayer && this.videoPlayer.paused) {
           bgMusic.volume = 0.6;
+          console.log('🎵 Video paused - restoring background music');
+        } else if (!this.videoPlayer.paused) {
+          console.log('🎵 Video still playing - keeping background music muted');
         }
         
         // Hide video backdrop
@@ -115,10 +118,13 @@ export class JukeboxSystem {
         e.stopPropagation();
         console.log('🎵 Jukebox handling ESC - returning to jukebox');
         
-        // Restore background music
+        // Only restore background music if video is not playing
         const bgMusic = this.audioManager.getAudio('bgMusic');
-        if (bgMusic) {
+        if (bgMusic && this.videoPlayer && this.videoPlayer.paused) {
           bgMusic.volume = 0.6;
+          console.log('🎵 Video paused - restoring background music');
+        } else if (!this.videoPlayer.paused) {
+          console.log('🎵 Video still playing - keeping background music muted');
         }
         
         // Hide video backdrop
@@ -309,6 +315,7 @@ export class JukeboxSystem {
       this.videoPlayer.onended = () => {
         if (bgMusic) {
           bgMusic.volume = 0.6;
+          console.log('🎵 Jukebox video ended - restoring background music');
         }
       };
       

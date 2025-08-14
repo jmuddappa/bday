@@ -52,7 +52,6 @@ export class Game {
     this.dialogContainer = document.getElementById('dialogContainer');
     this.dialogBackdrop = document.getElementById('dialogBackdrop');
     this.choiceModal = document.getElementById('choiceModal');
-    this.audioStatus = document.getElementById('audioStatus');
     
     // Game state
     this.isRunning = false;
@@ -192,7 +191,7 @@ export class Game {
 
   async initialize() {
     try {
-      this.audioManager.updateStatus();
+      this.setupLanguageToggle();
       
       console.log('📦 Loading game assets...');
       const sprites = await this.loadAssets();
@@ -202,6 +201,11 @@ export class Game {
       
       console.log('🚀 Starting game loop...');
       this.start();
+      
+      // For mobile devices, ensure audio context is resumed after user interaction
+      if (this.audioManager.isMobile) {
+        console.log('📱 Mobile device detected - audio will start on first interaction');
+      }
       
     } catch (error) {
       ErrorHandler.handleError(error, 'Game.initialize');
@@ -272,6 +276,7 @@ export class Game {
     const meDog = new Dog('Danoonie', CONFIG.DOGS.ME);
     meDog.setSprite(meFramesSprite); // Main sprite
     meDog.setFramesSprite(meFramesSprite); // Use me_frames.png for frame animation
+    meDog.setAudio(this.audioManager.getAudio('happybday'), 'happybday');
     
     // Create friend2 as simple dog entity
     const friend2 = new Dog('Raza', CONFIG.DOGS.FRIEND2);
@@ -289,7 +294,8 @@ export class Game {
     const friend6 = new Dog('Madeline', CONFIG.DOGS.FRIEND6);
     friend6.setSprite(friend6Sprite); // Set main sprite
     friend6.setFramesSprite(friend6Sprite); // Use same sprite for frames
-    // Note: Madeline's audio plays only during reveal, not during regular interactions
+    friend6.setAudio(this.audioManager.getAudio('friend6Sound'), 'friend6Sound');
+    // Note: Madeline's audio also plays during dialog interactions now
     
     // Create friend7 (Anne) with 2-frame animation
     const friend7 = new Dog('Anne', CONFIG.DOGS.FRIEND7);
@@ -561,6 +567,34 @@ export class Game {
         this.updateTalkPromptPosition();
       }
     });
+  }
+
+  setupLanguageToggle() {
+    const langBtn = document.getElementById('langBtn');
+    if (langBtn) {
+      // Update button text based on current language
+      this.updateLanguageButton();
+      
+      langBtn.addEventListener('click', () => {
+        language.toggle();
+        this.updateLanguageButton();
+        this.updateUITranslations();
+        console.log(`🌐 Language switched to: ${language.getCurrentLanguage()}`);
+        
+        // Also try to start audio on mobile when user interacts with language button
+        if (!this.audioManager.musicStarted) {
+          this.audioManager.tryStartAudio();
+        }
+      });
+    }
+  }
+
+  updateLanguageButton() {
+    const langBtn = document.getElementById('langBtn');
+    if (langBtn) {
+      // Show the opposite language (what it will switch TO)
+      langBtn.textContent = language.getCurrentLanguage() === 'vi' ? 'EN' : 'VN';
+    }
   }
 
   start() {
@@ -1189,8 +1223,13 @@ export class Game {
           });
         }
       } 
-      // Play sound for all other characters
-      else if (character.audio) {
+      // Play sound for all other characters, respecting cooldown
+      else if (character.audioKey && this.audioManager) {
+        // Use AudioManager to respect cooldown system
+        this.audioManager.play(character.audioKey);
+        console.log(`🎭 Playing dialog sound for ${character.name} via AudioManager`);
+      } else if (character.audio) {
+        // Fallback to direct audio play (legacy support)
         character.audio.currentTime = 0; // Reset to start
         character.audio.play().catch(e => {
           console.log('Could not play sound:', e);

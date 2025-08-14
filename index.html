@@ -8,11 +8,16 @@
 </head>
 <body>
   <canvas id="game"></canvas>
+  
+  <!-- Language Toggle Button -->
+  <div class="language-toggle" id="languageToggle">
+    <button class="lang-btn" id="langBtn">VN</button>
+  </div>
+  
   <div id="prompt">Press E to check mail</div>
   <div id="talkPrompt"></div>
   <div id="speechBubble">DANUNDIE!</div>
   <div id="speechBubbleDaninja">DANINJA!</div>
-  <div id="audioStatus" style="position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 5px; font-family: monospace; font-size: 12px; z-index: 1000;">Audio: Loading...</div>
   
   <!-- Audio Elements -->
   <audio id="barkRoti" src="assets/audio/roti.mp3" preload="auto"></audio>
