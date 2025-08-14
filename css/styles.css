@@ -2082,6 +2082,30 @@ audio {
     50% { opacity: 0.6; }
   }
   
+  /* Make jukebox backdrop more visible and interactive on mobile */
+  .jukebox-backdrop {
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+  
+  .jukebox-backdrop.visible {
+    backdrop-filter: blur(2px);
+  }
+  
+  /* Make interaction prompts smaller on mobile to avoid covering sprites */
+  #talkPrompt,
+  #prompt {
+    font-size: 14px !important;
+    padding: 6px 10px !important;
+    border-radius: 6px !important;
+    max-width: 180px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transform: translateX(-50%) translateY(-100%);
+    margin-top: -10px; /* Extra spacing above sprite */
+  }
+  
   /* Improve close button touch targets for mobile */
   .close-btn {
     min-width: 48px !important;

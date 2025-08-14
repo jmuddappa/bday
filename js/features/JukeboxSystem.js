@@ -106,6 +106,16 @@ export class JukeboxSystem {
       }
     });
 
+    // Add backdrop click to close functionality
+    if (this.jukeboxBackdrop) {
+      this.jukeboxBackdrop.addEventListener('click', (e) => {
+        if (e.target === this.jukeboxBackdrop && this.isOpen) {
+          this.closeJukebox();
+          console.log('🎵 Jukebox backdrop clicked - closing jukebox');
+        }
+      });
+    }
+
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && this.isOpen) {
         this.closeJukebox();
