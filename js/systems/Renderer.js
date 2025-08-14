@@ -252,17 +252,39 @@ export class Renderer {
         this.drawShadow(shadowX, shadowY, config.shadowWidth, config.shadowHeight, opacity);
       }
       
-      this.ctx.drawImage(
-        drawData.sprite,
-        drawData.sourceX,
-        drawData.sourceY,
-        drawData.sourceWidth,
-        drawData.sourceHeight,
-        drawData.destX,
-        drawData.destY,
-        drawData.destWidth,
-        drawData.destHeight
-      );
+      // Apply horizontal flip transformation for Madeline
+      if (drawData.flipHorizontal) {
+        this.ctx.save();
+        // Move to center of sprite, flip, then move back
+        this.ctx.translate(drawData.destX + drawData.destWidth / 2, drawData.destY + drawData.destHeight / 2);
+        this.ctx.scale(-1, 1);
+        this.ctx.translate(-drawData.destWidth / 2, -drawData.destHeight / 2);
+        
+        this.ctx.drawImage(
+          drawData.sprite,
+          drawData.sourceX,
+          drawData.sourceY,
+          drawData.sourceWidth,
+          drawData.sourceHeight,
+          0, 0, // Draw at origin since we translated
+          drawData.destWidth,
+          drawData.destHeight
+        );
+        
+        this.ctx.restore();
+      } else {
+        this.ctx.drawImage(
+          drawData.sprite,
+          drawData.sourceX,
+          drawData.sourceY,
+          drawData.sourceWidth,
+          drawData.sourceHeight,
+          drawData.destX,
+          drawData.destY,
+          drawData.destWidth,
+          drawData.destHeight
+        );
+      }
       
       // Restore context if we modified opacity
       if (opacity < 1.0) {

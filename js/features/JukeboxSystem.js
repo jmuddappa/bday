@@ -389,13 +389,13 @@ export class JukeboxSystem {
       // Show video modal with flex display for centering
       this.videoModal.style.display = 'flex';
       
-      // Setup video end handler to restore background music
+      // Setup video end handler to auto-play background music
       this.videoPlayer.onended = () => {
         this.clearPauseTimer(); // Clear any pause timer since video ended
-        if (bgMusic) {
-          bgMusic.volume = 0.6;
-          console.log('🎵 Jukebox video ended - restoring background music');
-        }
+        console.log('🎵 Jukebox video ended - auto-switching to background music');
+        
+        // Auto-play background music through jukebox system
+        this.autoPlayBackgroundMusic();
       };
       
       // Auto-play when ready with a small delay to avoid conflicts
@@ -752,6 +752,28 @@ export class JukeboxSystem {
       this.playVideo(bgMusicIndex);
     } else {
       console.warn(`🎵 Background music track not found in jukebox`);
+    }
+  }
+  
+  /**
+   * Auto-play background music when songs end (keeps music playing continuously)
+   */
+  autoPlayBackgroundMusic() {
+    // Find the background music track
+    const bgMusicIndex = this.videos.findIndex(video => video.isBgMusic);
+    if (bgMusicIndex >= 0) {
+      console.log(`🎵 Auto-playing background music to maintain continuous audio: ${this.videos[bgMusicIndex].title}`);
+      
+      // Set the current track and play background music directly
+      this.currentVideoIndex = bgMusicIndex;
+      this.playBackgroundMusicTrack(this.videos[bgMusicIndex]);
+      
+      // Force update the floating widget to show the new song
+      if (this.floatingNowPlaying && this.floatingNowPlaying.style.display !== 'none') {
+        this.showFloatingWidget(); // Refresh the floating widget content
+      }
+    } else {
+      console.warn(`🎵 Background music track not found for auto-play`);
     }
   }
 

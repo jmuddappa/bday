@@ -55,6 +55,15 @@ export class Dog extends GameObject {
     this.interactionBobOffset = 0;
     this.isPlayerNearForBob = false;
     
+    // Madeline-specific flip animation when player is nearby
+    this.flipAnimation = {
+      isFlipping: false,
+      flipDirection: 1, // 1 for normal, -1 for flipped
+      flipTimer: 0,
+      flipDuration: 60, // frames between flips (1 second at 60fps)
+      enabled: this.name === 'Madeline'
+    };
+    
     // Fade out system
     this.isFading = false;
     this.fadeOpacity = 1.0;
@@ -76,6 +85,15 @@ export class Dog extends GameObject {
     this.isEating = false;
     this.eatingComplete = false;
     this.shouldDieAfterEating = false;
+    
+    // Bouncing animation system (for Nolan when player is nearby)
+    this.bounceAnimation = {
+      isActive: false,
+      offset: 0,
+      speed: 0.3, // Speed of bounce animation
+      amplitude: 8, // How high to bounce in pixels
+      timer: 0
+    };
     
     // Audio tracking (prevent repeat sounds)
     this.hasPlayedRevealSound = false;
@@ -208,6 +226,51 @@ export class Dog extends GameObject {
         }
       } else {
         this.interactionBobOffset = 0; // No bob when player is away
+      }
+    }
+    
+    // Update Madeline's flip animation when player is nearby
+    if (this.flipAnimation.enabled) {
+      if (this.isPlayerNearForBob) {
+        // Flip immediately on first approach, then continue with timer
+        if (!this.flipAnimation.isFlipping) {
+          this.flipAnimation.isFlipping = true;
+          this.flipAnimation.flipDirection = -1; // Start with first flip immediately
+          this.flipAnimation.flipTimer = 0;
+        }
+        
+        this.flipAnimation.flipTimer++;
+        
+        // Flip every flipDuration frames after the initial flip
+        if (this.flipAnimation.flipTimer >= this.flipAnimation.flipDuration) {
+          this.flipAnimation.flipDirection *= -1; // Toggle flip direction
+          this.flipAnimation.flipTimer = 0;
+        }
+      } else {
+        // Stop flipping and reset to normal when player leaves
+        this.flipAnimation.isFlipping = false;
+        this.flipAnimation.flipDirection = 1;
+        this.flipAnimation.flipTimer = 0;
+      }
+    }
+    
+    // Update Nolan's bouncing animation when player is nearby
+    if (this.name === 'Nolan') {
+      if (this.isPlayerNearForBob && this.hasBeenRevealed && !this.isEating && !this.eatingComplete) {
+        // Start bouncing if not already active
+        if (!this.bounceAnimation.isActive) {
+          this.bounceAnimation.isActive = true;
+          this.bounceAnimation.timer = 0;
+        }
+        
+        // Update bounce animation
+        this.bounceAnimation.timer += this.bounceAnimation.speed;
+        this.bounceAnimation.offset = Math.sin(this.bounceAnimation.timer) * this.bounceAnimation.amplitude;
+      } else {
+        // Stop bouncing when player leaves or Nolan is eating
+        this.bounceAnimation.isActive = false;
+        this.bounceAnimation.offset = 0;
+        this.bounceAnimation.timer = 0;
       }
     }
     
@@ -547,6 +610,9 @@ export class Dog extends GameObject {
         offsetY = currentOffset.y;
       }
 
+      // Calculate bounce offset for Nolan
+      const bounceOffset = (this.name === 'Nolan' && this.bounceAnimation.isActive) ? this.bounceAnimation.offset : 0;
+      
       const renderData = {
         sprite: this.framesSprite,
         sourceX: sourceX,
@@ -554,9 +620,11 @@ export class Dog extends GameObject {
         sourceWidth: frameWidth,
         sourceHeight: config.frameHeight,
         destX: this.x + offsetX,
-        destY: this.y + offsetY + this.interactionBobOffset,
+        destY: this.y + offsetY + this.interactionBobOffset - bounceOffset, // Subtract to make bounce upward
         destWidth: this.originalWidth * this.scale,
-        destHeight: this.originalHeight * this.scale
+        destHeight: this.originalHeight * this.scale,
+        // Add flip information for Madeline
+        flipHorizontal: this.flipAnimation.enabled && this.flipAnimation.flipDirection === -1
       };
       
       
@@ -584,7 +652,9 @@ export class Dog extends GameObject {
       destX: this.x + offsetX,
       destY: this.y + offsetY + this.interactionBobOffset,
       destWidth: this.originalWidth * this.scale,
-      destHeight: this.originalHeight * this.scale
+      destHeight: this.originalHeight * this.scale,
+      // Add flip information for Madeline
+      flipHorizontal: this.flipAnimation.enabled && this.flipAnimation.flipDirection === -1
     };
   }
 
