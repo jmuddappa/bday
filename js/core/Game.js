@@ -35,11 +35,17 @@ export class Game {
     this.jukeboxSystem = new JukeboxSystem(this.audioManager);
     this.poopSystem = new PoopSystem();
     
+    // Set jukebox reference in AudioManager for background music control
+    this.audioManager.setJukeboxSystem(this.jukeboxSystem);
+    
     // Game entities
     this.player = new Player();
     this.dogs = [];
     this.mailbox = new Mailbox();
     this.jukebox = new Jukebox();
+    
+    // Set jukebox system reference in jukebox entity for animation control
+    this.jukebox.setJukeboxSystem(this.jukeboxSystem);
     this.cake = new Cake();
     this.danundieStreak = new DanundieStreak();
     this.daninjaReveal = new DaninjaReveal();
@@ -192,6 +198,7 @@ export class Game {
   async initialize() {
     try {
       this.setupLanguageToggle();
+      this.setupHoverSounds();
       
       console.log('📦 Loading game assets...');
       const sprites = await this.loadAssets();
@@ -473,7 +480,7 @@ export class Game {
         console.log('🎂 Eating cake:', result.message);
         
         // Play nolan eating sound
-        const eatSound = this.audioManager.getAudio('nolanEatSound');
+        const eatSound = this.audioManager.getAudio('linhEatSound');
         if (eatSound) {
           eatSound.currentTime = 0;
           eatSound.play().then(() => {
@@ -625,6 +632,63 @@ export class Game {
       // Show the opposite language (what it will switch TO)
       langBtn.textContent = language.getCurrentLanguage() === 'vi' ? 'EN' : 'VN';
     }
+  }
+
+  setupHoverSounds() {
+    // Add hover sounds to all close buttons
+    const closeButtons = document.querySelectorAll('.close-btn');
+    closeButtons.forEach(btn => {
+      btn.addEventListener('mouseenter', () => {
+        this.audioManager.play('hoverClickSound', { volume: 0.2 });
+      });
+    });
+
+    // Add hover sound to language toggle button
+    const langBtn = document.getElementById('langBtn');
+    if (langBtn) {
+      langBtn.addEventListener('mouseenter', () => {
+        this.audioManager.play('hoverClickSound', { volume: 0.2 });
+      });
+    }
+
+    // Add hover sounds to video navigation arrows
+    const videoNavLeft = document.getElementById('videoNavLeft');
+    const videoNavRight = document.getElementById('videoNavRight');
+    if (videoNavLeft) {
+      videoNavLeft.addEventListener('mouseenter', () => {
+        this.audioManager.play('hoverClickSound', { volume: 0.2 });
+      });
+    }
+    if (videoNavRight) {
+      videoNavRight.addEventListener('mouseenter', () => {
+        this.audioManager.play('hoverClickSound', { volume: 0.2 });
+      });
+    }
+
+    // Add hover sounds to volume controls
+    const volumeSlider = document.getElementById('volumeSlider');
+    if (volumeSlider) {
+      volumeSlider.addEventListener('mouseenter', () => {
+        this.audioManager.play('hoverClickSound', { volume: 0.15 });
+      });
+    }
+
+    // Add hover sound to play/pause button
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    if (playPauseBtn) {
+      playPauseBtn.addEventListener('mouseenter', () => {
+        this.audioManager.play('hoverClickSound', { volume: 0.2 });
+      });
+    }
+
+    // Add hover sound to floating play/pause button
+    const floatingPlayPauseBtn = document.getElementById('floatingPlayPauseBtn');
+    if (floatingPlayPauseBtn) {
+      floatingPlayPauseBtn.addEventListener('mouseenter', () => {
+        this.audioManager.play('hoverClickSound', { volume: 0.2 });
+      });
+    }
+
   }
 
   start() {
@@ -1475,6 +1539,15 @@ export class Game {
       this.characterChoices[options.character] = 'no';
       this.closeChoiceDialog();
       if (options.onNo) options.onNo();
+    });
+    
+    // Add hover sound effects to choice buttons
+    newYesButton.addEventListener('mouseenter', () => {
+      this.audioManager.play('hoverClickSound', { volume: 0.2 });
+    });
+
+    newNoButton.addEventListener('mouseenter', () => {
+      this.audioManager.play('hoverClickSound', { volume: 0.2 });
     });
   }
 

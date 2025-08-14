@@ -18,6 +18,7 @@ export class Jukebox extends GameObject {
     this.sprite = null;
     this.scale = CONFIG.JUKEBOX.SCALE;
     this.isPlayerNearby = false;
+    this.jukeboxSystem = null; // Reference to jukebox system for music status
     
     // Wiggle animation
     this.wiggleOffset = 0;
@@ -47,7 +48,39 @@ export class Jukebox extends GameObject {
   }
 
   /**
-   * Update jukebox behavior based on player proximity
+   * Set reference to jukebox system for music status checking
+   * @param {JukeboxSystem} jukeboxSystem - Jukebox system instance
+   */
+  setJukeboxSystem(jukeboxSystem) {
+    this.jukeboxSystem = jukeboxSystem;
+  }
+
+  /**
+   * Check if music is currently playing
+   * @returns {boolean} True if music is playing
+   */
+  isMusicPlaying() {
+    if (!this.jukeboxSystem) return false;
+    
+    const currentVideoIndex = this.jukeboxSystem.currentVideoIndex;
+    if (currentVideoIndex < 0) return false;
+    
+    const currentTrack = this.jukeboxSystem.videos[currentVideoIndex];
+    if (!currentTrack) return false;
+    
+    // Check if it's background music
+    if (currentTrack.isBgMusic) {
+      const bgMusic = this.jukeboxSystem.audioManager?.getAudio('bgMusic');
+      return bgMusic ? !bgMusic.paused : false;
+    } else {
+      // Check if video is playing
+      const videoPlayer = this.jukeboxSystem.videoPlayer;
+      return videoPlayer ? !videoPlayer.paused : false;
+    }
+  }
+
+  /**
+   * Update jukebox behavior - animate only when music is playing
    * @param {Player} player - Player entity
    */
   update(player) {
@@ -55,22 +88,24 @@ export class Jukebox extends GameObject {
     const wasNearby = this.isPlayerNearby;
     this.isPlayerNearby = distance < CONFIG.JUKEBOX.INTERACTION_DISTANCE;
     
-    // Start/stop animation based on proximity
+    // Log proximity changes for highlighting
     if (this.isPlayerNearby && !wasNearby) {
-      console.log('🎵 Player approached jukebox - starting animation');
+      console.log('🎵 Player approached jukebox - highlighting');
     } else if (!this.isPlayerNearby && wasNearby) {
-      console.log('🎵 Player left jukebox - stopping animation');
+      console.log('🎵 Player left jukebox - removing highlight');
     }
     
-    // Update wiggle animation when player is nearby
-    if (this.isPlayerNearby) {
+    // Only animate when music is playing
+    const musicPlaying = this.isMusicPlaying();
+    if (musicPlaying) {
       this.wiggleOffset = Math.sin(Date.now() * this.wiggleSpeed) * this.wiggleAmplitude;
       this.spawnMusicNotes();
     } else {
-      this.wiggleOffset = 0;
+      this.wiggleOffset = 0; // Stop wiggling when paused
+      // Don't spawn new notes when paused, but keep existing ones
     }
     
-    // Update existing music notes
+    // Always update existing music notes (so they fade out when paused)
     this.updateMusicNotes();
   }
 

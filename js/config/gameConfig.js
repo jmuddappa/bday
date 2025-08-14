@@ -66,7 +66,7 @@ export const CONFIG = {
 
   // Dog behavior settings
   DOGS: {
-    INTERACTION_DISTANCE: 80,
+    INTERACTION_DISTANCE: 100,
     ME_INTERACTION_DISTANCE: 120, // Same as others instead of 150
     NAT_INTERACTION_DISTANCE: 120, // 20px larger hitbox for earlier animation
     KHOA_INTERACTION_DISTANCE: 130, // 30px larger hitbox for Khoas

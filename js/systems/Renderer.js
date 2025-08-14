@@ -472,7 +472,14 @@ export class Renderer {
       const shadowY = drawData.destY + drawData.destHeight - 5;
       this.drawShadow(shadowX, shadowY, 60, 20, 0.3);
 
-      // Draw jukebox sprite
+      // Draw jukebox sprite with optional darkening when player is nearby
+      this.ctx.save();
+      
+      // Apply gentle darkening when player is nearby for clean interaction feedback
+      if (jukebox.isPlayerNearby) {
+        this.ctx.filter = 'brightness(0.85)'; // Subtle darkening effect
+      }
+      
       this.ctx.drawImage(
         drawData.sprite,
         drawData.sourceX,
@@ -484,6 +491,8 @@ export class Renderer {
         drawData.destWidth,
         drawData.destHeight
       );
+      
+      this.ctx.restore();
 
       // Draw floating music notes
       const musicNotes = jukebox.getMusicNotes();

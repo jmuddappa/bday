@@ -14,6 +14,7 @@ export class AudioManager {
     this.originalBgVolume = CONFIG.AUDIO.DEFAULT_VOLUME; // Store original bg volume
     this.activeAudioElements = new Set(); // Track currently playing audio
     this.isMobile = this.detectMobile();
+    this.jukeboxSystem = null; // Reference to jukebox system for video state checking
     
     this.setupAudioElements();
     this.setupMusicTrigger();
@@ -34,18 +35,22 @@ export class AudioManager {
       this.audioElements.set('friend3Sound', document.getElementById('friend3Sound'));
       this.audioElements.set('nolanInitSound', document.getElementById('nolanInitSound'));
       this.audioElements.set('nolanEatSound', document.getElementById('nolanEatSound'));
+      this.audioElements.set('linhEatSound', document.getElementById('linhEatSound'));
       this.audioElements.set('khushiByeSound', document.getElementById('khushiByeSound'));
       this.audioElements.set('natSound', document.getElementById('natSound'));
       this.audioElements.set('danundieSound', document.getElementById('danundieSound'));
       this.audioElements.set('daninjaSound', document.getElementById('daninjaSound'));
       this.audioElements.set('daninjaIntSound', document.getElementById('daninjaIntSound'));
       this.audioElements.set('fadeSound', document.getElementById('fadeSound'));
+      this.audioElements.set('hoverClickSound', document.getElementById('hoverClickSound'));
       
-      // Set up background music properties
+      // Set up background music properties - but pause it since jukebox system manages it now
       const bgMusic = this.audioElements.get('bgMusic');
       if (bgMusic) {
         bgMusic.loop = true;
         bgMusic.volume = CONFIG.AUDIO.DEFAULT_VOLUME;
+        bgMusic.pause(); // Ensure it's paused - jukebox system will manage playback
+        console.log(`🎵 [DEBUG] Background music element initialized and paused - jukebox system will manage playback`);
       }
       
     } catch (error) {
@@ -56,6 +61,14 @@ export class AudioManager {
   detectMobile() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
            ('ontouchstart' in window && navigator.maxTouchPoints > 0);
+  }
+
+  /**
+   * Set reference to jukebox system for video state checking
+   * @param {JukeboxSystem} jukeboxSystem - Jukebox system instance
+   */
+  setJukeboxSystem(jukeboxSystem) {
+    this.jukeboxSystem = jukeboxSystem;
   }
 
   setupMusicTrigger() {
@@ -78,40 +91,11 @@ export class AudioManager {
   }
 
   tryStartAudio() {
+    // Mark music as ready to start but don't auto-play - let jukebox handle it
     if (this.musicStarted) return;
     
-    const bgMusic = this.audioElements.get('bgMusic');
-    if (!bgMusic) return;
-    
-    // Check if audio is ready to play
-    const playAudio = () => {
-      bgMusic.volume = CONFIG.AUDIO.DEFAULT_VOLUME;
-      bgMusic.play()
-        .then(() => {
-          console.log('🎵 Background music started');
-          this.musicStarted = true;
-        })
-        .catch(e => {
-          console.log('🔇 Music play failed, retrying...', e);
-          // For mobile, try again after a short delay
-          if (this.isMobile) {
-            setTimeout(() => {
-              bgMusic.play().then(() => {
-                console.log('🎵 Background music started on retry');
-                this.musicStarted = true;
-              }).catch(retryError => {
-                console.log('🔇 Music retry failed:', retryError);
-              });
-            }, 500);
-          }
-        });
-    };
-
-    if (bgMusic.readyState >= 2) {
-      playAudio();
-    } else {
-      bgMusic.addEventListener('canplay', playAudio, { once: true });
-    }
+    console.log('🎵 [DEBUG] Audio interaction detected - marking music as startable, jukebox will handle playback');
+    this.musicStarted = true;
   }
 
 
@@ -122,6 +106,12 @@ export class AudioManager {
    */
   play(audioKey, options = {}) {
     try {
+      // Block direct bgMusic playback - jukebox system manages this now
+      if (audioKey === 'bgMusic') {
+        console.log(`🎵 [DEBUG] Direct bgMusic playback blocked - jukebox system manages background music`);
+        return;
+      }
+      
       const audio = this.audioElements.get(audioKey);
       if (!audio) {
         console.warn(`Audio element '${audioKey}' not found`);
@@ -129,7 +119,7 @@ export class AudioManager {
       }
 
       // Define exceptions that bypass cooldown
-      const cooldownExceptions = ['bgMusic', 'fadeSound', 'plantGrowSound'];
+      const cooldownExceptions = ['bgMusic', 'fadeSound', 'plantGrowSound', 'hoverClickSound'];
       const bypassCooldown = cooldownExceptions.includes(audioKey) || options.restart;
       
       // Check cooldown (5 seconds = 5000ms) unless bypassed
@@ -166,8 +156,9 @@ export class AudioManager {
       }
 
       // Duck background music when other audio plays (except bg music itself and system sounds)
-      const noDuckingExceptions = ['bgMusic', 'fadeSound', 'plantGrowSound'];
+      const noDuckingExceptions = ['bgMusic', 'fadeSound', 'plantGrowSound', 'hoverClickSound'];
       if (!noDuckingExceptions.includes(audioKey)) {
+        console.log(`🎵 [DEBUG] Playing audio '${audioKey}' - will duck background music`);
         this.duckBackgroundMusic();
         
         // Track this audio element and set up restoration when it ends
@@ -348,25 +339,26 @@ export class AudioManager {
 
   /**
    * Duck background music volume (reduce by 80%)
+   * NOTE: Background music is now managed by jukebox system - this method is disabled
    */
   duckBackgroundMusic() {
-    const bgMusic = this.audioElements.get('bgMusic');
-    if (bgMusic && this.musicStarted) {
-      const duckedVolume = this.originalBgVolume * 0.2; // 80% reduction
-      bgMusic.volume = duckedVolume;
-      console.log(`🔉 Background music ducked to ${Math.round(duckedVolume * 100)}% volume`);
-    }
+    console.log(`🎵 [DEBUG] duckBackgroundMusic called - DISABLED (jukebox manages all music now)`);
+    
+    // Do nothing - jukebox system manages background music now
+    // This prevents the old system from interfering with jukebox-managed audio
+    return;
   }
 
   /**
    * Restore background music to original volume
+   * NOTE: Background music is now managed by jukebox system - this method is disabled
    */
   restoreBackgroundMusic() {
-    const bgMusic = this.audioElements.get('bgMusic');
-    if (bgMusic && this.musicStarted) {
-      bgMusic.volume = this.originalBgVolume;
-      console.log(`🔊 Background music restored to ${Math.round(this.originalBgVolume * 100)}% volume`);
-    }
+    console.log(`🎵 [DEBUG] restoreBackgroundMusic called - DISABLED (jukebox manages all music now)`);
+    
+    // Do nothing - jukebox system manages background music now
+    // This prevents the old system from interfering with jukebox-managed audio
+    return;
   }
 
   /**

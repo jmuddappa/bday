@@ -242,6 +242,13 @@ export class MailSystem {
         }
       });
       
+      // Hover sound effect
+      mailItem.addEventListener('mouseenter', () => {
+        if (this.audioManager) {
+          this.audioManager.play('hoverClickSound', { volume: 0.2 });
+        }
+      });
+      
       return mailItem;
     } catch (error) {
       ErrorHandler.handleError(error, 'MailSystem.createMailItem');

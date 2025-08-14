@@ -281,7 +281,7 @@ export class Dog extends GameObject {
       // Nolan stays on frame 1 when player approaches - no animation until eating sequence
       // Just mark as barked to prevent repeated activation
       this.barked = true;
-    } else if (this.name !== 'Me' && !this.barked) {
+    } else if (this.name !== 'Me' && !this.barked && !this.isHidden) {
       this.setState('jump');
       this.barked = true;
       
