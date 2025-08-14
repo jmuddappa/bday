@@ -9,5 +9,5 @@ export const JUKEBOX_DATA = [
   { title: "My Mass", artist: "Asian Eyed Peas", src: "videos/jukebox/song3.mp4", icon: "" },
   { title: "Totally Not AI Generated Slideshow (Ft. Chat)", artist: "Khoa & Anne", src: "videos/jukebox/song4.mov", icon: "" },
   { title: "Special Birthday Song", artist: "Harper", src: "videos/jukebox/song5.mov", icon: "" },
-  { title: "Name TBD", artist: "Drew & Melanie", src: "videos/jukebox/song5.mov", icon: "" }
+  { title: "Name TBD", artist: "Drew & Melanie", src: "videos/jukebox/song6.mov", icon: "" }
 ];

@@ -57,8 +57,8 @@ export const CONFIG = {
   CAKE: {
     X: 900,
     Y: 700,
-    INTERACTION_DISTANCE: 120,
-    PROMPT_OFFSET_X: 650,
+    INTERACTION_DISTANCE: 100,
+    PROMPT_OFFSET_X: 550,
     PROMPT_OFFSET_Y: 20,
     ROTATION_SPEED: 0.02,
     SCALE: 0.07
@@ -66,8 +66,8 @@ export const CONFIG = {
 
   // Dog behavior settings
   DOGS: {
-    INTERACTION_DISTANCE: 100,
-    ME_INTERACTION_DISTANCE: 130, // Same as others instead of 150
+    INTERACTION_DISTANCE: 80,
+    ME_INTERACTION_DISTANCE: 120, // Same as others instead of 150
     NAT_INTERACTION_DISTANCE: 120, // 20px larger hitbox for earlier animation
     KHOA_INTERACTION_DISTANCE: 130, // 30px larger hitbox for Khoas
     NOLAN_INTERACTION_DISTANCE: 125, // 40px larger hitbox for Nolan
@@ -87,7 +87,7 @@ export const CONFIG = {
       shadowWidth: 50, shadowHeight: 18, shadowOffsetY: 8
     },
     ME: {
-      x: 860, y: 405, scale: 0.55,
+      x: 860, y: 425, scale: 0.55,
       width: 200, height: 300, // Much smaller hitbox dimensions
       // 3-frame animation system
       totalWidth: 1800, // Total sprite width (600px per frame * 3 frames)
@@ -147,7 +147,7 @@ export const CONFIG = {
     },
     //Khoa
     FRIEND8: {
-      x: 900, y: 850, scale: 0.35, // Reduced by another 30% (0.56 * 0.7 ≈ 0.39)
+      x: 910, y: 800, scale: 0.35, // Reduced by another 30% (0.56 * 0.7 ≈ 0.39)
       width: 500, height: 527, // Source dimensions for each frame (500x527 each)
       // 3-frame animation system
       totalWidth: 1500, // Total sprite width (500px per frame * 3 frames)
