@@ -99,6 +99,10 @@ export class InputManager extends EventEmitter {
       this.emit('audioRequested');
     });
 
+    this.mobileControls.on('danundieStreak', () => {
+      this.emit('danundieStreak');
+    });
+
     // Mobile movement is handled in getMovementInput()
   }
 

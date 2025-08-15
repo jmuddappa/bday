@@ -78,6 +78,9 @@ export class MobileControls extends EventEmitter {
     this.setupDirectionButton(this.dpadDown, 'down');
     this.setupDirectionButton(this.dpadLeft, 'left');
     this.setupDirectionButton(this.dpadRight, 'right');
+    
+    // Add special Danundie trigger for right D-pad
+    this.setupDanundieTrigger();
 
     // Interact button
     this.setupInteractButton();
@@ -172,6 +175,33 @@ export class MobileControls extends EventEmitter {
     this.interactBtn.addEventListener('click', (e) => {
       e.preventDefault();
       this.handleInteract();
+    });
+  }
+
+  /**
+   * Setup special Danundie trigger for right D-pad
+   */
+  setupDanundieTrigger() {
+    if (!this.dpadRight) return;
+    
+    // Add double-tap detection for Danundie trigger on right D-pad
+    let lastTapTime = 0;
+    const doubleTapDelay = 300; // 300ms window for double-tap
+    
+    this.dpadRight.addEventListener('touchstart', (e) => {
+      const currentTime = Date.now();
+      const timeDiff = currentTime - lastTapTime;
+      
+      if (timeDiff < doubleTapDelay) {
+        // Double-tap detected - trigger Danundie
+        e.preventDefault();
+        e.stopPropagation();
+        this.emit('danundieStreak');
+        console.log('🏃‍♂️ Danundie triggered via right D-pad double-tap!');
+        lastTapTime = 0; // Reset to prevent triple-tap
+      } else {
+        lastTapTime = currentTime;
+      }
     });
   }
 

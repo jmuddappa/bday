@@ -190,62 +190,13 @@ canvas {
   font-size: 14px;
 }
 
-/* Mobile responsive floating widget */
+/* Mobile responsive floating widget - hide on mobile to prevent modal interference */
 @media (max-width: 768px) {
   .floating-now-playing {
-    top: 10px;
-    right: 10px;
-    width: 280px;
-    max-width: calc(100vw - 20px);
-  }
-  
-  .floating-now-playing-song {
-    font-size: 14px;
+    display: none !important; /* Hide on mobile to prevent modal blocking */
   }
 }
 
-@media (max-width: 480px) {
-  .floating-now-playing {
-    width: 240px;
-    max-width: calc(100vw - 16px);
-    top: 8px;
-    right: 8px;
-  }
-  
-  .floating-now-playing-header {
-    padding: 10px 12px 6px;
-  }
-  
-  .floating-now-playing-song {
-    padding: 6px 12px 10px;
-    font-size: 13px;
-  }
-  
-  .floating-play-pause-btn {
-    width: 24px;
-    height: 24px;
-  }
-  
-  .floating-play-pause-btn.paused::before,
-  .floating-play-pause-btn.paused::after {
-    width: 1.5px;
-    height: 6px;
-  }
-  
-  .floating-play-pause-btn.paused::before {
-    left: 8px;
-  }
-  
-  .floating-play-pause-btn.paused::after {
-    right: 8px;
-  }
-  
-  .floating-play-pause-btn.playing::before {
-    border-left: 4px solid #2a1810;
-    border-top: 3px solid transparent;
-    border-bottom: 3px solid transparent;
-  }
-}
 
 /* Animations */
 @keyframes mailboxPulse {

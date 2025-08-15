@@ -149,6 +149,11 @@ export class AudioManager {
         const baseVolume = targetVolume !== undefined ? targetVolume : audio.volume || 1.0;
         targetVolume = baseVolume * 0.7;
         console.log(`🔊 Reducing Bo's audio volume by 30%: ${baseVolume.toFixed(2)} → ${targetVolume.toFixed(2)}`);
+      } else if (audioKey === 'friend2Sound') {
+        // Increase Raza's sound by 50% (multiply by 1.5)
+        const baseVolume = targetVolume !== undefined ? targetVolume : audio.volume || 1.0;
+        targetVolume = baseVolume * 1.5;
+        console.log(`🔊 Increasing Raza's audio volume by 50%: ${baseVolume.toFixed(2)} → ${targetVolume.toFixed(2)}`);
       }
       
       if (targetVolume !== undefined) {
