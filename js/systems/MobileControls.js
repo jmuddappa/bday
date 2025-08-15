@@ -22,6 +22,12 @@ export class MobileControls extends EventEmitter {
     
     this.detectMobileDevice();
     this.setupEventListeners();
+    
+    // Auto-hide functionality
+    this.autoHideTimer = null;
+    this.isAutoHidden = false;
+    this.autoHideDelay = 4000; // 4 seconds of inactivity
+    this.setupAutoHide();
   }
 
   /**
@@ -309,6 +315,71 @@ export class MobileControls extends EventEmitter {
     }
 
     return movement;
+  }
+
+  /**
+   * Setup auto-hide functionality
+   */
+  setupAutoHide() {
+    if (!this.isActive) return;
+    
+    // Start the auto-hide timer on load
+    this.startAutoHideTimer();
+    
+    // Reset timer on any touch activity
+    const resetTimer = () => {
+      this.showControls();
+      this.startAutoHideTimer();
+    };
+    
+    // Listen for any touch on mobile controls
+    if (this.mobileControls) {
+      this.mobileControls.addEventListener('touchstart', resetTimer);
+      this.mobileControls.addEventListener('touchmove', resetTimer);
+    }
+    
+    // Also reset on screen touch outside controls
+    document.addEventListener('touchstart', resetTimer);
+  }
+  
+  /**
+   * Start the auto-hide timer
+   */
+  startAutoHideTimer() {
+    this.clearAutoHideTimer();
+    this.autoHideTimer = setTimeout(() => {
+      this.hideControls();
+    }, this.autoHideDelay);
+  }
+  
+  /**
+   * Clear the auto-hide timer
+   */
+  clearAutoHideTimer() {
+    if (this.autoHideTimer) {
+      clearTimeout(this.autoHideTimer);
+      this.autoHideTimer = null;
+    }
+  }
+  
+  /**
+   * Hide controls with fade effect
+   */
+  hideControls() {
+    if (this.isActive && this.mobileControls && !this.isAutoHidden) {
+      this.mobileControls.classList.add('auto-hidden');
+      this.isAutoHidden = true;
+    }
+  }
+  
+  /**
+   * Show controls with fade effect
+   */
+  showControls() {
+    if (this.isActive && this.mobileControls && this.isAutoHidden) {
+      this.mobileControls.classList.remove('auto-hidden');
+      this.isAutoHidden = false;
+    }
   }
 
   /**
