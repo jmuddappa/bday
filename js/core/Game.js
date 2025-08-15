@@ -701,13 +701,13 @@ export class Game {
 
   pause() {
     this.isRunning = false;
-    this.audioManager.setVolume('bgMusic', 0.3);
+    // Background music volume managed by jukebox system
   }
 
   resume() {
     if (!this.isRunning) {
       this.isRunning = true;
-      this.audioManager.setVolume('bgMusic', 1.0);
+      // Background music volume managed by jukebox system
       this.lastFrameTime = performance.now(); // Reset frame time to prevent speed-up
       requestAnimationFrame((time) => this.gameLoop(time));
     }
@@ -1652,12 +1652,8 @@ export class Game {
         rightArrow.style.display = '';  // Clear inline style
       }
 
-      // Show modal and manage audio
+      // Show modal - jukebox system manages audio
       videoModal.style.display = 'flex';
-      
-      if (this.audioManager.musicStarted) {
-        this.audioManager.setVolume('bgMusic', 0);
-      }
       
       // Play video
       const playPromise = videoPlayer.play();
@@ -1671,11 +1667,10 @@ export class Game {
           });
       }
 
-      // Setup video end handler
+      // Setup video end handler - jukebox system manages audio restoration
       videoPlayer.onended = () => {
-        if (this.audioManager.musicStarted) {
-          this.audioManager.setVolume('bgMusic', 0.6);
-        }
+        console.log(`🎬 Direct video ended: ${title}`);
+        // Audio restoration handled by jukebox system
       };
 
     } catch (error) {

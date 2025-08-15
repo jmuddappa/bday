@@ -22,9 +22,11 @@ export class JukeboxSystem {
     this.wasJukeboxOpen = false;
     this.isTransitioning = false;
     this.pauseTimer = null; // Timer for auto-resume after pause
+    this.isUserPaused = false; // Track if user manually paused
     
     this.setupElements();
     this.setupEventListeners();
+    this.setupGlobalVideoMonitoring();
     
     console.log(`🎵 JukeboxSystem initialized with ${this.videos.length} songs`);
     
@@ -166,6 +168,59 @@ export class JukeboxSystem {
         this.wasJukeboxOpen = false;
       }
     });
+  }
+
+  /**
+   * Setup global video monitoring to mute background music during any video playback
+   */
+  setupGlobalVideoMonitoring() {
+    if (!this.videoPlayer) return;
+    
+    // Monitor when ANY video starts playing (including mailbox videos, direct videos, etc.)
+    this.videoPlayer.addEventListener('play', () => {
+      console.log('🎵 Video started playing - muting background music');
+      this.isUserPaused = false; // Reset user pause flag when video starts
+      this.muteBackgroundMusic();
+    });
+    
+    // Monitor when ANY video pauses
+    this.videoPlayer.addEventListener('pause', () => {
+      if (this.isUserPaused) {
+        console.log('🎵 Video paused by user - respecting pause state');
+        this.clearPauseTimer();
+      } else {
+        console.log('🎵 Video paused automatically - will auto-resume');
+        // Only auto-resume if it wasn't a user-initiated pause
+      }
+    });
+    
+    // Monitor when ANY video ends
+    this.videoPlayer.addEventListener('ended', () => {
+      console.log('🎵 Video ended - auto-switching to background music');
+      this.isUserPaused = false; // Reset user pause flag when video ends naturally
+      this.clearPauseTimer(); // Clear any pause timer
+      // Check if this was a jukebox video or external video
+      if (this.currentVideoIndex >= 0 && !this.videos[this.currentVideoIndex]?.isBgMusic) {
+        // Was a jukebox song - auto-play background music
+        this.autoPlayBackgroundMusic();
+      } else {
+        // External video (mail, direct) - auto-resume background music after short delay
+        setTimeout(() => {
+          this.autoPlayBackgroundMusic();
+        }, 1000); // 1 second delay before resuming
+      }
+    });
+  }
+
+  /**
+   * Mute background music for any video playback
+   */
+  muteBackgroundMusic() {
+    const bgMusic = this.audioManager.getAudio('bgMusic');
+    if (bgMusic && !bgMusic.paused) {
+      bgMusic.volume = 0;
+      console.log('🎵 Background music muted for video playback');
+    }
   }
 
   /**
@@ -542,13 +597,26 @@ export class JukeboxSystem {
    */
 
   /**
-   * Set volume for video playback
+   * Set volume for video playback and background music
    * @param {number} volume - Volume level (0-1)
    */
   setVolume(volume) {
+    // Set video player volume
     if (this.videoPlayer) {
       this.videoPlayer.volume = volume;
     }
+    
+    // Also set background music volume (when it's playing through jukebox)
+    const bgMusic = this.audioManager.getAudio('bgMusic');
+    if (bgMusic && !bgMusic.paused && this.currentVideoIndex >= 0) {
+      const currentTrack = this.videos[this.currentVideoIndex];
+      if (currentTrack && currentTrack.isBgMusic) {
+        // Only adjust bg music volume if it's currently the active track
+        bgMusic.volume = volume;
+        console.log(`🎵 Background music volume set to: ${Math.round(volume * 100)}%`);
+      }
+    }
+    
     console.log(`🎵 Volume set to: ${Math.round(volume * 100)}%`);
   }
 
@@ -564,15 +632,18 @@ export class JukeboxSystem {
         const bgMusic = this.audioManager.getAudio('bgMusic');
         if (bgMusic) {
           if (bgMusic.paused) {
+            this.isUserPaused = false; // User is resuming
             this.clearPauseTimer(); // Clear any existing pause timer
             bgMusic.play().catch(e => {
               console.log('🎵 Failed to resume background music:', e);
             });
             this.updatePlayPauseButton(false); // false = playing
           } else {
+            this.isUserPaused = true; // User is pausing
             bgMusic.pause();
             this.updatePlayPauseButton(true); // true = paused
-            this.startPauseTimer(); // Start 10s timer for auto-resume
+            // Don't auto-resume when user manually pauses - respect their choice
+            this.clearPauseTimer();
           }
         }
         return;
@@ -583,15 +654,18 @@ export class JukeboxSystem {
     if (!this.videoPlayer) return;
     
     if (this.videoPlayer.paused) {
+      this.isUserPaused = false; // User is resuming
       this.clearPauseTimer(); // Clear any existing pause timer
       this.videoPlayer.play().catch(e => {
         console.log('🎵 Failed to resume video:', e);
       });
       this.updatePlayPauseButton(false); // false = playing
     } else {
+      this.isUserPaused = true; // User is pausing
       this.videoPlayer.pause();
       this.updatePlayPauseButton(true); // true = paused
-      this.startPauseTimer(); // Start 10s timer for auto-resume
+      // Don't auto-resume when user manually pauses - respect their choice
+      this.clearPauseTimer();
     }
   }
 

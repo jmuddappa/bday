@@ -313,10 +313,7 @@ export class MailSystem {
         }, 100);
       }
       
-      // Manage background music
-      if (this.audioManager.musicStarted) {
-        this.audioManager.setVolume('bgMusic', 0);
-      }
+      // Background music managed by jukebox system
       
       // Play video directly
       const playPromise = this.videoPlayer.play();
@@ -332,9 +329,8 @@ export class MailSystem {
 
       // Setup video end handler
       this.videoPlayer.onended = () => {
-        if (this.audioManager.musicStarted) {
-          this.audioManager.setVolume('bgMusic', 0.6);
-        }
+        console.log(`📧 Mail video ended: ${mail.sender}`);
+        // Background music restoration handled by jukebox system
       };
 
       // Update mail list to remove NEW badge
@@ -388,9 +384,7 @@ export class MailSystem {
         // Clean up transition state
         this.isTransitioning = false;
         
-        if (this.audioManager.musicStarted) {
-          this.audioManager.setVolume('bgMusic', 0.6);
-        }
+        // Background music restoration handled by jukebox system
         
         // Clean up event handlers
         this.videoPlayer.onended = null;
