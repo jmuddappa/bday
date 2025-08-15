@@ -276,12 +276,37 @@ export class Cake extends GameObject {
 
   /**
    * Get prompt position for UI
+   * @param {HTMLCanvasElement} canvas - Canvas element for coordinate conversion
    * @returns {Object} Prompt position
    */
-  getPromptPosition() {
+  getPromptPosition(canvas) {
+    if (!canvas) {
+      // Fallback for when canvas is not provided
+      return {
+        x: this.x + CONFIG.CAKE.PROMPT_OFFSET_X,
+        y: this.y + CONFIG.CAKE.PROMPT_OFFSET_Y,
+        show: this.showPrompt
+      };
+    }
+    
+    // Calculate cake center in world coordinates
+    const cakeCenterX = this.x + this.width / 2;
+    const cakeCenterY = this.y + this.height / 2;
+    
+    // Get canvas scaling and position
+    const canvasRect = canvas.getBoundingClientRect();
+    const scaleX = canvasRect.width / CONFIG.CANVAS.WIDTH;
+    const scaleY = canvasRect.height / CONFIG.CANVAS.HEIGHT;
+    
+    // Convert world coordinates to screen coordinates with proper scaling
+    const screenX = (cakeCenterX * scaleX) + canvasRect.left + 
+                   (CONFIG.CAKE.PROMPT_OFFSET_X * scaleX);
+    const screenY = (cakeCenterY * scaleY) + canvasRect.top + 
+                   (CONFIG.CAKE.PROMPT_OFFSET_Y * scaleY);
+    
     return {
-      x: this.x + CONFIG.CAKE.PROMPT_OFFSET_X,
-      y: this.y + CONFIG.CAKE.PROMPT_OFFSET_Y,
+      x: screenX,
+      y: screenY,
       show: this.showPrompt
     };
   }

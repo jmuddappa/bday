@@ -913,7 +913,7 @@ export class Game {
   }
 
   updateCakePromptPosition() {
-    const pos = this.cake.getPromptPosition();
+    const pos = this.cake.getPromptPosition(this.canvas);
     this.prompt.style.left = `${pos.x}px`;
     this.prompt.style.top = `${pos.y}px`;
   }
