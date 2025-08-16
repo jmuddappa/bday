@@ -31,10 +31,8 @@ export class JukeboxSystem {
     
     console.log(`🎵 JukeboxSystem initialized with ${this.videos.length} songs`);
     
-    // Auto-start background music immediately (if enabled)
-    if (this.backgroundMusicEnabled) {
-      this.autoStartBackgroundMusic();
-    }
+    // Auto-start DISABLED - no background music on page load
+    console.log('🎵 Background music auto-start DISABLED - user must manually start music');
   }
 
   setupElements() {
@@ -912,16 +910,12 @@ export class JukeboxSystem {
   }
 
   /**
-   * Start pause timer for auto-resume after 10 seconds
+   * Start pause timer for auto-resume after 10 seconds - DISABLED
    */
   startPauseTimer() {
-    this.clearPauseTimer(); // Clear any existing timer
-    
-    console.log('🎵 Starting 10s pause timer for auto-resume');
-    this.pauseTimer = setTimeout(() => {
-      console.log('🎵 10s pause timer expired - auto-resuming bg.mp3');
-      this.autoResumeBackgroundMusic();
-    }, 10000); // 10 seconds
+    // DISABLED - no more auto-resume timers
+    console.log('🎵 Pause timer DISABLED - no auto-resume');
+    return;
   }
   
   /**
