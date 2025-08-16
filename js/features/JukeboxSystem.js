@@ -463,7 +463,7 @@ export class JukeboxSystem {
       });
       
       this.videoPlayer.addEventListener('pause', () => {
-        this.startPauseTimer(); // Start pause timer when paused
+        // this.startPauseTimer(); // DISABLED - no auto-resume
         this.updatePlayPauseButton(true);
       });
     }
@@ -740,7 +740,7 @@ export class JukeboxSystem {
           });
           
           bgMusic.addEventListener('pause', () => {
-            this.startPauseTimer(); // Start pause timer when paused
+            // this.startPauseTimer(); // DISABLED - no auto-resume
             this.updatePlayPauseButton(true);
           });
         }).catch(e => {
@@ -781,7 +781,7 @@ export class JukeboxSystem {
         });
         
         bgMusic.addEventListener('pause', () => {
-          this.startPauseTimer(); // Start pause timer when paused
+          // this.startPauseTimer(); // DISABLED - no auto-resume
           this.updatePlayPauseButton(true);
         });
         
