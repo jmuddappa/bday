@@ -189,8 +189,12 @@ export class JukeboxSystem {
         console.log('🎵 Video paused by user - respecting pause state');
         this.clearPauseTimer();
       } else {
-        console.log('🎵 Video paused automatically - will auto-resume');
-        // Only auto-resume if it wasn't a user-initiated pause
+        console.log('🎵 Video paused automatically - checking if video is still active');
+        // On mobile, don't auto-resume if video modal is still open and video hasn't ended
+        if (this.videoModal && this.videoModal.style.display === 'flex') {
+          console.log('🎵 Video modal still open - keeping background music muted');
+          this.clearPauseTimer();
+        }
       }
     });
     
@@ -221,6 +225,13 @@ export class JukeboxSystem {
       bgMusic.volume = 0;
       console.log('🎵 Background music muted for video playback');
     }
+  }
+
+  /**
+   * Check if video modal is currently active (to prevent background music during video viewing)
+   */
+  isVideoModalActive() {
+    return this.videoModal && this.videoModal.style.display === 'flex';
   }
 
   /**
@@ -819,6 +830,12 @@ export class JukeboxSystem {
    * Auto-play background music when songs end (keeps music playing continuously)
    */
   autoPlayBackgroundMusic() {
+    // Don't auto-play if video modal is still active (prevents mobile resume issues)
+    if (this.isVideoModalActive()) {
+      console.log(`🎵 Video modal still active - not auto-playing background music`);
+      return;
+    }
+    
     // Find the background music track
     const bgMusicIndex = this.videos.findIndex(video => video.isBgMusic);
     if (bgMusicIndex >= 0) {
