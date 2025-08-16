@@ -18,6 +18,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.game = game;
     console.log('🔧 Game instance available as window.game');
     
+    // Global helper functions for background music control
+    window.disableBgMusicAutoPlay = () => {
+      if (game.jukeboxSystem) {
+        game.jukeboxSystem.disableBackgroundMusicAutoPlay();
+        console.log('🎵 Background music auto-play DISABLED. Use enableBgMusicAutoPlay() to re-enable.');
+      }
+    };
+    
+    window.enableBgMusicAutoPlay = () => {
+      if (game.jukeboxSystem) {
+        game.jukeboxSystem.enableBackgroundMusicAutoPlay();
+        console.log('🎵 Background music auto-play ENABLED.');
+      }
+    };
+    
+    console.log('🎵 Use disableBgMusicAutoPlay() or enableBgMusicAutoPlay() to control background music auto-resuming');
+    
     console.log('✅ Game initialized successfully!');
     
   } catch (error) {

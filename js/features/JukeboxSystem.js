@@ -23,6 +23,7 @@ export class JukeboxSystem {
     this.isTransitioning = false;
     this.pauseTimer = null; // Timer for auto-resume after pause
     this.isUserPaused = false; // Track if user manually paused
+    this.backgroundMusicEnabled = true; // Master control for all bg music auto-play
     
     this.setupElements();
     this.setupEventListeners();
@@ -30,8 +31,10 @@ export class JukeboxSystem {
     
     console.log(`🎵 JukeboxSystem initialized with ${this.videos.length} songs`);
     
-    // Auto-start background music immediately
-    this.autoStartBackgroundMusic();
+    // Auto-start background music immediately (if enabled)
+    if (this.backgroundMusicEnabled) {
+      this.autoStartBackgroundMusic();
+    }
   }
 
   setupElements() {
@@ -813,6 +816,12 @@ export class JukeboxSystem {
    * Automatically start playing background music from jukebox
    */
   autoStartBackgroundMusic() {
+    // Check if background music auto-play is disabled
+    if (!this.backgroundMusicEnabled) {
+      console.log(`🎵 Background music auto-start DISABLED - not starting`);
+      return;
+    }
+    
     // Find the background music track (last in list)
     const bgMusicIndex = this.videos.findIndex(video => video.isBgMusic);
     if (bgMusicIndex >= 0) {
@@ -827,6 +836,12 @@ export class JukeboxSystem {
    * Auto-play background music when songs end (keeps music playing continuously)
    */
   autoPlayBackgroundMusic() {
+    // Check if background music auto-play is disabled
+    if (!this.backgroundMusicEnabled) {
+      console.log(`🎵 Background music auto-play DISABLED - not resuming`);
+      return;
+    }
+    
     // Don't auto-play if video modal is still active (prevents mobile resume issues)
     if (this.isVideoModalActive()) {
       console.log(`🎵 Video modal still active - not auto-playing background music`);
@@ -934,6 +949,12 @@ export class JukeboxSystem {
    * Auto-resume background music through jukebox system
    */
   autoResumeBackgroundMusic() {
+    // Check if background music auto-play is disabled
+    if (!this.backgroundMusicEnabled) {
+      console.log(`🎵 Background music auto-resume DISABLED - not resuming`);
+      return;
+    }
+    
     // Find the background music track
     const bgMusicIndex = this.videos.findIndex(video => video.isBgMusic);
     if (bgMusicIndex >= 0) {
@@ -944,6 +965,31 @@ export class JukeboxSystem {
     } else {
       console.warn('🎵 Background music track not found for auto-resume');
     }
+  }
+
+  /**
+   * Disable all background music auto-play/resume functionality
+   */
+  disableBackgroundMusicAutoPlay() {
+    this.backgroundMusicEnabled = false;
+    this.clearPauseTimer(); // Clear any active timers
+    console.log('🎵 Background music auto-play/resume DISABLED');
+  }
+
+  /**
+   * Enable background music auto-play/resume functionality
+   */
+  enableBackgroundMusicAutoPlay() {
+    this.backgroundMusicEnabled = true;
+    console.log('🎵 Background music auto-play/resume ENABLED');
+  }
+
+  /**
+   * Check if background music auto-play is enabled
+   * @returns {boolean}
+   */
+  isBackgroundMusicAutoPlayEnabled() {
+    return this.backgroundMusicEnabled;
   }
 
   /**

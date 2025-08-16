@@ -1304,20 +1304,13 @@ export class Game {
       // Special audio handling for Danoonie (Me) - only on first interaction
       if (character.name === 'Danoonie' && this.dogInteractionCounts.Danoonie === 0) {
         const happybdayAudio = this.audioManager.getAudio('happybday');
-        const bgAudio = this.audioManager.getAudio('bgMusic');
-        
-        if (bgAudio) {
-          bgAudio.volume = 0; // Mute background music
-        }
         
         if (happybdayAudio) {
           happybdayAudio.currentTime = 0;
           
-          // Restore background music when Danoonie's audio ends
+          // Background music ducking/restoration handled by AudioManager
           happybdayAudio.onended = () => {
-            if (bgAudio) {
-              bgAudio.volume = 0.6; // Restore background music volume
-            }
+            // Audio restoration handled by AudioManager ducking system
           };
           
           happybdayAudio.play().then(() => {

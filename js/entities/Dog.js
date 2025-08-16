@@ -322,10 +322,6 @@ export class Dog extends GameObject {
         });
       }
       
-      if (bgAudio) {
-        bgAudio.volume = 0;
-      }
-      
       if (specialAudio) {
         specialAudio.currentTime = 0;
         specialAudio.play().then(() => {
@@ -334,10 +330,9 @@ export class Dog extends GameObject {
           ErrorHandler.handleError(e, `Dog.activate(${this.name})`);
         });
         
+        // Background music ducking/restoration handled by AudioManager
         specialAudio.onended = () => {
-          if (this.state === 'jump' && bgAudio) {
-            bgAudio.volume = 0.6;
-          }
+          // Audio restoration handled by AudioManager ducking system
         };
       }
     } else if (this.name === 'Nolan') {
@@ -377,9 +372,7 @@ export class Dog extends GameObject {
         specialAudio.currentTime = 0;
       }
       
-      if (bgAudio) {
-        bgAudio.volume = 0.6;
-      }
+      // Background music restoration handled by AudioManager ducking system
       
       // Start reverse animation
       if (this.useFrameAnimation) {
@@ -403,9 +396,7 @@ export class Dog extends GameObject {
         specialAudio.currentTime = 0;
       }
       
-      if (bgAudio) {
-        bgAudio.volume = 0.6;
-      }
+      // Background music restoration handled by AudioManager ducking system
     } else if (this.name === 'Nolan') {
       // Nolan stays on frame 1 when player moves away - no animation changes
       // Only reset barked if not eating/dying
