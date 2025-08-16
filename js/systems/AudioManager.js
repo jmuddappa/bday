@@ -343,27 +343,45 @@ export class AudioManager {
   }
 
   /**
-   * Duck background music volume (reduce by 80%)
-   * NOTE: Background music is now managed by jukebox system - this method is disabled
+   * Duck background music volume (reduce to 60%)
    */
   duckBackgroundMusic() {
-    console.log(`🎵 [DEBUG] duckBackgroundMusic called - DISABLED (jukebox manages all music now)`);
-    
-    // Do nothing - jukebox system manages background music now
-    // This prevents the old system from interfering with jukebox-managed audio
-    return;
+    try {
+      const bgMusic = this.audioElements.get('bgMusic');
+      if (bgMusic && !bgMusic.paused) {
+        // Store original volume if not already stored
+        if (!bgMusic.dataset.originalVolume) {
+          bgMusic.dataset.originalVolume = bgMusic.volume;
+        }
+        
+        // Reduce to 60% of current volume
+        const duckedVolume = bgMusic.volume * 0.6;
+        bgMusic.volume = duckedVolume;
+        console.log(`🎵 Background music ducked to 60%: ${Math.round(duckedVolume * 100)}%`);
+      }
+    } catch (error) {
+      ErrorHandler.handleError(error, 'AudioManager.duckBackgroundMusic');
+    }
   }
 
   /**
    * Restore background music to original volume
-   * NOTE: Background music is now managed by jukebox system - this method is disabled
    */
   restoreBackgroundMusic() {
-    console.log(`🎵 [DEBUG] restoreBackgroundMusic called - DISABLED (jukebox manages all music now)`);
-    
-    // Do nothing - jukebox system manages background music now
-    // This prevents the old system from interfering with jukebox-managed audio
-    return;
+    try {
+      const bgMusic = this.audioElements.get('bgMusic');
+      if (bgMusic && !bgMusic.paused) {
+        // Restore from stored original volume
+        const originalVolume = parseFloat(bgMusic.dataset.originalVolume) || this.originalBgVolume;
+        bgMusic.volume = originalVolume;
+        console.log(`🎵 Background music restored to: ${Math.round(originalVolume * 100)}%`);
+        
+        // Clear stored volume
+        delete bgMusic.dataset.originalVolume;
+      }
+    } catch (error) {
+      ErrorHandler.handleError(error, 'AudioManager.restoreBackgroundMusic');
+    }
   }
 
   /**

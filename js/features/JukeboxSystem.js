@@ -617,15 +617,11 @@ export class JukeboxSystem {
       this.videoPlayer.volume = volume;
     }
     
-    // Also set background music volume (when it's playing through jukebox)
+    // Also set background music volume (always control bg music when it's playing)
     const bgMusic = this.audioManager.getAudio('bgMusic');
-    if (bgMusic && !bgMusic.paused && this.currentVideoIndex >= 0) {
-      const currentTrack = this.videos[this.currentVideoIndex];
-      if (currentTrack && currentTrack.isBgMusic) {
-        // Only adjust bg music volume if it's currently the active track
-        bgMusic.volume = volume;
-        console.log(`🎵 Background music volume set to: ${Math.round(volume * 100)}%`);
-      }
+    if (bgMusic && !bgMusic.paused) {
+      bgMusic.volume = volume;
+      console.log(`🎵 Background music volume set to: ${Math.round(volume * 100)}%`);
     }
     
     console.log(`🎵 Volume set to: ${Math.round(volume * 100)}%`);
