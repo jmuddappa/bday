@@ -349,15 +349,19 @@ export class AudioManager {
     try {
       const bgMusic = this.audioElements.get('bgMusic');
       if (bgMusic && !bgMusic.paused) {
-        // Store original volume if not already stored
+        // Get the jukebox volume slider value as source of truth
+        const volumeSlider = document.getElementById('volumeSlider');
+        const userVolume = volumeSlider ? (volumeSlider.value / 100) : bgMusic.volume;
+        
+        // Store original user volume if not already stored
         if (!bgMusic.dataset.originalVolume) {
-          bgMusic.dataset.originalVolume = bgMusic.volume;
+          bgMusic.dataset.originalVolume = userVolume;
         }
         
-        // Reduce to 60% of current volume
-        const duckedVolume = bgMusic.volume * 0.6;
+        // Reduce to 60% of user's set volume
+        const duckedVolume = userVolume * 0.6;
         bgMusic.volume = duckedVolume;
-        console.log(`🎵 Background music ducked to 60%: ${Math.round(duckedVolume * 100)}%`);
+        console.log(`🎵 Background music ducked to 60% of user volume (${Math.round(userVolume * 100)}%): ${Math.round(duckedVolume * 100)}%`);
       }
     } catch (error) {
       ErrorHandler.handleError(error, 'AudioManager.duckBackgroundMusic');
@@ -371,10 +375,10 @@ export class AudioManager {
     try {
       const bgMusic = this.audioElements.get('bgMusic');
       if (bgMusic && !bgMusic.paused) {
-        // Restore from stored original volume
+        // Restore from stored original user volume
         const originalVolume = parseFloat(bgMusic.dataset.originalVolume) || this.originalBgVolume;
         bgMusic.volume = originalVolume;
-        console.log(`🎵 Background music restored to: ${Math.round(originalVolume * 100)}%`);
+        console.log(`🎵 Background music restored to user volume: ${Math.round(originalVolume * 100)}%`);
         
         // Clear stored volume
         delete bgMusic.dataset.originalVolume;

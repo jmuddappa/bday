@@ -65,9 +65,15 @@ export class JukeboxSystem {
     
     // Setup volume control
     if (this.volumeSlider) {
-      this.volumeSlider.addEventListener('input', (e) => {
+      const handleVolumeChange = (e) => {
         this.setVolume(e.target.value / 100);
-      });
+      };
+      
+      // Listen for multiple events to ensure mobile compatibility
+      this.volumeSlider.addEventListener('input', handleVolumeChange);
+      this.volumeSlider.addEventListener('change', handleVolumeChange);
+      this.volumeSlider.addEventListener('touchend', handleVolumeChange);
+      this.volumeSlider.addEventListener('mouseup', handleVolumeChange);
     }
     
     // Setup play/pause button
@@ -608,23 +614,18 @@ export class JukeboxSystem {
    */
 
   /**
-   * Set volume for video playback and background music
+   * Set volume for background music only
    * @param {number} volume - Volume level (0-1)
    */
   setVolume(volume) {
-    // Set video player volume
-    if (this.videoPlayer) {
-      this.videoPlayer.volume = volume;
-    }
-    
-    // Also set background music volume (always control bg music when it's playing)
+    // Only set background music volume - videos should keep their own volume
     const bgMusic = this.audioManager.getAudio('bgMusic');
-    if (bgMusic && !bgMusic.paused) {
+    if (bgMusic) {
       bgMusic.volume = volume;
       console.log(`🎵 Background music volume set to: ${Math.round(volume * 100)}%`);
     }
     
-    console.log(`🎵 Volume set to: ${Math.round(volume * 100)}%`);
+    console.log(`🎵 Jukebox volume control set to: ${Math.round(volume * 100)}%`);
   }
 
   /**
