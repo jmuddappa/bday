@@ -209,19 +209,10 @@ export class JukeboxSystem {
     
     // Monitor when ANY video ends
     this.videoPlayer.addEventListener('ended', () => {
-      console.log('🎵 Video ended - auto-switching to background music');
+      console.log('🎵 Video ended - NOT auto-resuming music (prevents mobile issues)');
       this.isUserPaused = false; // Reset user pause flag when video ends naturally
       this.clearPauseTimer(); // Clear any pause timer
-      // Check if this was a jukebox video or external video
-      if (this.currentVideoIndex >= 0 && !this.videos[this.currentVideoIndex]?.isBgMusic) {
-        // Was a jukebox song - auto-play background music
-        this.autoPlayBackgroundMusic();
-      } else {
-        // External video (mail, direct) - auto-resume background music after short delay
-        setTimeout(() => {
-          this.autoPlayBackgroundMusic();
-        }, 1000); // 1 second delay before resuming
-      }
+      // Don't auto-resume music - let user manually control or wait for silence detection
     });
   }
 
@@ -450,13 +441,12 @@ export class JukeboxSystem {
       // Show video modal with flex display for centering
       this.videoModal.style.display = 'flex';
       
-      // Setup video end handler to auto-play background music
+      // Setup video end handler - don't auto-resume music
       this.videoPlayer.onended = () => {
         this.clearPauseTimer(); // Clear any pause timer since video ended
-        console.log('🎵 Jukebox video ended - auto-switching to background music');
+        console.log('🎵 Jukebox video ended - NOT auto-resuming music (prevents issues)');
         
-        // Auto-play background music through jukebox system
-        this.autoPlayBackgroundMusic();
+        // Don't auto-resume music - let user manually control
       };
       
       // Auto-play when ready with a small delay to avoid conflicts
